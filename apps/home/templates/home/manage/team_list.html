@@ -39,7 +39,7 @@
    {% if sortable %}<div class="client-admin-card__drag" draggable="true" title="Перетащить карточку"><span>⠿</span><small>Перетащить</small></div>{% endif %}
    <div class="client-admin-card__image">
     {% if member.image %}<img src="{{ member.image.url }}" alt="{{ member.name }}">
-    {% elif member.legacy_image %}<img src="{% static member.legacy_image %}" alt="{{ member.name }}">
+
     {% else %}<span class="client-admin-card__placeholder">Нет фото</span>{% endif %}
    </div>
    <div class="client-admin-card__body">

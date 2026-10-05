@@ -12,7 +12,7 @@
   {% if form.non_field_errors %}<div class="client-form__errors">{{ form.non_field_errors }}</div>{% endif %}
   <div class="client-form__field">{{ form.name.label_tag }}{{ form.name }}{{ form.name.errors }}</div>
   <div class="client-form__field">{{ form.position.label_tag }}{{ form.position }}{{ form.position.errors }}</div>
-  {% if member and member.has_image %}<div class="client-form__current"><span>Текущее фото</span>{% if member.image %}<img src="{{ member.image.url }}" alt="{{ member.name }}">{% elif member.legacy_image %}<img src="{% static member.legacy_image %}" alt="{{ member.name }}">{% endif %}</div>{% endif %}
+  {% if member and member.has_image %}<div class="client-form__current"><span>Текущее фото</span>{% if member.image %}<img src="{{ member.image.url }}" alt="{{ member.name }}">{% endif %}</div>{% endif %}
   <div class="client-form__field">{{ form.image.label_tag }}{{ form.image }}{{ form.image.errors }}<small>Для старых сотрудников текущее фото можно не менять.</small></div>
   <div class="client-form__field">{{ form.sort_order.label_tag }}{{ form.sort_order }}{{ form.sort_order.errors }}{% if form.sort_order.help_text %}<small>{{ form.sort_order.help_text }}</small>{% endif %}</div>
   <label class="client-form__check">{{ form.is_published }} <span>{{ form.is_published.label }}</span></label>
