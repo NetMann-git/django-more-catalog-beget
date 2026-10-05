@@ -56,9 +56,11 @@
         {% endif %}
     {% endblock %}
     {% block extra_css %}{% endblock %}
+    {% block catalog_card_css %}
     {% if request.resolver_match.url_name != 'catalog' and request.resolver_match.url_name != 'home' %}
         <link rel="stylesheet" href="{% static 'products/css/catalog/_catalog-car-card.css' %}">
     {% endif %}
+    {% endblock %}
     <link rel="stylesheet" href="{% static 'css/cookie-preferences.css' %}">
     <link rel="stylesheet" href="{% static 'css/scroll-to-top.css' %}">
 </head>
@@ -110,6 +112,7 @@
     <button type="button" class="scroll-to-top" aria-label="Наверх" title="Наверх" hidden>↑</button>
     <script src="{% static 'js/scroll-to-top.js' %}" defer></script>
 
+    {% block appointment_modal %}
     <div id="appointment-modal" class="modal" style="display:none;">
         <div class="modal-content">
             <span class="modal-close">&times;</span>
@@ -118,6 +121,8 @@
             </div>
         </div>
     </div>
+
+    {% endblock %}
 
     {% block global_js %}
         <script src="{% static 'js/config.js' %}"></script>

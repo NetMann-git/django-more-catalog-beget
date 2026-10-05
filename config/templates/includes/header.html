@@ -9,8 +9,8 @@
 
         <nav class="main-nav" aria-label="Основная навигация">
             <a href="{% url 'home' %}" class="nav-link">Главная</a>
-            {% if request.resolver_match.url_name == 'home' %}
-            <a href="#housing-catalog" class="nav-link">О каталоге жилья</a>
+            {% if request.resolver_match.url_name == 'home' or hide_catalog_navigation %}
+            <a href="{% url 'home' %}#housing-catalog" class="nav-link">О каталоге жилья</a>
             {% else %}
             <a href="{% url 'catalog:catalog' %}" class="nav-link{% if request.resolver_match.namespace == 'catalog' %} is-active{% endif %}">Каталог</a>
             <a href="{% url 'catalog:comparison' %}" class="nav-link">Сравнение <span class="badge-count" id="comparison-count">{{ comparison_ids|length }}</span></a>
@@ -29,7 +29,7 @@
         </nav>
 
         <div class="header-actions">
-            {% if request.resolver_match.url_name != 'home' %}
+            {% if request.resolver_match.url_name != 'home' and not hide_catalog_navigation %}
             <div id="search-container" class="header-search">
                 <input type="text" id="search-input" placeholder="Поиск по каталогу..." autocomplete="off" aria-label="Поиск по каталогу">
                 <div id="search-results" class="search-results" style="display:none;"></div>
@@ -44,8 +44,8 @@
 
     <nav class="mobile-nav" aria-label="Мобильная навигация" data-mobile-nav>
         <a href="{% url 'home' %}" class="nav-link">Главная</a>
-        {% if request.resolver_match.url_name == 'home' %}
-        <a href="#housing-catalog" class="nav-link">О каталоге жилья</a>
+        {% if request.resolver_match.url_name == 'home' or hide_catalog_navigation %}
+        <a href="{% url 'home' %}#housing-catalog" class="nav-link">О каталоге жилья</a>
         {% else %}
         <a href="{% url 'catalog:catalog' %}" class="nav-link">Каталог</a>
         <a href="{% url 'catalog:comparison' %}" class="nav-link">Сравнение <span class="badge-count" data-comparison-count>{{ comparison_ids|length }}</span></a>

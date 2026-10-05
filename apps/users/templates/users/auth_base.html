@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{# Общая оболочка входа, регистрации и восстановления пароля. #}
+{% block global_css %}
+<link rel="stylesheet" href="{% static 'css/fonts.css' %}">
+<link rel="stylesheet" href="{% static 'css/core/variables.css' %}">
+<link rel="stylesheet" href="{% static 'css/core/components.css' %}">
+<link rel="stylesheet" href="{% static 'users/css/auth-shell.css' %}">
+<link rel="stylesheet" href="{% static 'css/header.css' %}">
+<link rel="stylesheet" href="{% static 'css/footer-legal.css' %}">
+{% endblock %}
+{% block body_class %}sea-auth{% endblock %}
+{% block body_theme_class %}{% endblock %}
+{% block site_header %}
+{% include 'includes/header.html' with hide_catalog_navigation=True %}
+{% endblock %}
+{% block catalog_card_css %}{% endblock %}
+{% block appointment_modal %}{% endblock %}
+{% block global_js %}
+<script src="{% static 'js/site-header.js' %}"></script>
+{% endblock %}
+{% block extra_js %}{% endblock %}

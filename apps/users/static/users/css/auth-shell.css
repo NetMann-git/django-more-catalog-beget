@@ -1,0 +1,20 @@
+/* Цвета и шапка страниц авторизации каталога отдыха. */
+body.sea-auth {
+    --color-primary: #165c57;
+    --color-primary-light: #247d73;
+    --color-primary-dark: #104641;
+    --color-primary-bg: #e6f5ee;
+    --font-display: system-ui, sans-serif;
+    background: #f7faf9;
+}
+.sea-auth .site-header {
+    --header-bg: #123c46;
+    --header-accent: #8fd8ca;
+}
+.sea-auth .header-inner { grid-template-columns: auto 1fr; }
+.sea-auth .main-nav { justify-content: flex-end; }
+.sea-auth .header-actions { display: none; }
+.sea-auth .logo { text-transform: none; letter-spacing: 0; }
+@media (max-width: 900px) {
+    .sea-auth .header-actions { display: flex; justify-content: flex-end; }
+}
