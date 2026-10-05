@@ -1,10 +1,9 @@
-# apps/home/views.py
+"""Главная страница каталога отдыха «Дикарь-Сочи»."""
 
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
-from .context import HomeContextBuilder
 
-
-def home(request):
-    context = HomeContextBuilder.build(request)
-    return render(request, "home/home.html", context)
+def home(request: HttpRequest) -> HttpResponse:
+    """Показать заготовку главной без выборки автомобильных данных."""
+    return render(request, "home/home.html")

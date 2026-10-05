@@ -2,22 +2,21 @@
 {% load static %}
 <header class="site-header" data-site-header>
     <div class="header-inner">
-        <div class="logo">
-            <a href="{% url 'home' %}">
-             <img alt="Подберем АВТО - автомобили под заказ из Южной Кореи и Китая полный цикл услуг" class="logo-image-phone d-inline-block d-lg-none" decoding="async" src="{% static 'home/images/logo.png' %}"/>
-            </a>
-        </div>
-        <!-- <a href="{% url 'home' %}" class="logo" aria-label="Подберем АВТО — на главную">
-            <span>Подберем АВТО</span>
-            <small>Автомобили из Кореи и Китая</small>
-        </a> -->
+        <a href="{% url 'home' %}" class="logo" aria-label="Дикарь-Сочи — на главную">
+            <span>Дикарь-Сочи</span>
+            <small>Жильё для отдыха у моря</small>
+        </a>
 
         <nav class="main-nav" aria-label="Основная навигация">
             <a href="{% url 'home' %}" class="nav-link">Главная</a>
+            {% if request.resolver_match.url_name == 'home' %}
+            <a href="#housing-catalog" class="nav-link">О каталоге жилья</a>
+            {% else %}
             <a href="{% url 'catalog:catalog' %}" class="nav-link{% if request.resolver_match.namespace == 'catalog' %} is-active{% endif %}">Каталог</a>
             <a href="{% url 'catalog:comparison' %}" class="nav-link">Сравнение <span class="badge-count" id="comparison-count">{{ comparison_ids|length }}</span></a>
             <a href="{% url 'wishlist:list' %}" class="nav-link">Избранное <span class="badge-count" id="wishlist-count">{{ wishlist_count }}</span></a>
             <a href="{% url 'catalog:recently_viewed' %}" class="nav-link">История <span class="badge-count" id="recently-viewed-count">{{ recently_viewed_ids|length }}</span></a>
+            {% endif %}
             {% if user.is_authenticated %}
             <a href="{% url 'users:dashboard' %}" class="nav-link">Личный кабинет</a>
             <form action="{% url 'users:logout' %}" method="post" class="header-logout-form">
@@ -30,11 +29,13 @@
         </nav>
 
         <div class="header-actions">
+            {% if request.resolver_match.url_name != 'home' %}
             <div id="search-container" class="header-search">
                 <input type="text" id="search-input" placeholder="Поиск по каталогу..." autocomplete="off" aria-label="Поиск по каталогу">
                 <div id="search-results" class="search-results" style="display:none;"></div>
             </div>
 
+            {% endif %}
             <button type="button" class="mobile-menu-toggle" aria-label="Открыть меню" aria-expanded="false" data-mobile-menu-toggle>
                 <span></span>
             </button>
@@ -43,10 +44,14 @@
 
     <nav class="mobile-nav" aria-label="Мобильная навигация" data-mobile-nav>
         <a href="{% url 'home' %}" class="nav-link">Главная</a>
+        {% if request.resolver_match.url_name == 'home' %}
+        <a href="#housing-catalog" class="nav-link">О каталоге жилья</a>
+        {% else %}
         <a href="{% url 'catalog:catalog' %}" class="nav-link">Каталог</a>
         <a href="{% url 'catalog:comparison' %}" class="nav-link">Сравнение <span class="badge-count" data-comparison-count>{{ comparison_ids|length }}</span></a>
         <a href="{% url 'wishlist:list' %}" class="nav-link">Избранное <span class="badge-count" data-wishlist-count>{{ wishlist_count }}</span></a>
         <a href="{% url 'catalog:recently_viewed' %}" class="nav-link">История <span class="badge-count" data-recently-viewed-count>{{ recently_viewed_ids|length }}</span></a>
+        {% endif %}
         {% if user.is_authenticated %}
         <a href="{% url 'users:dashboard' %}" class="nav-link">Личный кабинет</a>
         <form action="{% url 'users:logout' %}" method="post" class="header-logout-form">

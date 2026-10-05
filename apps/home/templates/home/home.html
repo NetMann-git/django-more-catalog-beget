@@ -1,114 +1,41 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Подбор и доставка авто из Кореи и Китая под ключ в любой регион. Полный цикл, минимальная комиссия, юридическое сопровождение{% endblock %}
-
-{% block body_class %}com-sppagebuilder ltr offcanvas-init offcanvs-position-right preset-white{% endblock %}
+{% block title %}Дикарь-Сочи — жильё для отдыха у моря{% endblock %}
+{% block title_suffix %}{% endblock %}
+{% block body_class %}sea-home{% endblock %}
 {% block body_theme_class %}{% endblock %}
-
 {% block global_css %}
-            <link href="{% static 'home/css/v78/home.bundle.css' %}" rel="stylesheet">
-            <link href="{% static 'home/css/home-header.css' %}" rel="stylesheet">
-            <link href="{% static 'home/css/home-hero.css' %}" rel="stylesheet">
-            <link href="{% static 'home/css/home-catalog.css' %}" rel="stylesheet">
-    <link href="{% static 'home/css/home-full-cycle.css' %}" rel="stylesheet">
-            <link href="{% static 'home/css/home-clients.css' %}" rel="stylesheet">
-            <link href="{% static 'home/css/home-reviews.css' %}" rel="stylesheet">
-            <link href="{% static 'home/css/home-callback.css' %}" rel="stylesheet">
-            <link href="{% static 'home/css/home-team.css' %}" rel="stylesheet">
-            <link href="{% static 'home/css/home-contacts.css' %}" rel="stylesheet">
-            <link href="{% static 'css/footer-legal.css' %}" rel="stylesheet">
-    <link href="{% static 'home/css/home-about.css' %}" rel="stylesheet">
-    <link href="{% static 'home/css/home-advantages.css' %}" rel="stylesheet">
-    <link href="{% static 'home/css/home-process.css' %}" rel="stylesheet">
-    <link href="{% static 'home/css/home-inspection.css' %}" rel="stylesheet">
-    <link href="{% static 'home/css/home-delivery.css' %}" rel="stylesheet">
-    <link href="{% static 'home/css/home-china.css' %}" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/header.css' %}">
+<link rel="stylesheet" href="{% static 'css/footer-legal.css' %}">
+<link rel="stylesheet" href="{% static 'home/css/sea-home.css' %}">
 {% endblock %}
+{% block extra_js %}{% endblock %}
 
-{% block site_shell %}
-<div class="body-wrapper">
-<div class="body-innerwrapper">
-{% block site_header %}{% include 'home/includes/v78_header.html' %}{% endblock %}
-{% if messages %}
-<div class="messages">
-{% for message in messages %}<div class="alert alert-{{ message.tags }}">{{ message }}</div>{% endfor %}
-</div>
-{% endif %}
-<section id="sp-main-body">
- <div class="row">
-  <div class="col-lg-12" id="sp-component">
-   <div class="sp-column">
-    <div class="sp-page-builder page-130" id="sp-page-builder">
-     <div class="page-content builder-container">
-      {% include 'home/sections/hero.html' %}
-      {% include 'home/sections/lead_form.html' %}
-      {% include 'home/sections/about.html' %}
-      {% include 'home/sections/brands.html' %}
-      {% include 'home/sections/catalog.html' %}
-      {% include 'home/sections/full_cycle.html' %}
-      {% include 'home/sections/advantages.html' %}
-      {% include 'home/sections/process.html' %}
-      {% include 'home/sections/inspection.html' %}
-      {% include 'home/sections/delivery.html' %}
-      {% include 'home/sections/china.html' %}
-      {% include 'home/sections/team.html' %}
-      {% include 'home/sections/clients.html' %}
-      {% include 'home/sections/reviews.html' %}
-      {% include 'home/sections/contacts.html' %}
-     </div>
+{% block content %}
+<main id="main-content" class="sea-home__main">
+  {# Заготовка первого экрана без фотографий и видео старого сайта. #}
+  <section class="sea-home__hero" aria-labelledby="sea-home-title">
+    <div class="sea-home__container">
+      <p class="sea-home__eyebrow">ДИКАРЬ-СОЧИ · ОТДЫХ У МОРЯ</p>
+      <h1 id="sea-home-title">Ваше место<br>для отдыха у моря</h1>
+      <p class="sea-home__intro">Гостевые дома, квартиры и мини-гостиницы в Сочи и на побережье. Выбирайте место, где хочется провести отпуск.</p>
+      <a class="sea-home__button" href="#housing-catalog">О каталоге жилья <span aria-hidden="true">↓</span></a>
+      <div class="sea-home__destinations" aria-label="Направления отдыха">
+        <span>Адлер</span><span>Хоста</span><span>Сочи</span><span>Лазаревское</span>
+      </div>
     </div>
-   </div>
-  </div>
- </div>
-</section>
-
-{% block site_footer %}{% include 'home/includes/v78_footer.html' %}{% endblock %}
-</div>
-</div>
-{% include 'home/includes/v78_offcanvas.html' %}
-{% endblock %}
-
-{% block global_js %}
-    <script src="{% static 'home/js/v78/home.bundle.js' %}"></script>
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'home/js/home-callback.js' %}" defer></script>
-<script src="{% static 'home/js/home-inspection.js' %}" defer></script>
-<script>
-(function () {
-    function loadHeroVideo() {
-        var video = document.querySelector('.sppb-section-background-video video.section-bg-video');
-        if (!video || video.dataset.sourcesLoaded === '1') {
-            return;
-        }
-
-        video.querySelectorAll('source[data-src]').forEach(function (source) {
-            source.src = source.dataset.src;
-            source.removeAttribute('data-src');
-        });
-
-        video.dataset.sourcesLoaded = '1';
-        video.load();
-
-        var playPromise = video.play();
-        if (playPromise && typeof playPromise.catch === 'function') {
-            playPromise.catch(function () {});
-        }
-    }
-
-    function scheduleHeroVideo() {
-        requestAnimationFrame(function () {
-            requestAnimationFrame(loadHeroVideo);
-        });
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', scheduleHeroVideo, { once: true });
-    } else {
-        scheduleHeroVideo();
-    }
-})();
-</script>
+  </section>
+  {# Здесь появится выдача объектов после подключения приложения housing. #}
+  <section id="housing-catalog" class="sea-home__catalog sea-home__container" aria-labelledby="housing-catalog-title">
+    <p class="sea-home__eyebrow">КАТАЛОГ ЖИЛЬЯ</p>
+    <h2 id="housing-catalog-title">Выбирайте отдых под себя</h2>
+    <p class="sea-home__muted">Готовим новый каталог. Здесь появятся фотографии, условия проживания, цены и отзывы.</p>
+    <div class="sea-home__grid">
+      <article class="sea-home__card"><span class="sea-home__number">01</span><h3>Гостевые дома</h3><p>Для спокойного отдыха и знакомства с побережьем.</p></article>
+      <article class="sea-home__card"><span class="sea-home__number">02</span><h3>Квартиры</h3><p>Больше самостоятельности и привычного домашнего комфорта.</p></article>
+      <article class="sea-home__card"><span class="sea-home__number">03</span><h3>Мини-гостиницы</h3><p>Удобный формат для короткой поездки или отпуска.</p></article>
+    </div>
+  </section>
+</main>
 {% endblock %}
