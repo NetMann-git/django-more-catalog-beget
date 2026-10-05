@@ -8,3 +8,4 @@ from .product_gallery import ProductGalleryImage  # ← новая модель 
 from .attribute_type import AttributeType  # ← типы характеристик
 from .attribute_value import AttributeValue  # ← значение характеристик
 from .brand import Brand  # ← Бренды
+from .location import Location  # География каталога жилья.

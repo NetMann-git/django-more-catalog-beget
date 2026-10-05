@@ -13,6 +13,7 @@ from .models import (
     ProductAttribute,
     Badge,
     Category,
+    Location,
 )
 
 
@@ -94,9 +95,22 @@ class CategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("title",)}
 
 
+@admin.register(Location)
+class LocationAdmin(admin.ModelAdmin):
+    """Управление географией без изменения типов жилья и характеристик."""
+
+    list_display = ("name", "parent", "slug")
+    search_fields = ("name", "slug", "parent__name")
+    prepopulated_fields = {"slug": ("name",)}
+    autocomplete_fields = ("parent",)
+    list_select_related = ("parent",)
+
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     save_on_top = True
+    autocomplete_fields = ("location",)
+    list_select_related = ("category", "brand", "location")
 
     def save_related(self, request, form, formsets, change):
         """Invalidate cached attributes after all inline values are saved."""
@@ -106,6 +120,7 @@ class ProductAdmin(admin.ModelAdmin):
         "title",
         "article",
         "category",
+        "location",
         "formatted_price",
         "availability_status",
         "is_featured",
@@ -119,6 +134,7 @@ class ProductAdmin(admin.ModelAdmin):
 
     list_filter = (
         "category",
+        "location",
         "brand",
         "availability_status",
         "is_featured",
@@ -127,6 +143,7 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = (
         "title",
         "article",
+        "location__name",
         "short_description",
         "description",
     )
@@ -143,6 +160,7 @@ class ProductAdmin(admin.ModelAdmin):
                     "slug",
                     "article",
                     "category",
+                    "location",
                     "brand",
                     "image",
                 )

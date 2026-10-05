@@ -57,6 +57,16 @@ class Product(models.Model):
         verbose_name="Тип товара"
     )
 
+    # Необязательная связь сохраняет совместимость существующих записей.
+    location = models.ForeignKey(
+        "products.Location",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="products",
+        verbose_name="Локация",
+    )
+
     # Цена
     price = models.DecimalField(
         max_digits=10,
