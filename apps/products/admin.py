@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from easy_thumbnails.files import get_thumbnailer
 from .product_attribute_forms import ProductAttributeForm
+from .attribute_formsets import ProductAttributeFormSet
 from .cache import CatalogCache
 from .templatetags.price_format import price_format
 
@@ -57,7 +58,7 @@ class AttributeValueInline(admin.TabularInline):
 
 @admin.register(AttributeType)
 class AttributeTypeAdmin(admin.ModelAdmin):
-    list_display = ("name", "slug", "data_type")
+    list_display = ("name", "slug", "data_type", "allow_multiple")
     prepopulated_fields = {"slug": ("name",)}
     inlines = [AttributeValueInline]
 
@@ -78,6 +79,7 @@ class ProductGalleryInline(admin.TabularInline):
 class ProductAttributeInline(admin.TabularInline):
     model = ProductAttribute
     form = ProductAttributeForm
+    formset = ProductAttributeFormSet
     extra = 1
     fields = ("attribute_type", "attribute_value", "free_value", "sort_order")
     ordering = ("sort_order",)

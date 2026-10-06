@@ -65,10 +65,10 @@ class LocationTests(TestCase):
         ProductAttribute.objects.create(
             product=product, attribute_type=kind, attribute_value=wifi
         )
-        with self.assertRaises(IntegrityError), transaction.atomic():
-            ProductAttribute.objects.create(
+        with self.assertRaises(ValidationError):
+            ProductAttribute(
                 product=product, attribute_type=kind, attribute_value=pool
-            )
+            ).full_clean()
 
 
 class LocationMigrationTests(TransactionTestCase):
