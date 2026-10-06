@@ -6,16 +6,31 @@
 <link rel="stylesheet" href="{% static 'products/css/attributes.css' %}">
 <link rel="stylesheet" href="{% static 'products/css/manage.css' %}">
 <link rel="stylesheet" href="{% static 'products/css/attribute-editor.css' %}">
+<link rel="stylesheet" href="{% static 'products/css/multiple-attributes.css' %}">
 {% endblock %}
 {% block content %}
 <div class="attributes-container attribute-editor">
     <h1>Характеристики товара</h1>
-    <p class="subtitle">Автомобиль: <strong>{{ product.title }}</strong></p>
+    <p class="subtitle">Объект: <strong>{{ product.title }}</strong></p>
     <p>Редактируйте существующие строки или добавляйте новые. Меньшее число в поле «Порядок» выводится раньше.
-        Каждый тип можно указать только один раз: для изменения значения редактируйте существующую строку.
+        Одиночный тип можно указать только один раз: для изменения значения редактируйте существующую строку.
         Чтобы удалить характеристику, отметьте «Удалить» и сохраните изменения.</p>
     <form method="post" id="attribute-editor-form">
         {% csrf_token %}
+        {% if multiple_form.fields %}
+        <section class="multiple-attributes" aria-label="Множественные характеристики">
+            <h2>Множественные характеристики</h2>
+            {{ multiple_form.non_field_errors }}
+            {% for field in multiple_form %}
+            <fieldset class="multiple-attributes__group">
+                <legend>{{ field.label }}</legend>
+                {{ field.errors }}
+                {{ field }}
+                <p>{{ field.help_text }}</p>
+            </fieldset>
+            {% endfor %}
+        </section>
+        {% endif %}
         {{ formset.management_form }}
         {{ formset.non_form_errors }}
         <div class="attribute-editor__scroll">

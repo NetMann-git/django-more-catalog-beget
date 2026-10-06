@@ -4,7 +4,8 @@ from django.contrib import admin
 from django.utils.html import format_html
 from easy_thumbnails.files import get_thumbnailer
 from .product_attribute_forms import ProductAttributeForm
-from .attribute_formsets import ProductAttributeFormSet
+from .attribute_formsets import SingleProductAttributeFormSet
+from .multiple_attribute_forms import build_multiple_form, MultipleProductAdminForm, multiple_types
 from .cache import CatalogCache
 from .templatetags.price_format import price_format
 
@@ -79,7 +80,7 @@ class ProductGalleryInline(admin.TabularInline):
 class ProductAttributeInline(admin.TabularInline):
     model = ProductAttribute
     form = ProductAttributeForm
-    formset = ProductAttributeFormSet
+    formset = SingleProductAttributeFormSet
     extra = 1
     fields = ("attribute_type", "attribute_value", "free_value", "sort_order")
     ordering = ("sort_order",)
@@ -117,6 +118,7 @@ class ProductAdmin(admin.ModelAdmin):
     def save_related(self, request, form, formsets, change):
         """Invalidate cached attributes after all inline values are saved."""
         super().save_related(request, form, formsets, change)
+        form.save_multiple(form.instance)
         CatalogCache.clear_catalog()
     list_display = (
         "title",
@@ -207,6 +209,35 @@ class ProductAdmin(admin.ModelAdmin):
             },
         ),
     )
+
+    class Media:
+        css = {"all": ("products/css/multiple-attributes.css",)}
+
+    def editable_multiple_types(self, request):
+        """Сохранить права на характеристики, действовавшие для инлайна."""
+        permitted = self.has_change_permission(request) and all(
+            request.user.has_perm("products." + action + "_productattribute")
+            for action in ("add", "change", "delete")
+        )
+        return multiple_types() if permitted else []
+
+    def get_form(self, request, obj=None, **kwargs):
+        """Декларативные поля нужны до построения формы админкой."""
+        kwargs["form"] = build_multiple_form(
+            MultipleProductAdminForm, self.editable_multiple_types(request)
+        )
+        return super().get_form(request, obj, **kwargs)
+
+    def get_fieldsets(self, request, obj=None):
+        """Не изменять общий список fieldsets между запросами пользователей."""
+        fieldsets = list(super().get_fieldsets(request, obj))
+        names = tuple(
+            f"multiple_attribute_{kind.pk}"
+            for kind in self.editable_multiple_types(request)
+        )
+        if names:
+            fieldsets.append(("Множественные характеристики", {"fields": names}))
+        return fieldsets
 
     inlines = [
         ProductGalleryInline,

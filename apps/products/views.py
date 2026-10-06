@@ -19,7 +19,8 @@ from django.db.models import Max, Q
 from django.shortcuts import render, redirect, get_object_or_404
 
 from .forms import ProductForm, GalleryImageForm, BrandForm
-from .attribute_formsets import ManagerAttributeFormSet
+from .attribute_formsets import ManagerSingleAttributeFormSet
+from .multiple_attribute_forms import build_multiple_form
 
 from .models import Product, ProductGalleryImage, AttributeType, AttributeValue, ProductAttribute
 
@@ -589,7 +590,7 @@ def product_attributes(request, product_id):
     """Управление характеристиками товара."""
     
     product = get_object_or_404(Product, id=product_id)
-    formset = ManagerAttributeFormSet(
+    formset = ManagerSingleAttributeFormSet(
         request.POST if request.method == 'POST' else None,
         instance=product,
         queryset=product.attributes.select_related(
@@ -597,15 +598,27 @@ def product_attributes(request, product_id):
         ),
         prefix='attributes',
     )
-    if request.method == 'POST' and formset.is_valid():
+    multiple_form = build_multiple_form()(
+        request.POST if request.method == 'POST' else None,
+        product=product, prefix='multiple',
+    )
+    # Обе формы проверяются до любых изменений, чтобы сохранить всё вместе.
+    if request.method == 'POST':
+        single_valid = formset.is_valid()
+        multiple_valid = multiple_form.is_valid()
+    else:
+        single_valid = multiple_valid = False
+    if single_valid and multiple_valid:
         with transaction.atomic():
             formset.save()
+            multiple_form.save_multiple(product)
             transaction.on_commit(CatalogCache.clear_catalog)
         messages.success(request, 'Характеристики сохранены.')
         return redirect('catalog:product_attributes', product_id=product.id)
     return render(request, 'products/product_attributes.html', {
         'product': product,
         'formset': formset,
+        'multiple_form': multiple_form,
     })
 
 

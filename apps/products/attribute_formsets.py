@@ -80,3 +80,28 @@ ManagerAttributeFormSet = inlineformset_factory(
     extra=1,
     can_delete=True,
 )
+
+
+class SingleProductAttributeFormSet(ProductAttributeFormSet):
+    """В строковом редакторе остаются только одиночные типы."""
+
+    def add_fields(self, form, index):
+        """Сохранить общую форму, ограничив её одиночными типами."""
+        super().add_fields(form, index)
+        form.fields["attribute_type"].queryset = form.fields[
+            "attribute_type"
+        ].queryset.filter(allow_multiple=False)
+
+    def get_queryset(self):
+        return super().get_queryset().filter(attribute_type__allow_multiple=False)
+
+
+ManagerSingleAttributeFormSet = inlineformset_factory(
+    Product,
+    ProductAttribute,
+    form=ProductAttributeForm,
+    formset=SingleProductAttributeFormSet,
+    fields=("attribute_type", "attribute_value", "free_value", "sort_order"),
+    extra=1,
+    can_delete=True,
+)

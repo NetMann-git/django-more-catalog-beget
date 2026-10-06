@@ -1,0 +1,8 @@
+/* Флажки характеристик в панели менеджера и стандартной админке. */
+.multiple-attributes { margin-block: 24px; }
+.multiple-attributes__group { padding: 16px; margin-block: 16px; border: 1px solid #bacac5; border-radius: 8px; }
+.multiple-attributes__choices { display: flex; flex-wrap: wrap; gap: 12px 24px; padding: 8px 0; }
+.multiple-attributes__choices label { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+.multiple-attributes__choices input[type="checkbox"] { margin: 0; width: 18px; height: 18px; }
+.multiple-attributes__group legend { font-weight: 600; }
+.multiple-attributes__group p { font-size: .9em; }
