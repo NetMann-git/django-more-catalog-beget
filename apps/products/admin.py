@@ -51,15 +51,32 @@ class BrandAdmin(admin.ModelAdmin):
         )
 
 
-class AttributeValueInline(admin.TabularInline):
+class AttributeIconPreview:
+    @admin.display(description="Предпросмотр")
+    def icon_preview(self, obj):
+        """Показать сохранённую собственную иконку без генерации миниатюры."""
+        if not obj or not obj.icon:
+            return "—"
+        return format_html(
+            '<img src="{}" width="32" height="32" style="object-fit:contain" alt="" />',
+            obj.icon.url,
+        )
+
+
+class AttributeValueInline(AttributeIconPreview, admin.TabularInline):
     model = AttributeValue
     extra = 1
-    fields = ("value", "sort_order")
+    fields = ("value", "icon", "icon_preview", "sort_order")
+    readonly_fields = ("icon_preview",)
     ordering = ("sort_order",)
 
 @admin.register(AttributeType)
-class AttributeTypeAdmin(admin.ModelAdmin):
-    list_display = ("name", "slug", "data_type", "allow_multiple")
+class AttributeTypeAdmin(AttributeIconPreview, admin.ModelAdmin):
+    list_display = ("icon_preview", "name", "slug", "data_type", "allow_multiple")
+    readonly_fields = ("icon_preview",)
+    fields = ("name", "slug", "data_type", "allow_multiple", "icon", "icon_preview")
+    search_fields = ("name", "slug")
+    list_filter = ("data_type", "allow_multiple")
     prepopulated_fields = {"slug": ("name",)}
     inlines = [AttributeValueInline]
 

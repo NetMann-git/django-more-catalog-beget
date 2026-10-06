@@ -1,5 +1,6 @@
 # apps/products/models/attribute_type.py
 from django.core.exceptions import ValidationError
+from apps.products.icon_validators import validate_attribute_icon
 from django.db import models
 from django.db.models import Count
 
@@ -46,6 +47,12 @@ class AttributeType(models.Model):
                         "allow_multiple": "Сначала оставьте одно значение этого типа у каждого объекта."
                     }
                 )
+
+    icon = models.ImageField(
+        "Иконка", upload_to="attributes/types/", blank=True,
+        validators=[validate_attribute_icon],
+        help_text="Необязательно: статический PNG/WebP до 256 × 256 пикселей и 256 КБ.",
+    )
 
     class Meta:
         ordering = ["name"]

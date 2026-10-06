@@ -1,5 +1,6 @@
 # apps/products/models/attribute_value.py
 
+from apps.products.icon_validators import validate_attribute_icon
 from django.db import models
 from .attribute_type import AttributeType
 
@@ -16,6 +17,17 @@ class AttributeValue(models.Model):
         verbose_name="Значение"
     )
     sort_order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
+
+    icon = models.ImageField(
+        "Иконка", upload_to="attributes/values/", blank=True,
+        validators=[validate_attribute_icon],
+        help_text="Необязательно: статический PNG/WebP до 256 × 256 пикселей и 256 КБ.",
+    )
+
+    @property
+    def effective_icon(self):
+        """Использовать иконку значения, затем иконку типа, если она задана."""
+        return self.icon or self.attribute_type.icon
 
     class Meta:
         ordering = ["sort_order", "value"]
