@@ -19,6 +19,7 @@ class AttributeTypeSelect(forms.Select):
         if hasattr(value, 'instance'):
             option['attrs']['data-kind'] = value.instance.data_type
             option['attrs']['data-slug'] = value.instance.slug
+            option['attrs']['data-icon'] = value.instance.icon.url if value.instance.icon else ''
         return option
 
 
@@ -32,6 +33,8 @@ class AttributeValueSelect(forms.Select):
         option = super().create_option(name, value, label, selected, index, **kwargs)
         if hasattr(value, 'instance'):
             option['attrs']['data-owner'] = value.instance.attribute_type_id
+            icon = value.instance.effective_icon
+            option['attrs']['data-icon'] = icon.url if icon else ''
         return option
 
 

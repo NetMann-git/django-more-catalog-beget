@@ -17,7 +17,7 @@ class AttributeTypeForm(AutoSlugMixin, forms.ModelForm):
 
     class Meta:
         model = AttributeType
-        fields = ("name", "slug", "data_type")
+        fields = ("name", "slug", "data_type", "icon")
         widgets = {
             "name": forms.TextInput(attrs={
                 "class": "form-control", "data-slug-source": "true",
@@ -40,7 +40,7 @@ class AttributeValueForm(forms.ModelForm):
 
     class Meta:
         model = AttributeValue
-        fields = ("value", "sort_order")
+        fields = ("value", "sort_order", "icon")
         widgets = {
             "value": forms.TextInput(attrs={"class": "form-control"}),
             "sort_order": forms.NumberInput(attrs={

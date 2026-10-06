@@ -73,6 +73,7 @@ class AttributeValueInline(AttributeIconPreview, admin.TabularInline):
 @admin.register(AttributeType)
 class AttributeTypeAdmin(AttributeIconPreview, admin.ModelAdmin):
     list_display = ("icon_preview", "name", "slug", "data_type", "allow_multiple")
+    list_display_links = ("name",)
     readonly_fields = ("icon_preview",)
     fields = ("name", "slug", "data_type", "allow_multiple", "icon", "icon_preview")
     search_fields = ("name", "slug")

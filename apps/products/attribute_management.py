@@ -27,7 +27,7 @@ def attribute_type_list_manage(request):
 @role_required(ROLE_MANAGER, ROLE_ADMIN)
 def attribute_type_create(request):
     """Создать тип характеристики и перейти к его значениям."""
-    form = AttributeTypeForm(request.POST or None)
+    form = AttributeTypeForm(request.POST if request.method == "POST" else None, request.FILES or None)
     if request.method == "POST" and form.is_valid():
         attribute_type = form.save()
         CatalogCache.clear_catalog()
@@ -42,7 +42,7 @@ def attribute_type_create(request):
 def attribute_type_edit(request, type_id):
     """Редактировать имя и тип данных, не меняя slug."""
     attribute_type = get_object_or_404(AttributeType, pk=type_id)
-    form = AttributeTypeForm(request.POST or None, instance=attribute_type)
+    form = AttributeTypeForm(request.POST if request.method == "POST" else None, request.FILES or None, instance=attribute_type)
     if request.method == "POST" and form.is_valid():
         form.save()
         CatalogCache.clear_catalog()
@@ -51,7 +51,7 @@ def attribute_type_edit(request, type_id):
     return render(request, "products/attribute_type_form.html", {
         "form": form,
         "attribute_type": attribute_type,
-        "values": attribute_type.values.all(),
+        "values": attribute_type.values.select_related("attribute_type"),
         "value_form": AttributeValueForm(attribute_type=attribute_type),
     })
 
@@ -83,7 +83,7 @@ def attribute_value_create(request, type_id):
     """Добавить значение конкретному типу."""
     attribute_type = get_object_or_404(AttributeType, pk=type_id)
     value_form = AttributeValueForm(
-        request.POST, attribute_type=attribute_type,
+        request.POST, request.FILES, attribute_type=attribute_type,
     )
     if value_form.is_valid():
         value = value_form.save(commit=False)
@@ -95,7 +95,7 @@ def attribute_value_create(request, type_id):
     return render(request, "products/attribute_type_form.html", {
         "form": AttributeTypeForm(instance=attribute_type),
         "attribute_type": attribute_type,
-        "values": attribute_type.values.all(),
+        "values": attribute_type.values.select_related("attribute_type"),
         "value_form": value_form,
     }, status=400)
 
@@ -107,7 +107,7 @@ def attribute_value_edit(request, type_id, value_id):
         AttributeValue, pk=value_id, attribute_type_id=type_id,
     )
     form = AttributeValueForm(
-        request.POST or None, attribute_type=value.attribute_type,
+        request.POST if request.method == "POST" else None, request.FILES or None, attribute_type=value.attribute_type,
         instance=value,
     )
     if request.method == "POST" and form.is_valid():

@@ -12,6 +12,27 @@
             if (!choice || !input) return;
             initialized.add(type);
             const options = Array.from(choice.options, option => option.cloneNode(true));
+            // Иконки выбранного типа и значения в обоих редакторах.
+            function addPreview(select) {
+                const image = document.createElement('img');
+                image.width = 24;
+                image.height = 24;
+                image.alt = '';
+                image.style.objectFit = 'contain';
+                select.after(image);
+                return image;
+            }
+            const typeIcon = addPreview(type);
+            const valueIcon = addPreview(choice);
+            function updateIcons() {
+                [[type, typeIcon], [choice, valueIcon]].forEach(([select, image]) => {
+                    const url = select.selectedOptions[0]?.dataset.icon;
+                    image.hidden = !url || select.disabled;
+                    if (url) image.src = url;
+                    else image.removeAttribute('src');
+                });
+            }
+            choice.addEventListener('change', updateIcons);
             function update() {
                 const option = type.selectedOptions[0];
                 const kind = option ? option.dataset.kind : '';
@@ -33,6 +54,7 @@
                     input.step = mileage ? '1' : 'any';
                     if (mileage) input.min = '0';
                 }
+                updateIcons();
                 const choiceContainer = row.querySelector('[data-attribute-choice-container]');
                 const inputContainer = row.querySelector('[data-attribute-input-container]');
                 (choiceContainer || choice).hidden = !isChoice;

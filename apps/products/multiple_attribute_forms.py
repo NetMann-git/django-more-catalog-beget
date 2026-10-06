@@ -2,6 +2,7 @@
 
 from django import forms
 from django.db import transaction
+from django.utils.html import format_html
 
 from .models import AttributeType, AttributeValue, Product, ProductAttribute
 
@@ -58,6 +59,22 @@ class MultipleProductAdminForm(MultipleAttributeMixin, forms.ModelForm):
         fields = "__all__"
 
 
+def icon_label(text, icon):
+    """Сохранить текст подписи и безопасно добавить необязательную иконку."""
+    if not icon:
+        return text
+    return format_html(
+        '<img src="{}" width="24" height="24" style="object-fit:contain;vertical-align:middle" alt=""> {}',
+        icon.url, text,
+    )
+
+
+class IconMultipleChoiceField(forms.ModelMultipleChoiceField):
+    def label_from_instance(self, obj):
+        """Использовать иконку значения с резервной иконкой типа."""
+        return icon_label(obj.value, obj.effective_icon)
+
+
 def multiple_types():
     """Показывать только типы со включённым множественным выбором."""
     return list(AttributeType.objects.filter(allow_multiple=True, data_type="choice"))
@@ -68,9 +85,9 @@ def build_multiple_form(base=MultipleAttributeForm, kinds=None):
     kinds = multiple_types() if kinds is None else kinds
     attributes = {"multiple_types": tuple(kinds), "__module__": __name__}
     for kind in kinds:
-        attributes[f"multiple_attribute_{kind.pk}"] = forms.ModelMultipleChoiceField(
-            queryset=AttributeValue.objects.filter(attribute_type=kind),
-            label=kind.name,
+        attributes[f"multiple_attribute_{kind.pk}"] = IconMultipleChoiceField(
+            queryset=AttributeValue.objects.filter(attribute_type=kind).select_related("attribute_type"),
+            label=icon_label(kind.name, kind.icon),
             required=False,
             widget=forms.CheckboxSelectMultiple(
                 attrs={"class": "multiple-attributes__choices"}
