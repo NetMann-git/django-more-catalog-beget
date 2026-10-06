@@ -113,7 +113,7 @@ class Product(models.Model):
         null=True,
         blank=True,
         related_name="products",
-        verbose_name="Бренд",
+        verbose_name="Тип жилья",
     )
 
     meta_title = models.CharField(

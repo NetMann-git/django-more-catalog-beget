@@ -10,7 +10,7 @@ class Brand(models.Model):
         upload_to="brands/",
         blank=True,
         null=True,
-        verbose_name="Логотип"
+        verbose_name="Изображение типа жилья"
     )
     description = models.TextField(blank=True, verbose_name="Описание")
     country = models.CharField(max_length=100, blank=True, verbose_name="Страна")
@@ -26,7 +26,7 @@ class Brand(models.Model):
         max_length=255,
         blank=True,
         verbose_name="SEO Title",
-        help_text="Если не заполнено, будет использоваться название бренда."
+        help_text="Если не заполнено, будет использоваться название типа жилья."
     )
     meta_description = models.TextField(
         blank=True,
@@ -36,8 +36,8 @@ class Brand(models.Model):
 
     class Meta:
         ordering = ["name"]
-        verbose_name = "Бренд"
-        verbose_name_plural = "Бренды"
+        verbose_name = "Тип жилья"
+        verbose_name_plural = "Типы жилья"
 
     def __str__(self):
         return self.name

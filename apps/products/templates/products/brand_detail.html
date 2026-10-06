@@ -14,11 +14,8 @@
     {% if brand.description %}
         <div class="brand-description">{{ brand.description|linebreaks }}</div>
     {% endif %}
-    {% if brand.country %}
-        <p><strong>Страна:</strong> {{ brand.country }}</p>
-    {% endif %}
 
-    <h2>Товары бренда</h2>
+    <h2>Жильё этого типа</h2>
     {% if products %}
         <div class="product-grid">
             {% for product in products %}
@@ -26,7 +23,7 @@
             {% endfor %}
         </div>
     {% else %}
-        <p>Нет товаров этого бренда.</p>
+        <p>Жильё этого типа пока не добавлено.</p>
     {% endif %}
 </div>
 {% endblock %}

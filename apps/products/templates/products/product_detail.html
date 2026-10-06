@@ -85,7 +85,7 @@
             <h1>{{ product.title }}</h1>
 
             {% if product.brand %}
-                <div class="product-brand">Марка: <a href="{{ product.brand.get_absolute_url }}">{{ product.brand.name }}</a></div>
+                <div class="product-brand">Тип жилья: <a href="{{ product.brand.get_absolute_url }}">{{ product.brand.name }}</a></div>
             {% endif %}
 
             {% if product.badges.all %}

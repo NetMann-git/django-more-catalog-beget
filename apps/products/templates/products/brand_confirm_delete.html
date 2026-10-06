@@ -5,13 +5,13 @@
 <link rel="stylesheet" type="text/css" href="{% static 'products/css/manage.css' %}">
 {% endblock %}
 
-{% block title %}Удаление бренда{% endblock %}
+{% block title %}Удаление типа жилья{% endblock %}
 
 {% block content %}
 <div class="form-container">
-    <h1>Удаление бренда</h1>
-    <p>Удалить бренд <strong>{{ brand.name }}</strong>?</p>
-    <p style="color:#777;">Товары этого бренда не удаляются.</p>
+    <h1>Удаление типа жилья</h1>
+    <p>Удалить тип жилья <strong>{{ brand.name }}</strong>?</p>
+    <p style="color:#777;">Объекты этого типа жилья не удаляются; поле «Тип жилья» у них станет пустым.</p>
 
     <form method="post" style="margin-top:20px;">
         {% csrf_token %}

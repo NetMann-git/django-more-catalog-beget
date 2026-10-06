@@ -96,7 +96,7 @@ class ProductForm(AutoSlugMixin, forms.ModelForm):
 
 
 class BrandForm(AutoSlugMixin, forms.ModelForm):
-    """Форма управления брендом для менеджера."""
+    """Форма управления типом жилья для менеджера."""
 
     slug_source = "name"
     slug = forms.SlugField(
@@ -107,7 +107,7 @@ class BrandForm(AutoSlugMixin, forms.ModelForm):
     class Meta:
         model = Brand
         fields = [
-            "name", "slug", "logo", "description", "country", "sort_order",
+            "name", "slug", "logo", "description", "sort_order",
             "meta_title", "meta_description",
         ]
         widgets = {
@@ -117,7 +117,6 @@ class BrandForm(AutoSlugMixin, forms.ModelForm):
             "slug": forms.TextInput(attrs={"class": "form-control"}),
             "logo": ImagePreviewWidget(attrs={"class": "form-control"}),
             "description": forms.Textarea(attrs={"class": "form-control", "rows": 5}),
-            "country": forms.TextInput(attrs={"class": "form-control"}),
             "sort_order": forms.NumberInput(attrs={"class": "form-control", "min": 0}),
             "meta_title": forms.TextInput(attrs={"class": "form-control"}),
             "meta_description": forms.Textarea(attrs={"class": "form-control", "rows": 3}),

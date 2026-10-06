@@ -64,7 +64,7 @@
                     <button type="submit">Найти</button>
                 </div>
 
-                <label class="filter-label" for="catalog-brand">Марка</label>
+                <label class="filter-label" for="catalog-brand">Тип жилья</label>
                 <select id="catalog-brand" name="brand">
                     <option value="">Все марки</option>
                     {% for brand in brands %}
@@ -177,7 +177,7 @@
             <!-- Отдельные условия можно снять без сброса остальных. -->
             <div class="active-filters">
                 {% if search_query %}<a class="filter-chip" href="{% catalog_without 'q' %}">Поиск: {{ search_query }} ✕</a>{% endif %}
-                {% if selected_brand %}<a class="filter-chip" href="{% catalog_without 'brand' %}">Марка: {{ selected_brand_name|default:selected_brand }} ✕</a>{% endif %}
+                {% if selected_brand %}<a class="filter-chip" href="{% catalog_without 'brand' %}">Тип жилья: {{ selected_brand_name|default:selected_brand }} ✕</a>{% endif %}
                 {% if selected_year %}<a class="filter-chip" href="{% catalog_without 'year' %}">Год: {{ selected_year }} ✕</a>{% endif %}
                 {% if selected_price_min or selected_price_max %}<a class="filter-chip" href="{% catalog_without 'price_min' 'price_max' %}">Цена: {{ selected_price_min|default:'0'|price_format }}–{{ selected_price_max|default:'∞'|price_format }} ₽ ✕</a>{% endif %}
                 {% if selected_mileage_min or selected_mileage_max %}<a class="filter-chip" href="{% catalog_without 'mileage_min' 'mileage_max' %}">Пробег: {{ selected_mileage_min|default:'0' }}–{{ selected_mileage_max|default:'∞' }} км ✕</a>{% endif %}

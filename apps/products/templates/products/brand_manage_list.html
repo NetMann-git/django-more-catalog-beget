@@ -6,19 +6,19 @@
 <link rel="stylesheet" type="text/css" href="{% static 'products/css/manage.css' %}">
 {% endblock %}
 
-{% block title %}Управление брендами{% endblock %}
+{% block title %}Управление типами жилья{% endblock %}
 
 {% block content %}
 <div class="manage-container">
     <div class="manage-header">
-        <h1>🚘 Управление брендами</h1>
-        <a href="{% url 'catalog:brand_create' %}" class="btn-primary">+ Добавить бренд</a>
+        <h1>Управление типами жилья</h1>
+        <a href="{% url 'catalog:brand_create' %}" class="btn-primary">+ Добавить тип жилья</a>
     </div>
 
     <div class="manage-header">
-        <span>Всего: {{ total }} брендов</span>
+        <span>Всего: {{ total }} типов жилья</span>
         <form method="get" class="search-form">
-            <input type="text" name="search" placeholder="Поиск по названию или стране..." value="{{ search }}">
+            <input type="text" name="search" placeholder="Поиск по названию..." value="{{ search }}">
             <button type="submit" class="btn-primary">Найти</button>
         </form>
     </div>
@@ -35,9 +35,8 @@
         <table class="product-table">
             <thead>
                 <tr>
-                    <th>Логотип</th>
+                    <th>Изображение</th>
                     <th>Название</th>
-                    <th>Страна</th>
                     <th>Порядок</th>
                     <th>Действия</th>
                 </tr>
@@ -52,7 +51,7 @@
                                  style="width:80px;height:50px;object-fit:contain;"
                                  loading="lazy">
                         {% else %}
-                            <span style="color:#aaa;">Нет логотипа</span>
+                            <span style="color:#aaa;">Нет изображения</span>
                         {% endif %}
                     </td>
                     <td>
@@ -61,7 +60,6 @@
                             {{ brand.name }}
                         </a>
                     </td>
-                    <td>{{ brand.country|default:"—" }}</td>
                     <td style="width:130px;">
                         <input type="number"
                                name="sort_order_{{ brand.pk }}"
@@ -86,7 +84,7 @@
         </div>
     </form>
     {% else %}
-        <div class="empty-message"><p>Брендов не найдено.</p></div>
+        <div class="empty-message"><p>Типов жилья не найдено.</p></div>
     {% endif %}
 </div>
 {% endblock %}

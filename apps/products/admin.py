@@ -26,17 +26,17 @@ from .models import Brand
 
 @admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
-    list_display = ("logo_tag", "name", "slug", "country", "sort_order")
+    list_display = ("logo_tag", "name", "slug", "sort_order")
     list_editable = ("sort_order",)
     ordering = ("sort_order", "name")
     prepopulated_fields = {"slug": ("name",)}
-    search_fields = ("name", "country")
+    search_fields = ("name",)
     fieldsets = (
-        (None, {"fields": ("name", "slug", "logo", "description", "country", "sort_order")}),
+        (None, {"fields": ("name", "slug", "logo", "description", "sort_order")}),
         ("SEO", {"fields": ("meta_title", "meta_description")}),
     )
 
-    @admin.display(description="Логотип")
+    @admin.display(description="Изображение типа жилья")
     def logo_tag(self, obj):
         if not obj.logo:
             return format_html('<span style="color:#aaa;">Нет</span>')

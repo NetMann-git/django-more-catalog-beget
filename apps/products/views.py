@@ -328,13 +328,13 @@ def comparison_list(request):
 
 @role_required(ROLE_MANAGER, ROLE_ADMIN)
 def brand_list_manage(request):
-    """Список брендов для управления менеджером."""
+    """Список типов жилья для управления менеджером."""
     brands = Brand.objects.all().order_by("sort_order", "name")
 
     search = request.GET.get("search", "").strip()
     if search:
         brands = brands.filter(
-            Q(name__icontains=search) | Q(country__icontains=search)
+            Q(name__icontains=search)
         )
 
     if request.method == "POST":
@@ -351,7 +351,7 @@ def brand_list_manage(request):
                 brand.save(update_fields=["sort_order"])
 
         CatalogCache.clear_catalog()
-        messages.success(request, "Порядок брендов сохранён.")
+        messages.success(request, "Порядок типов жилья сохранён.")
         url = reverse("catalog:brand_list_manage")
         if search:
             url += f"?search={search}"
@@ -370,13 +370,13 @@ def brand_list_manage(request):
 
 @role_required(ROLE_MANAGER, ROLE_ADMIN)
 def brand_create(request):
-    """Создание бренда менеджером."""
+    """Создание типа жилья менеджером."""
     if request.method == "POST":
         form = BrandForm(request.POST, request.FILES)
         if form.is_valid():
             brand = form.save()
             CatalogCache.clear_catalog()
-            messages.success(request, f'Бренд "{brand.name}" успешно создан.')
+            messages.success(request, f'Тип жилья "{brand.name}" успешно создан.')
             return redirect("catalog:brand_edit", brand_id=brand.pk)
     else:
         form = BrandForm()
@@ -384,13 +384,13 @@ def brand_create(request):
     return render(
         request,
         "products/brand_form.html",
-        {"form": form, "title": "Добавление бренда"},
+        {"form": form, "title": "Добавление типа жилья"},
     )
 
 
 @role_required(ROLE_MANAGER, ROLE_ADMIN)
 def brand_edit(request, brand_id):
-    """Редактирование бренда менеджером."""
+    """Редактирование типа жилья менеджером."""
     brand = get_object_or_404(Brand, pk=brand_id)
 
     if request.method == "POST":
@@ -398,7 +398,7 @@ def brand_edit(request, brand_id):
         if form.is_valid():
             form.save()
             CatalogCache.clear_catalog()
-            messages.success(request, f'Бренд "{brand.name}" успешно обновлён.')
+            messages.success(request, f'Тип жилья "{brand.name}" успешно обновлён.')
             return redirect("catalog:brand_edit", brand_id=brand.pk)
     else:
         form = BrandForm(instance=brand)
@@ -406,20 +406,20 @@ def brand_edit(request, brand_id):
     return render(
         request,
         "products/brand_form.html",
-        {"form": form, "brand": brand, "title": "Редактирование бренда"},
+        {"form": form, "brand": brand, "title": "Редактирование типа жилья"},
     )
 
 
 @role_required(ROLE_MANAGER, ROLE_ADMIN)
 def brand_delete(request, brand_id):
-    """Удаление бренда менеджером."""
+    """Удаление типа жилья менеджером."""
     brand = get_object_or_404(Brand, pk=brand_id)
 
     if request.method == "POST":
         name = brand.name
         brand.delete()
         CatalogCache.clear_catalog()
-        messages.success(request, f'Бренд "{name}" удалён.')
+        messages.success(request, f'Тип жилья "{name}" удалён.')
         return redirect("catalog:brand_list_manage")
 
     return render(
