@@ -152,7 +152,7 @@ class ProductAdmin(admin.ModelAdmin):
     @admin.display(description="Цена", ordering="price")
     def formatted_price(self, obj):
         """Display grouped prices while retaining numeric sorting."""
-        return price_format(obj.price)
+        return "Цена по запросу" if obj.price is None else price_format(obj.price)
 
     list_filter = (
         "category",

@@ -7,8 +7,8 @@
     {% if product %}
         <p class="appointment-product">
             Платье: <strong>{{ product.title }}</strong>
-            {% if product.price %}
-                — {{ product.price|price_format }} {{ product.currency }}
+            {% if product %}
+                — {% product_price product %}
             {% endif %}
         </p>
     {% endif %}

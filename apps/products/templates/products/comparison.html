@@ -71,7 +71,7 @@
                 <tr>
                     <th scope="row">Цена</th>
                     {% for product in products %}
-                        <td data-product-id="{{ product.id }}"><strong class="comparison-page__price">{{ product.price|price_format }} {% if product.currency == "RUB" %}₽{% else %}{{ product.currency }}{% endif %}</strong></td>
+                        <td data-product-id="{{ product.id }}"><strong class="comparison-page__price">{% product_price product %}</strong></td>
                     {% endfor %}
                 </tr>
                 <tr>

@@ -3,6 +3,7 @@
 from decimal import Decimal, InvalidOperation
 
 from django.db import connection
+from django.db.models import F
 from django.db.models.functions import Lower
 
 from apps.products.models import AttributeValue, Brand, ProductAttribute
@@ -153,9 +154,9 @@ class CatalogFilter:
                 queryset = queryset.filter(title__icontains=self.query)
 
         if self.sort == "price_asc":
-            queryset = queryset.order_by("price", "pk")
+            queryset = queryset.order_by(F("price").asc(nulls_last=True), "pk")
         elif self.sort == "price_desc":
-            queryset = queryset.order_by("-price", "pk")
+            queryset = queryset.order_by(F("price").desc(nulls_last=True), "pk")
         elif self.sort == "title_asc":
             queryset = queryset.order_by(Lower("title"), "pk")
         elif self.sort == "title_desc":

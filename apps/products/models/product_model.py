@@ -94,7 +94,10 @@ class Product(models.Model):
     price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
-        verbose_name="Цена"
+        null=True,
+        blank=True,
+        verbose_name="Цена",
+        help_text="Оставьте пустым, если цена неизвестна: будет показано «Цена по запросу»."
     )
     currency = models.CharField(
         max_length=3,

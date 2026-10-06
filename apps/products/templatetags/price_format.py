@@ -23,3 +23,12 @@ def price_format(value: Any) -> str:
     integer = integer.replace(',', '\u00a0')
     fraction = fraction.rstrip('0')
     return integer + (',' + fraction if fraction else '')
+
+
+@register.simple_tag
+def product_price(product):
+    """Цена объекта с валютой; пустое значение отличается от нуля."""
+    if product.price is None:
+        return "Цена по запросу"
+    currency = "₽" if product.currency == "RUB" else product.currency
+    return f"{price_format(product.price)} {currency}"

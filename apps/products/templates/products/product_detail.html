@@ -115,7 +115,7 @@
 
             <div class="price-block">
                 <span class="price-label">Цена</span>
-                <div class="price">{{ product.price|price_format }} ₽</div>
+                <div class="price">{% product_price product %}</div>
             </div>
 
             <div class="product-availability">

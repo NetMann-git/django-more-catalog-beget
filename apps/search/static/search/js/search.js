@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="search-item-content">
                             <div class="search-item-title">${highlightText(item.title, query)}</div>
                             <div class="search-item-meta">
-                                ${item.price ? `<span class="price">${formatPrice(item.price)} ${item.currency}</span>` : ''}
+                                ${item.price !== null && item.price !== undefined && item.price !== '' ? `<span class="price">${formatPrice(item.price)} ${item.currency}</span>` : '<span class="price">Цена по запросу</span>'}
                                 ${item.category ? `<span class="category">${item.category}</span>` : ''}
                             </div>
                             ${item.badges && item.badges.length ? `<div class="search-item-badges">${item.badges.map(b => `<span class="badge badge-${b.slug}">${b.title}</span>`).join('')}</div>` : ''}
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="search-item-content">
                             <div class="search-item-title">${highlightText(item.title, query)}</div>
                             <div class="search-item-meta">
-                                ${item.price ? `<span class="price">${formatPrice(item.price)} ${item.currency}</span>` : ''}
+                                ${item.price !== null && item.price !== undefined && item.price !== '' ? `<span class="price">${formatPrice(item.price)} ${item.currency}</span>` : '<span class="price">Цена по запросу</span>'}
                                 <span class="search-item-type">Характеристика</span>
                             </div>
                         </div>

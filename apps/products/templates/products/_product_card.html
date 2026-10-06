@@ -59,12 +59,16 @@
             {% endfor %}
         </div>
 
+        {% if product.price != None %}
         <div class="card-price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
             <span class="current-price" itemprop="price" content="{{ product.price|unlocalize }}">
-                {{ product.price|price_format }} ₽
+                {% product_price product %}
             </span>
-            <meta itemprop="priceCurrency" content="RUB">
+            <meta itemprop="priceCurrency" content="{{ product.currency }}">
         </div>
+        {% else %}
+        <div class="card-price"><span class="current-price">Цена по запросу</span></div>
+        {% endif %}
 
         <div class="card-availability">
             {% if product.availability_status == 'in_stock' %}

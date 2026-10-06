@@ -68,7 +68,7 @@ class SearchService:
                 'type': 'product',
                 'id': product.id,
                 'title': product.title,
-                'price': str(product.price),
+                'price': str(product.price) if product.price is not None else None,
                 'currency': product.currency,
                 'url': product.get_absolute_url(),
                 'image': SearchService._thumbnail_url(product.image),
@@ -125,7 +125,7 @@ class SearchService:
                 'product_title': product.title,
                 'url': product.get_absolute_url(),
                 'image': SearchService._thumbnail_url(product.image),
-                'price': str(product.price),
+                'price': str(product.price) if product.price is not None else None,
                 'currency': product.currency,
             })
 
