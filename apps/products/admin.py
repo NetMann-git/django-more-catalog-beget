@@ -166,6 +166,12 @@ class ProductAdmin(admin.ModelAdmin):
         "title",
         "article",
         "location__name",
+        "address",
+        "contact_name",
+        "contact_phone",
+        "additional_contact_name",
+        "additional_contact_phone",
+        "contact_email",
         "short_description",
         "description",
     )
@@ -183,10 +189,16 @@ class ProductAdmin(admin.ModelAdmin):
                     "article",
                     "category",
                     "location",
+                    "address",
                     "brand",
                     "image",
                 )
             },
+        ),
+        (
+            "Контакты",
+            {"fields": ("contact_name", "contact_phone", "additional_contact_name",
+                        "additional_contact_phone", "contact_email")},
         ),
         (
             "Описание",
@@ -203,9 +215,14 @@ class ProductAdmin(admin.ModelAdmin):
                 "fields": (
                     "price",
                     "currency",
+                    "price_description",
                     "badges",
                 )
             },
+        ),
+        (
+            "Внутренние заметки",
+            {"fields": ("internal_notes",)},
         ),
         (
             "SEO",

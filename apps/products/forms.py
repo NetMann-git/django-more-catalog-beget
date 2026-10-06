@@ -43,7 +43,10 @@ class ProductForm(AutoSlugMixin, forms.ModelForm):
     class Meta:
         model = Product
         fields = [
-            'title', 'slug', 'category', 'brand', 'price', 'currency',
+            'title', 'slug', 'category', 'brand', 'location', 'address',
+            'contact_name', 'contact_phone', 'additional_contact_name',
+            'additional_contact_phone', 'contact_email', 'price_description',
+            'internal_notes', 'price', 'currency',
             'short_description', 'description', 'image', 'is_active', 'is_featured',
             'availability_status', 'article', 'product_type', 'meta_title', 'meta_description',
             'badges'
@@ -63,6 +66,15 @@ class ProductForm(AutoSlugMixin, forms.ModelForm):
             }),
             'category': forms.Select(attrs={'class': 'form-control'}),
             'brand': forms.Select(attrs={'class': 'form-control'}),
+            'location': forms.Select(attrs={'class': 'form-control'}),
+            'address': forms.TextInput(attrs={'class': 'form-control'}),
+            'contact_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'contact_phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'additional_contact_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'additional_contact_phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'contact_email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'price_description': forms.Textarea(attrs={'class': 'form-control', 'rows': 8}),
+            'internal_notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
             'currency': forms.Select(attrs={'class': 'form-control'}),
             'short_description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),

@@ -67,6 +67,29 @@ class Product(models.Model):
         verbose_name="Локация",
     )
 
+    # Поля жилья необязательны: существующие записи остаются совместимыми.
+    address = models.CharField("Адрес", max_length=500, blank=True)
+    contact_name = models.CharField("Контактное лицо", max_length=255, blank=True)
+    contact_phone = models.CharField(
+        "Телефон", max_length=255, blank=True,
+        help_text="Можно указать несколько номеров; форматирование сохраняется.",
+    )
+    additional_contact_name = models.CharField(
+        "Дополнительное контактное лицо", max_length=255, blank=True,
+    )
+    additional_contact_phone = models.CharField(
+        "Дополнительный телефон", max_length=255, blank=True,
+    )
+    contact_email = models.EmailField("Контактный email", blank=True)
+    price_description = models.TextField(
+        "Описание тарифов", blank=True,
+        help_text="Сезонные цены, тарифы номеров и условия оплаты. Числовую цену не заменяет.",
+    )
+    internal_notes = models.TextField(
+        "Внутренние заметки", blank=True,
+        help_text="Для менеджера и администратора. На публичных страницах не отображается.",
+    )
+
     # Цена
     price = models.DecimalField(
         max_digits=10,
