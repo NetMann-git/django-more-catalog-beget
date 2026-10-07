@@ -47,7 +47,7 @@ class HousingContactTests(TestCase):
         self.assertEqual(self.product.location_id, self.location.pk)
         for name in NEW_FIELDS:
             self.assertEqual(getattr(self.product, name), data[name])
-        self.assertContains(self.client.get(url), "Описание тарифов")
+        self.assertContains(self.client.get(url), "Цены")
         self.assertContains(self.client.get(url), "Внутренние заметки")
         for name in NEW_FIELDS:
             data[name] = ""

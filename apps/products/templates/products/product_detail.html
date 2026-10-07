@@ -1,10 +1,11 @@
 <!-- apps/products/templates/products/product_detail.html -->
 {% extends "base.html" %}
 {% load price_format l10n %}
-{% load static %}
+{% load static prices_html %}
 {% load thumbnail %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{% static 'products/css/prices-editor.css' %}">
 <link rel="stylesheet" href="{% static 'products/css/availability.css' %}">
 <link rel="stylesheet" href="{% static 'products/css/product/product.css' %}">
 <link rel="stylesheet" href="{% static 'products/css/catalog/catalog.css' %}">
@@ -162,6 +163,12 @@
             </div>
 
             <!-- Описание -->
+            {% if product.price_description %}
+            <section class="description-block prices-content" aria-labelledby="housing-prices-title">
+                <h2 id="housing-prices-title">Цены</h2>
+                <div class="prices-content__body">{{ product.price_description|prices_html }}</div>
+            </section>
+            {% endif %}
             {% if product.description %}
             <section class="description-block">
                 <h2>Об автомобиле</h2>

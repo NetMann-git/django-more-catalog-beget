@@ -82,8 +82,12 @@ class Product(models.Model):
     )
     contact_email = models.EmailField("Контактный email", blank=True)
     price_description = models.TextField(
-        "Описание тарифов", blank=True,
+        "Цены", blank=True,
         help_text="Сезонные цены, тарифы номеров и условия оплаты. Числовую цену не заменяет.",
+    )
+    price_description_source = models.TextField(
+        "Исходный HTML цен", blank=True, editable=False,
+        help_text="Архив первого непустого HTML. Не выводится публично.",
     )
     internal_notes = models.TextField(
         "Внутренние заметки", blank=True,
@@ -197,6 +201,16 @@ class Product(models.Model):
     @property
     def seo_title(self):
         return self.meta_title or self.title
+
+    def save(self, *args, **kwargs):
+        """Архивировать первый HTML; дальнейшее редактирование не меняет архив."""
+        capture = not self.price_description_source and bool(self.price_description)
+        update_fields = kwargs.get("update_fields")
+        if capture and (update_fields is None or "price_description" in update_fields):
+            self.price_description_source = self.price_description
+            if update_fields is not None:
+                kwargs["update_fields"] = set(update_fields) | {"price_description_source"}
+        return super().save(*args, **kwargs)
 
     @property
     def search_description(self):

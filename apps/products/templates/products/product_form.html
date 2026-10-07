@@ -3,6 +3,7 @@
 {% load static %}
 
 {% block extra_css %}
+    {{ form.media.css }}
     <link rel="stylesheet" type="text/css" href="{% static 'products/css/manage.css' %}">
     <link rel="stylesheet" href="{% static 'products/css/housing-editor.css' %}">
 {% endblock %}
@@ -42,6 +43,12 @@
         {% endfor %}
     </form>
     
+    {% if product.price_description_source %}
+    <details class="housing-editor__section">
+        <summary>Исходный HTML цен (архив, только чтение)</summary>
+        <textarea readonly rows="10" style="width:100%" aria-label="Исходный HTML цен">{{ product.price_description_source }}</textarea>
+    </details>
+    {% endif %}
     <!-- Галерея -->
     {% if product %}
         <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;">
@@ -124,5 +131,6 @@
 {% endblock %}
 
 {% block extra_js %}
+    {{ form.media.js }}
     <script src="{% static 'products/js/manager_slug.js' %}"></script>
 {% endblock %}

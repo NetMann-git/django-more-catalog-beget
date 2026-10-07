@@ -5,6 +5,7 @@ from django.db import transaction
 from django.utils.html import format_html
 
 from .models import AttributeType, AttributeValue, Product, ProductAttribute
+from .price_widgets import PricesWidget
 
 
 class MultipleAttributeMixin:
@@ -57,6 +58,7 @@ class MultipleProductAdminForm(MultipleAttributeMixin, forms.ModelForm):
     class Meta:
         model = Product
         fields = "__all__"
+        widgets = {"price_description": PricesWidget()}
 
 
 def icon_label(text, icon):

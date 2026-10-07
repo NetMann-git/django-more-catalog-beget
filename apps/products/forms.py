@@ -4,6 +4,7 @@ from django.utils.safestring import mark_safe
 from .models import Product, ProductGalleryImage, Badge, Brand
 from .manager_slugs import AutoSlugMixin
 from .housing_editor_layout import HOUSING_EDITOR_SECTIONS
+from .price_widgets import PricesWidget
 
 
 class ImagePreviewWidget(forms.ClearableFileInput):
@@ -80,7 +81,7 @@ class ProductForm(AutoSlugMixin, forms.ModelForm):
             'additional_contact_name': forms.TextInput(attrs={'class': 'form-control'}),
             'additional_contact_phone': forms.TextInput(attrs={'class': 'form-control'}),
             'contact_email': forms.EmailInput(attrs={'class': 'form-control'}),
-            'price_description': forms.Textarea(attrs={'class': 'form-control', 'rows': 8}),
+            'price_description': PricesWidget(attrs={'class': 'form-control', 'rows': 14}),
             'internal_notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
             'currency': forms.Select(attrs={'class': 'form-control'}),
