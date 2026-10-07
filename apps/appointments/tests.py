@@ -204,14 +204,14 @@ class CarInquiryTests(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Тестовый автомобиль')
-        self.assertContains(response, 'Город доставки')
+        self.assertContains(response, 'Ваш город')
 
     def test_product_page_has_inquiry_link(self):
         response = self.client.get(self.product.get_absolute_url())
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.url)
-        self.assertContains(response, 'Узнать стоимость под ключ')
-        self.assertContains(response, 'Заказать это авто')
+        self.assertContains(response, 'Уточнить условия')
+        self.assertContains(response, 'Оставить заявку')
         self.assertNotContains(response, 'Подобрать размер')
         self.assertNotContains(response, 'Таблица размеров')
 
@@ -220,13 +220,13 @@ class CarInquiryTests(TestCase):
             self.url + '?type=order',
             HTTP_X_REQUESTED_WITH='XMLHttpRequest',
         )
-        self.assertContains(response, 'Заказать это авто')
-        self.assertContains(response, 'Заявка не бронирует автомобиль')
+        self.assertContains(response, 'Оставить заявку')
+        self.assertContains(response, 'Заявка не подтверждает бронирование')
         self.assertContains(response, f'action="{self.url}?type=order"')
 
     def test_order_form_opens_without_javascript(self):
         response = self.client.get(self.url + '?type=order')
-        self.assertContains(response, 'Заказать это авто')
+        self.assertContains(response, 'Оставить заявку')
         self.assertContains(response, f'action="{self.url}?type=order"')
 
     @patch('apps.appointments.views.send_max_notification')
@@ -306,7 +306,7 @@ class CarInquiryTests(TestCase):
             HTTP_X_REQUESTED_WITH='XMLHttpRequest',
         )
         self.assertEqual(response.status_code, 400)
-        self.assertContains(response, 'Город доставки', status_code=400)
+        self.assertContains(response, 'Ваш город', status_code=400)
         self.assertEqual(CallbackRequest.objects.count(), 0)
 
     def test_honeypot_does_not_create_inquiry(self):

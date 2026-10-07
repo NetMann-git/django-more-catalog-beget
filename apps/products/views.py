@@ -1,3 +1,4 @@
+from .housing_detail import housing_context
 # apps/products/views.py
 
 from django.http import HttpRequest, HttpResponse, JsonResponse
@@ -137,8 +138,9 @@ def recently_viewed_list(request):
 
 # @cache_page(60 * 5)  # 5 минут
 def product_detail(request, slug):
-    product = get_object_or_404(Product, slug=slug, is_active=True)
+    product = get_object_or_404(Product.objects.select_related("brand", "location"), slug=slug, is_active=True)
     context = {"product": product, "page": product}
+    context.update(housing_context(product))
     context["car_order_success"] = (
         request.session.pop('car_order_success_product_id', None) == product.pk
     )

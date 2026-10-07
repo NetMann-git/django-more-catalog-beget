@@ -1,16 +1,16 @@
-<h2 id="car-inquiry-title">{% if is_order %}Заказать это авто{% else %}Узнать стоимость под ключ{% endif %}</h2>
+<h2 id="car-inquiry-title">{% if is_order %}Оставить заявку{% else %}Уточнить условия{% endif %}</h2>
 {% if is_order %}
-<p>Оставьте контакты — менеджер уточнит наличие и условия покупки. Заявка не бронирует автомобиль.</p>
+<p>Оставьте контакты — менеджер уточнит свободные даты и условия проживания. Заявка не подтверждает бронирование.</p>
 {% else %}
-<p>Оставьте контакты — менеджер расскажет об автомобиле и вариантах доставки.</p>
+<p>Оставьте контакты — менеджер уточнит информацию об объекте и условиях проживания.</p>
 {% endif %}
-<p class="car-inquiry__product">Автомобиль: <strong>{{ product.title }}</strong></p>
+<p class="car-inquiry__product">Объект: <strong>{{ product.title }}</strong></p>
 
 <form action="{% url 'appointments:car_inquiry' product.id %}{% if is_order %}?type=order{% endif %}" method="post" class="car-inquiry__form">
     {% csrf_token %}
     {% for field in form %}
         <div class="car-inquiry__field">
-            <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+            <label for="{{ field.id_for_label }}">{% if field.name == "city" %}Ваш город{% else %}{{ field.label }}{% endif %}{% if field.field.required %} *{% endif %}</label>
             {{ field }}
             {% for error in field.errors %}<span class="car-inquiry__error">{{ error }}</span>{% endfor %}
         </div>

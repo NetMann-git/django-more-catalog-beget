@@ -1,0 +1,44 @@
+{% if housing_sections or housing_attributes or housing_has_contacts %}
+<nav class="housing-detail__navigation" aria-label="Разделы объекта">
+    {% for section in housing_sections %}<a href="#housing-{{ section.slug }}">{{ section.title }}</a>{% endfor %}
+    {% if housing_attributes %}<a href="#housing-amenities">Удобства</a>{% endif %}
+    {% if housing_has_contacts %}<a href="#housing-contacts">Контакты</a>{% endif %}
+</nav>
+<div class="car-detail__information housing-detail__information">
+    {% for section in housing_sections %}
+    <section class="description-block prices-content housing-detail__section" id="housing-{{ section.slug }}" aria-labelledby="housing-{{ section.slug }}-title">
+        <h2 id="housing-{{ section.slug }}-title">{{ section.title }}</h2>
+        {% for block in section.blocks %}
+            {% if block.label != section.title %}<h3>{{ block.label }}</h3>{% endif %}
+            <div class="prices-content__body housing-detail__text">{{ block.html }}</div>
+        {% endfor %}
+    </section>
+    {% endfor %}
+    {% if housing_attributes %}
+    <section class="description-block housing-detail__section" id="housing-amenities" aria-labelledby="housing-amenities-title">
+        <h2 id="housing-amenities-title">Удобства и характеристики</h2>
+        {% for group in housing_attributes %}
+        <div class="housing-detail__amenity-group">
+            <h3>{% if group.icon %}<img src="{{ group.icon.url }}" alt="" width="24" height="24" loading="lazy">{% endif %}{{ group.name }}</h3>
+            <ul class="housing-detail__amenities">
+                {% for value in group.values %}<li>{% if value.icon %}<img src="{{ value.icon.url }}" alt="" width="24" height="24" loading="lazy">{% endif %}<span>{{ value.text }}</span></li>{% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+    </section>
+    {% endif %}
+    {% if housing_has_contacts %}
+    <section class="description-block housing-detail__section" id="housing-contacts" aria-labelledby="housing-contacts-title">
+        <h2 id="housing-contacts-title">Контакты и бронирование</h2>
+        {% for contact in housing_contacts %}
+        <div class="housing-detail__contact">
+            {% if contact.name %}<h3>{{ contact.name }}</h3>{% endif %}
+            {% for phone in contact.phones %}<p>{% if phone.href %}<a href="{{ phone.href }}">{{ phone.text }}</a>{% else %}{{ phone.text }}{% endif %}</p>{% endfor %}
+        </div>
+        {% endfor %}
+        {% if product.contact_email %}<p><a href="mailto:{{ product.contact_email }}">{{ product.contact_email }}</a></p>{% endif %}
+        <p class="housing-detail__contact-note">Уточняйте актуальные цены, свободные даты и условия бронирования при обращении.</p>
+    </section>
+    {% endif %}
+</div>
+{% endif %}

@@ -12,11 +12,12 @@
 <link rel="stylesheet" href="{% static 'reviews/css/reviews.css' %}">
 <link rel="stylesheet" href="{% static 'appointments/css/car_inquiry.css' %}">
 <link rel="stylesheet" href="{% static 'products/css/product/car-detail.css' %}">
+<link rel="stylesheet" href="{% static 'products/css/product/housing-detail.css' %}">
 {% endblock extra_css %}
 
 {% block content %}
 
-<div class="container car-detail">
+<div class="container car-detail housing-detail">
 
     <!-- Хлебные крошки -->
     <nav class="breadcrumbs">
@@ -35,33 +36,33 @@
         ======================================= -->
         <div class="dress-photo">
             <div class="gallery-wrapper">
-                {% if product.gallery.all %}
+                {% if housing_gallery %}
                     <div class="gallery-thumbs-vertical">
                         {% if product.image %}
                             <img src="{% thumbnail product.image 100x75 crop %}"
-                                 data-full="{% thumbnail product.image 800x600 crop %}"
+                                 data-full="{% thumbnail housing_cover 800x600 %}"
                                  class="gallery-thumb-vertical active"
                                  alt="{{ product.title }}">
                         {% endif %}
-                        {% for photo in product.gallery.all %}
+                        {% for photo in housing_gallery %}
                             <img src="{% thumbnail photo.image 100x75 crop %}"
-                                 data-full="{% thumbnail photo.image 800x600 crop %}"
-                                 class="gallery-thumb-vertical"
+                                 data-full="{% thumbnail photo.image 800x600 %}"
+                                 class="gallery-thumb-vertical{% if not product.image and forloop.first %} active{% endif %}"
                                  alt="{{ photo.alt|default:product.title }}">
                         {% endfor %}
                     </div>
                 {% endif %}
 
                 <div class="main-image-wrapper">
-                    {% if product.image %}
+                    {% if housing_cover %}
                         <img id="main-image"
-                             src="{% thumbnail product.image 800x600 crop %}"
+                             src="{% thumbnail housing_cover 800x600 %}"
                              alt="{{ product.title }}"
                              class="main-image"
                              style="cursor:pointer;">
-                        {% if product.gallery.all %}
-                            <button class="image-arrow prev-image" id="prev-image-btn">‹</button>
-                            <button class="image-arrow next-image" id="next-image-btn">›</button>
+                        {% if housing_gallery %}
+                            <button type="button" aria-label="Предыдущее фото" class="image-arrow prev-image" id="prev-image-btn">‹</button>
+                            <button type="button" aria-label="Следующее фото" class="image-arrow next-image" id="next-image-btn">›</button>
                         {% endif %}
                     {% else %}
                         <div class="dress-image-placeholder">Нет фото</div>
@@ -69,12 +70,10 @@
                 </div>
             </div>
 
-            {% if product.gallery.all %}
+            {% if housing_gallery %}
             <div class="gallery-counter">
                 Фото <span id="current-photo">1</span> из <span id="total-photos">
-                    {% with total=product.gallery.all.count|add:1 %}
-                        {{ total }}
-                    {% endwith %}
+                    {{ housing_gallery_count }}
                 </span>
             </div>
             {% endif %}
@@ -84,6 +83,15 @@
         <div class="dress-info">
 
             <h1>{{ product.title }}</h1>
+            {% if product.subtitle %}<p class="housing-detail__subtitle">{{ product.subtitle }}</p>{% endif %}
+            {% if product.location or product.district_text or product.address %}
+            <div class="housing-detail__location">
+                {% if product.location %}<p><strong>{{ product.location.name }}</strong></p>{% endif %}
+                {% if product.district_text %}<p>{{ product.district_text }}</p>{% endif %}
+                {% if product.address %}<p>{{ product.address }}</p>{% endif %}
+            </div>
+            {% endif %}
+            {% if housing_short_description %}<div class="housing-detail__intro prices-content">{{ housing_short_description }}</div>{% endif %}
 
             {% if product.brand %}
                 <div class="product-brand">Тип жилья: <a href="{{ product.brand.get_absolute_url }}">{{ product.brand.name }}</a></div>
@@ -119,18 +127,15 @@
                 <div class="price">{% product_price product %}</div>
             </div>
 
-            <div class="product-availability">
-                <span class="availability-status availability-{{ product.availability_status }}">
-                    {{ product.get_availability_status_display }}
-                </span>
-            </div>
+            <p class="housing-detail__contact-note">Свободные даты уточняйте при бронировании.</p>
 
             <!-- Заявки по выбранному автомобилю. -->
             <div class="dress-actions">
+                {% if housing_has_contacts %}<a href="#housing-contacts" class="btn">Контакты и бронирование</a>{% endif %}
                 <a href="{% url 'appointments:car_inquiry' product.id %}" class="btn car-inquiry__trigger" id="open-car-inquiry-modal">
-                    Узнать стоимость под ключ
+                    Уточнить условия
                 </a>
-                <a href="{% url 'appointments:car_inquiry' product.id %}?type=order" class="btn btn-outline car-inquiry__trigger">Заказать это авто</a>
+                <a href="{% url 'appointments:car_inquiry' product.id %}?type=order" class="btn btn-outline car-inquiry__trigger">Оставить заявку</a>
                 <a href="/catalog/" class="car-detail__back">← Вернуться в каталог</a>
             </div>
 
@@ -138,45 +143,7 @@
         </div>
     </div>
 
-    <div class="car-detail__information">
-            <!-- =======================================
-                ТАБЛИЦА ХАРАКТЕРИСТИК
-            ======================================= -->
-            <div class="dress-specs">
-                <h2>Характеристики</h2>
-
-                {% if product.article %}
-                <div class="spec-row">
-                    <span>Артикул</span>
-                    <strong>{{ product.article }}</strong>
-                </div>
-                {% endif %}
-
-                {% for attr in product.attributes.all %}
-                    <div class="spec-row">
-                        <span>{{ attr.attribute_type.name }}</span>
-                        <strong>{{ attr.attribute_value.value }}</strong>
-                    </div>
-                {% empty %}
-                    <p class="text-muted">Характеристики не указаны.</p>
-                {% endfor %}
-            </div>
-
-            <!-- Описание -->
-            {% if product.price_description %}
-            <section class="description-block prices-content" aria-labelledby="housing-prices-title">
-                <h2 id="housing-prices-title">Цены</h2>
-                <div class="prices-content__body">{{ product.price_description|prices_html }}</div>
-            </section>
-            {% endif %}
-            {% if product.description %}
-            <section class="description-block">
-                <h2>Об автомобиле</h2>
-                <div class="description">{{ product.description|linebreaks }}</div>
-            </section>
-            {% endif %}
-
-    </div>
+    {% include "products/_housing_information.html" %}
 
     <!-- =======================================
         НЕДАВНО ПРОСМОТРЕННЫЕ
@@ -205,7 +172,7 @@
     ======================================= -->
     {% if similar_products %}
     <section class="similar_products">
-        <h2 class="similar-title">Похожие автомобили</h2>
+        <h2 class="similar-title">Похожие варианты жилья</h2>
         <div class="products-grid">
             {% for similar in similar_products %}
                 {% include "products/_product_card.html" with product=similar %}
@@ -324,7 +291,7 @@
             {% if car_order_success %}
                 <h2 id="car-inquiry-title">Спасибо!</h2>
                 <p>Заявка получена. Менеджер свяжется с вами.</p>
-                <a href="{{ product.get_absolute_url }}">Вернуться к автомобилю</a>
+                <a href="{{ product.get_absolute_url }}">Вернуться к объекту</a>
             {% endif %}
         </div>
     </div>
