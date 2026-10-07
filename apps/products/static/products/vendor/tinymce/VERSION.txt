@@ -1,0 +1,5 @@
+TinyMCE 8.9.3
+Russian language pack: tinymce-i18n 26.9.28
+Upstream source: https://github.com/tinymce/tinymce/tree/8.9.3
+GPL-2.0-or-later. See license.md and notices.txt.
+Corresponding upstream source included: sources/tinymce-8.9.3-source.tar.gz

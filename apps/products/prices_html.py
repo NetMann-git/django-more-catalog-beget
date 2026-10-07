@@ -4,7 +4,7 @@ import re
 from urllib.parse import urlsplit
 from bs4 import BeautifulSoup, Comment, NavigableString, Tag
 
-TAGS = set("p div span br hr h2 h3 h4 h5 h6 strong b em i u s ul ol li blockquote pre code table caption colgroup col thead tbody tfoot tr th td a img video source iframe".split())
+TAGS = set("p div span br hr h1 h2 h3 h4 h5 h6 strong b em i u s sup sub ul ol li blockquote pre code table caption colgroup col thead tbody tfoot tr th td a img video source iframe".split())
 DROP = set("script style svg math object embed form input button textarea select option template noscript base link meta".split())
 VOID = {"br", "hr", "img", "source", "col"}
 FRAME_PATHS = {
@@ -42,7 +42,7 @@ def safe_url(value: str, kind: str = "link") -> str:
     return ""
 
 
-def safe_style(value: str) -> str:
+def safe_style(value: str, for_editor: bool = False) -> str:
     """Оставить оформление без URL, выражений и перекрытия интерфейса."""
     result = []
     for part in value.split(";"):
@@ -51,7 +51,7 @@ def safe_style(value: str) -> str:
         valid = False
         if key in {"color", "background-color"}:
             valid = bool(re.fullmatch(r"#[0-9a-f]{3,8}|[a-z]{1,20}|rgba?\([0-9.,% ]+\)", val))
-        elif key in {"font-size", "width", "height", "max-width", "border-width", "padding"}:
+        elif key in {"font-size", "width", "height", "max-width", "border-width", "padding", "padding-left", "padding-right", "padding-top", "padding-bottom", "margin-bottom", "margin-top", "line-height"}:
             valid = bool(re.fullmatch(r"\d{1,4}(?:\.\d{1,2})?(?:px|pt|em|rem|%)", val))
         elif key in {"margin-left", "margin-right"}:
             valid = val == "auto"
@@ -67,6 +67,12 @@ def safe_style(value: str) -> str:
             valid = val in {"block", "inline", "inline-block"}
         elif key == "font-family":
             valid = bool(re.fullmatch(r"[a-z ,'-]{1,100}", val))
+        if key.startswith("border-") or key in {"border", "border-top", "border-right", "border-bottom", "border-left", "border-color", "border-style", "padding", "margin", "border-spacing"}:
+            valid = bool(re.fullmatch(r"[0-9a-z#.% -]{1,100}", val)) and "expression" not in val
+        elif key in {"border-collapse", "table-layout", "vertical-align"}:
+            valid = val in {"collapse", "separate", "auto", "fixed", "top", "middle", "bottom", "baseline"}
+        elif for_editor and key in {"position", "overflow", "top", "bottom", "left", "right", "line-height"}:
+            valid = bool(re.fullmatch(r"relative|absolute|hidden|auto|visible|scroll|(?:\d{1,4}(?:\.\d{1,2})?(?:px|pt|em|rem|%)?)", val))
         if valid:
             result.append(f"{key}:{val}")
     return ";".join(result)
@@ -83,7 +89,7 @@ def convert_joomla_source(value: str) -> str:
     return re.sub(r"\{source(?:\s+[^}]*)?\}(.*?)\{/source\}", decode, value, flags=re.S | re.I)
 
 
-def sanitize_prices(value: str) -> str:
+def sanitize_prices(value: str, for_editor: bool = False) -> str:
     """Собрать HTML заново: входные атрибуты не попадают в вывод напрямую."""
     soup = BeautifulSoup(convert_joomla_source(value or ""), "html.parser")
 
@@ -114,18 +120,33 @@ def sanitize_prices(value: str) -> str:
             if node.get(key):
                 attrs[key] = str(node[key])
         if node.get("style"):
-            style = safe_style(str(node["style"]))
+            style = safe_style(str(node["style"]), for_editor=for_editor)
             if style:
                 attrs["style"] = style
         for key in ("width", "height", "colspan", "rowspan", "span"):
             val = str(node.get(key, ""))
-            if re.fullmatch(r"[1-9]\d{0,3}", val):
+            if re.fullmatch(r"[1-9]\d{0,3}%?", val):
                 attrs[key] = val
+        if node.get("dir") in {"rtl", "ltr", "auto"}:
+            attrs["dir"] = node["dir"]
+        if for_editor and node.get("id"):
+            attrs["id"] = str(node["id"])
         classes = node.get("class", [])
         allowed = {"table-responsive", "table", "table-striped", "table-bordered", "table-hover", "table-condensed"}
-        classes = [x for x in classes if x in allowed]
+        classes = [x for x in classes if x in allowed or (for_editor and re.fullmatch(r"[a-zA-Z0-9_-]{1,100}", x))]
         if classes:
             attrs["class"] = " ".join(classes)
+        if name in {"table", "td", "th", "tr", "col"}:
+            for key in ("border", "cellpadding", "cellspacing"):
+                val = str(node.get(key, ""))
+                if re.fullmatch(r"\d{1,3}", val):
+                    attrs[key] = val
+            if node.get("align") in {"left", "center", "right"}:
+                attrs["align"] = node["align"]
+            if node.get("valign") in {"top", "middle", "bottom"}:
+                attrs["valign"] = node["valign"]
+            if re.fullmatch(r"#[0-9a-fA-F]{3,8}|[a-zA-Z]{1,20}", str(node.get("bgcolor", ""))):
+                attrs["bgcolor"] = node["bgcolor"]
         if name == "a":
             url = safe_url(str(node.get("href", "")))
             if url:

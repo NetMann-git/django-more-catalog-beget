@@ -7,7 +7,7 @@ from .prices_html import sanitize_prices
 class PricesWidget(forms.Textarea):
     class Media:
         css = {"all": ("products/css/prices-editor.css",)}
-        js = ("products/js/prices-editor.js",)
+        js = ("products/vendor/tinymce/tinymce.min.js", "products/js/prices-editor.js")
 
     def render(self, name, value, attrs=None, renderer=None):
         attrs = dict(attrs or {})
@@ -15,5 +15,5 @@ class PricesWidget(forms.Textarea):
         textarea = super().render(name, value, attrs, renderer)
         return format_html(
             '{}<textarea hidden class="prices-editor__initial" aria-hidden="true">{}</textarea>',
-            textarea, sanitize_prices(value or ""),
+            textarea, sanitize_prices(value or "", for_editor=True),
         )

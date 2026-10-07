@@ -153,3 +153,34 @@ class PricesMigrationTests(TransactionTestCase):
             self.assertIsNone(obj.price)
         finally:
             MigrationExecutor(connection).migrate(latest)
+
+
+class TinyMCECompatibilityTests(SimpleTestCase):
+    def test_editor_widget_uses_local_tinymce(self):
+        widget = PricesWidget()
+        self.assertIn('products/vendor/tinymce/tinymce.min.js', widget.media._js)
+        rendered = widget.render('price_description', EXAMPLE, attrs={'id':'id_price_description'})
+        self.assertIn('data-prices-editor="true"', rendered)
+        self.assertIn('&lt;table', rendered)
+
+    def test_legacy_table_styles_and_attributes_survive_preview(self):
+        source = '<table border="1" cellspacing="2" cellpadding="4" width="100%" class="old-prices"><tr><td rowspan="2" valign="middle" style="border-top-color:#ff0000;padding-left:12px;vertical-align:middle;line-height:1.5">Цена</td></tr></table>'
+        result = sanitize_prices(source, for_editor=True)
+        self.assertIn('width="100%"', result)
+        self.assertIn('cellpadding="4"',result)
+        self.assertIn('old-prices',result)
+        self.assertIn('border-top-color:#ff0000',result)
+        self.assertIn('padding-left:12px',result)
+        self.assertIn('line-height:1.5',result)
+
+    def test_editor_preview_does_not_allow_active_content(self):
+        result = sanitize_prices('<div class="old-prices" style="position:absolute;left:0px;background:url(javascript:bad)"><script>attack()</script><iframe src="https://evil.test" onload="attack()"></iframe></div>', for_editor=True)
+        self.assertNotIn('attack',result)
+        self.assertNotIn('iframe',result)
+        self.assertNotIn('url(',result)
+
+    def test_legacy_headings_superscript_and_direction_survive(self):
+        result = sanitize_prices('<h1>Цены</h1><p dir="ltr">м<sup>2</sup></p>',for_editor=True)
+        self.assertIn('<h1>Цены</h1>',result)
+        self.assertIn('<sup>2</sup>',result)
+        self.assertIn('dir="ltr"',result)
