@@ -1,0 +1,17 @@
+/* Разделы редактора изолированы от публичной карточки и остальных форм. */
+.housing-editor__section {
+    min-width: 0;
+    margin: 1.25rem 0;
+    padding: 1rem;
+    border: 1px solid #d8e2eb;
+    border-radius: .75rem;
+}
+.housing-editor__section legend {
+    float: none;
+    width: auto;
+    padding: 0 .5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+.housing-editor__section textarea { resize: vertical; }
+.housing-editor__section .errorlist { color: #b42318; }

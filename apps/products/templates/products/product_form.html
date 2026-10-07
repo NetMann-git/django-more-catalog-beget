@@ -4,6 +4,7 @@
 
 {% block extra_css %}
     <link rel="stylesheet" type="text/css" href="{% static 'products/css/manage.css' %}">
+    <link rel="stylesheet" href="{% static 'products/css/housing-editor.css' %}">
 {% endblock %}
 
 {% block title %}{{ title }}{% endblock %}
@@ -14,31 +15,30 @@
     
     <!-- Кнопка Сохранить вверху -->
     <div style="margin-bottom: 20px;">
-        <button type="submit" form="product-form" class="btn-save">💾 Сохранить товар</button>
+        <button type="submit" form="product-form" class="btn-save">💾 Сохранить объект</button>
         <a href="{% url 'catalog:product_list_manage' %}" class="btn-cancel">Отмена</a>
     </div>
     
     <form id="product-form" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         
-        {% for field in form %}
+        {{ form.non_field_errors }}
+        {% for section_title, fields in form.editor_sections %}
+        <fieldset class="housing-editor__section">
+            <legend>{{ section_title }}</legend>
+            {% for field in fields %}
             <div class="form-group">
                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                
-                <!-- Для поля badges используем специальный контейнер -->
                 {% if field.name == 'badges' %}
-                    <div class="badges-group">
-                        {{ field }}
-                    </div>
+                <div class="badges-group">{{ field }}</div>
                 {% else %}
-                    {{ field }}
+                {{ field }}
                 {% endif %}
-                
-                {% if field.help_text %}
-                    <div class="help-text">{{ field.help_text }}</div>
-                {% endif %}
+                {% if field.help_text %}<div class="help-text">{{ field.help_text }}</div>{% endif %}
                 {{ field.errors }}
             </div>
+            {% endfor %}
+        </fieldset>
         {% endfor %}
     </form>
     
@@ -82,7 +82,7 @@
     <!-- ========== ХАРАКТЕРИСТИКИ ========== -->
     {% if product %}
         <div style="margin: 20px 0; padding: 15px; background: #f0f8ff; border-radius: 8px; border: 1px solid #cce5ff;">
-            <h3>🏷️ Характеристики товара</h3>
+            <h3>🏷️ Характеристики объекта</h3>
             
             <div style="margin: 10px 0;">
                 <a href="{% url 'catalog:product_attributes' product.id %}" class="btn-save" style="padding: 8px 20px; font-size: 14px; text-decoration: none; display: inline-block;">
@@ -102,8 +102,8 @@
                         <tbody>
                             {% for attr in product.attributes.all %}
                                 <tr>
-                                    <td style="padding: 8px; border-bottom: 1px solid #eee;">{{ attr.attribute_type.name }}</td>
-                                    <td style="padding: 8px; border-bottom: 1px solid #eee;">{{ attr.attribute_value.value|default:"—" }}</td>
+                                    <td style="padding: 8px; border-bottom: 1px solid #eee;">{% if attr.attribute_type.icon %}<img src="{{ attr.attribute_type.icon.url }}" width="24" height="24" style="object-fit:contain" alt=""> {% endif %}{{ attr.attribute_type.name }}</td>
+                                    <td style="padding: 8px; border-bottom: 1px solid #eee;">{% if attr.attribute_value.effective_icon %}<img src="{{ attr.attribute_value.effective_icon.url }}" width="24" height="24" style="object-fit:contain" alt=""> {% endif %}{{ attr.attribute_value.value|default:"—" }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -117,7 +117,7 @@
 
     <!-- Кнопка Сохранить внизу -->
     <div style="margin-top: 20px; display: flex; gap: 15px;">
-        <button type="submit" form="product-form" class="btn-save">💾 Сохранить товар</button>
+        <button type="submit" form="product-form" class="btn-save">💾 Сохранить объект</button>
         <a href="{% url 'catalog:product_list_manage' %}" class="btn-cancel">Отмена</a>
     </div>
 </div>

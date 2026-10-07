@@ -90,6 +90,22 @@ class Product(models.Model):
         help_text="Для менеджера и администратора. На публичных страницах не отображается.",
     )
 
+    # Разделы карточки Joomla сохраняются отдельно, без извлечения чисел из текста.
+    subtitle = models.CharField("Подзаголовок", max_length=255, blank=True)
+    district_text = models.CharField("Район (текст)", max_length=255, blank=True)
+    location_description = models.TextField("Месторасположение", blank=True)
+    rooms_description = models.TextField("Номерной фонд / описание комнат", blank=True)
+    meals_description = models.TextField("Питание", blank=True)
+    beach_description = models.TextField("Пляж", blank=True)
+    beach_distance_description = models.TextField("Расстояние до пляжа", blank=True)
+    special_conditions = models.TextField("Особые условия", blank=True)
+    additional_services = models.TextField("Дополнительные услуги", blank=True)
+    booking_conditions = models.TextField("Условия бронирования", blank=True)
+    checkin_checkout_description = models.TextField("Расчётный час", blank=True)
+    included_services = models.TextField("Входит в стоимость", blank=True)
+    paid_services = models.TextField("За дополнительную плату", blank=True)
+    extra_beds_description = models.TextField("Дополнительные места", blank=True)
+
     # Цена
     price = models.DecimalField(
         max_digits=10,

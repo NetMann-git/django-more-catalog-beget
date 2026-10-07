@@ -7,6 +7,7 @@ from .product_attribute_forms import ProductAttributeForm
 from .attribute_formsets import SingleProductAttributeFormSet
 from .multiple_attribute_forms import build_multiple_form, MultipleProductAdminForm, multiple_types
 from .cache import CatalogCache
+from .housing_editor_layout import HOUSING_EDITOR_SECTIONS
 from .templatetags.price_format import price_format
 
 from .models import (
@@ -179,71 +180,8 @@ class ProductAdmin(admin.ModelAdmin):
     filter_horizontal = ("badges",)
     view_on_site = False
 
-    fieldsets = (
-        (
-            "Основное",
-            {
-                "fields": (
-                    "title",
-                    "slug",
-                    "article",
-                    "category",
-                    "location",
-                    "address",
-                    "brand",
-                    "image",
-                )
-            },
-        ),
-        (
-            "Контакты",
-            {"fields": ("contact_name", "contact_phone", "additional_contact_name",
-                        "additional_contact_phone", "contact_email")},
-        ),
-        (
-            "Описание",
-            {
-                "fields": (
-                    "short_description",
-                    "description",
-                )
-            },
-        ),
-        (
-            "Каталог",
-            {
-                "fields": (
-                    "price",
-                    "currency",
-                    "price_description",
-                    "badges",
-                )
-            },
-        ),
-        (
-            "Внутренние заметки",
-            {"fields": ("internal_notes",)},
-        ),
-        (
-            "SEO",
-            {
-                "fields": (
-                    "meta_title",
-                    "meta_description",
-                )
-            },
-        ),
-        (
-            "Публикация",
-            {
-                "fields": (
-                    "is_featured",
-                    "is_active",
-                    "availability_status",
-                )
-            },
-        ),
-    )
+    # Одинаковые разделы помогают менеджеру и администратору видеть одну структуру.
+    fieldsets = tuple((title, {"fields": names}) for title, names in HOUSING_EDITOR_SECTIONS)
 
     class Media:
         css = {"all": ("products/css/multiple-attributes.css",)}

@@ -3,6 +3,7 @@ from django import forms
 from django.utils.safestring import mark_safe
 from .models import Product, ProductGalleryImage, Badge, Brand
 from .manager_slugs import AutoSlugMixin
+from .housing_editor_layout import HOUSING_EDITOR_SECTIONS
 
 
 class ImagePreviewWidget(forms.ClearableFileInput):
@@ -42,15 +43,7 @@ class ProductForm(AutoSlugMixin, forms.ModelForm):
     
     class Meta:
         model = Product
-        fields = [
-            'title', 'slug', 'category', 'brand', 'location', 'address',
-            'contact_name', 'contact_phone', 'additional_contact_name',
-            'additional_contact_phone', 'contact_email', 'price_description',
-            'internal_notes', 'price', 'currency',
-            'short_description', 'description', 'image', 'is_active', 'is_featured',
-            'availability_status', 'article', 'product_type', 'meta_title', 'meta_description',
-            'badges'
-        ]
+        fields = [name for _, names in HOUSING_EDITOR_SECTIONS for name in names]
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control', 
@@ -66,6 +59,20 @@ class ProductForm(AutoSlugMixin, forms.ModelForm):
             }),
             'category': forms.Select(attrs={'class': 'form-control'}),
             'brand': forms.Select(attrs={'class': 'form-control'}),
+            'subtitle': forms.TextInput(attrs={'class': 'form-control'}),
+            'district_text': forms.TextInput(attrs={'class': 'form-control'}),
+            'location_description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+            'rooms_description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+            'meals_description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+            'beach_description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+            'beach_distance_description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+            'special_conditions': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+            'additional_services': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+            'booking_conditions': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+            'checkin_checkout_description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+            'included_services': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+            'paid_services': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+            'extra_beds_description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
             'location': forms.Select(attrs={'class': 'form-control'}),
             'address': forms.TextInput(attrs={'class': 'form-control'}),
             'contact_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -97,6 +104,12 @@ class ProductForm(AutoSlugMixin, forms.ModelForm):
         self.fields['slug'].widget.attrs['class'] = 'form-control'
         self.fields['slug'].widget.attrs['data-slug-target'] = 'true'
     
+    @property
+    def editor_sections(self):
+        """Вернуть связанные поля вместе с ошибками и отправленными значениями."""
+        return [(title, [self[name] for name in names])
+                for title, names in HOUSING_EDITOR_SECTIONS]
+
     def save(self, commit=True):
         product = super().save(commit=False)
         if commit:
