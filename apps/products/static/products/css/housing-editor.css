@@ -15,3 +15,10 @@
 }
 .housing-editor__section textarea { resize: vertical; }
 .housing-editor__section .errorlist { color: #b42318; }
+
+.housing-editor__categories { max-height:320px; overflow:auto; border:1px solid #d8e2eb; border-radius:8px; padding:10px; }
+.housing-editor__categories #id_categories { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:8px; }
+.housing-editor__categories label { display:flex; align-items:center; gap:8px; margin:0; padding:8px; border-radius:5px; background:#f6f8fa; font-weight:400; cursor:pointer; }
+.housing-editor__categories label:has(input:checked) { background:#e8f1fa; }
+.housing-editor__categories input[type="checkbox"] { flex:0 0 auto; width:16px; height:16px; margin:0; }
+@media (max-width:480px) { .housing-editor__categories #id_categories { grid-template-columns:1fr; } }

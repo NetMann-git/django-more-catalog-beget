@@ -6,6 +6,7 @@ from django.utils.html import format_html
 
 from .models import AttributeType, AttributeValue, Product, ProductAttribute
 from .price_widgets import PricesWidget
+from .product_category_forms import ProductCategoryFormMixin
 
 
 class MultipleAttributeMixin:
@@ -52,7 +53,7 @@ class MultipleAttributeForm(MultipleAttributeMixin, forms.Form):
     """Форма менеджера, сохраняемая вместе с одиночными характеристиками."""
 
 
-class MultipleProductAdminForm(MultipleAttributeMixin, forms.ModelForm):
+class MultipleProductAdminForm(ProductCategoryFormMixin, MultipleAttributeMixin, forms.ModelForm):
     """Обычная форма Product с дополнительными полями флажков."""
 
     class Meta:

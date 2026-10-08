@@ -1,7 +1,7 @@
 # apps/products/signals.py
 from django.core.cache import cache
 from django.db import transaction
-from django.db.models.signals import post_delete, post_save, pre_save
+from django.db.models.signals import post_delete, post_save, pre_save, m2m_changed
 from django.dispatch import receiver
 
 from apps.products.models import Brand, Product, ProductGalleryImage, AttributeType, AttributeValue
@@ -81,3 +81,10 @@ def remove_deleted_product_image(sender, instance, using, **kwargs) -> None:
                 instance, name, using, field_name=field_name,
             ), using=using,
         )
+
+
+@receiver(m2m_changed, sender=Product.categories.through)
+def clear_category_membership_cache(sender, action, **kwargs):
+    """Обновлять каталог после изменения категорий через формы и импорт."""
+    if action in {"post_add", "post_remove", "post_clear"}:
+        transaction.on_commit(lambda: (cache.delete("catalog_queryset"), cache.delete("catalog_filters")))

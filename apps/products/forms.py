@@ -5,6 +5,7 @@ from .models import Product, ProductGalleryImage, Badge, Brand
 from .manager_slugs import AutoSlugMixin
 from .housing_editor_layout import HOUSING_EDITOR_SECTIONS
 from .price_widgets import PricesWidget
+from .product_category_forms import ProductCategoryFormMixin
 
 
 class ImagePreviewWidget(forms.ClearableFileInput):
@@ -25,7 +26,7 @@ class ImagePreviewWidget(forms.ClearableFileInput):
         return html
 
 
-class ProductForm(AutoSlugMixin, forms.ModelForm):
+class ProductForm(ProductCategoryFormMixin, AutoSlugMixin, forms.ModelForm):
     """Форма для создания и редактирования товара."""
     
     slug_source = "title"
@@ -59,6 +60,7 @@ class ProductForm(AutoSlugMixin, forms.ModelForm):
                 'data-slug-target': 'true'
             }),
             'category': forms.Select(attrs={'class': 'form-control'}),
+            'categories': forms.CheckboxSelectMultiple(),
             'brand': forms.Select(attrs={'class': 'form-control'}),
             'subtitle': forms.TextInput(attrs={'class': 'form-control'}),
             'district_text': forms.TextInput(attrs={'class': 'form-control'}),

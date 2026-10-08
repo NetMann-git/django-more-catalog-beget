@@ -3,10 +3,10 @@
 from decimal import Decimal, InvalidOperation
 
 from django.db import connection
-from django.db.models import F
+from django.db.models import F, Q
 from django.db.models.functions import Lower
 
-from apps.products.models import AttributeValue, Brand, ProductAttribute
+from apps.products.models import AttributeValue, Brand, ProductAttribute, Product
 
 
 NUMERIC_ATTRIBUTES = {
@@ -96,7 +96,13 @@ class CatalogFilter:
         if self.errors:
             return queryset.none()
         if self.category:
-            queryset = queryset.filter(category_id=self.category) if self.category.isdigit() else queryset.none()
+            if self.category.isdigit():
+                category_members = Product.categories.through.objects.filter(
+                    category_id=self.category,
+                ).values("product_id")
+                queryset = queryset.filter(Q(category_id=self.category) | Q(pk__in=category_members))
+            else:
+                queryset = queryset.none()
         if self.brand:
             queryset = queryset.filter(brand_id=self.brand) if self.brand.isdigit() else queryset.none()
         if self.availability:

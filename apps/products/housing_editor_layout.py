@@ -1,7 +1,7 @@
 """Единая группировка полей объекта для менеджера и Django Admin."""
 
 HOUSING_EDITOR_SECTIONS = (
-    ("Основное", ("title", "slug", "subtitle", "category", "brand", "image")),
+    ("Основное", ("title", "slug", "subtitle", "category", "categories", "brand", "image")),
     ("Расположение", ("location", "district_text", "address", "location_description")),
     ("Контакты", ("contact_name", "contact_phone", "additional_contact_name", "additional_contact_phone", "contact_email")),
     ("Описание и проживание", ("short_description", "description", "rooms_description")),

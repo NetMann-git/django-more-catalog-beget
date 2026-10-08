@@ -30,7 +30,9 @@
             {% for field in fields %}
             <div class="form-group">
                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {% if field.name == 'badges' %}
+                {% if field.name == 'categories' %}
+                <div class="housing-editor__categories">{{ field }}</div>
+                {% elif field.name == 'badges' %}
                 <div class="badges-group">{{ field }}</div>
                 {% else %}
                 {{ field }}

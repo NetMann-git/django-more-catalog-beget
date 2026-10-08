@@ -1,7 +1,8 @@
 # apps/products/admin.py
 
 from django.contrib import admin
-from django.db.models import Count
+from django.db.models import Count, OuterRef, Subquery, Value, Q as models_q
+from django.db.models.functions import Coalesce
 from django.utils.html import format_html
 from easy_thumbnails.files import get_thumbnailer
 from .product_attribute_forms import ProductAttributeForm
@@ -130,7 +131,12 @@ class CategoryAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request).annotate(
-            elements_count=Count("product_items", distinct=True),
+            elements_count=Coalesce(Subquery(
+                Product.objects.filter(
+                    models_q(category_id=OuterRef("pk")) | models_q(categories__pk=OuterRef("pk")),
+                ).order_by().annotate(group=Value(1)).values("group")
+                .annotate(total=Count("pk", distinct=True)).values("total"),
+            ), Value(0)),
         )
 
     def get_changelist(self, request, **kwargs):
@@ -191,6 +197,7 @@ class ProductAdmin(admin.ModelAdmin):
 
     list_filter = (
         "category",
+        "categories",
         "location",
         "brand",
         "availability_status",
@@ -211,7 +218,7 @@ class ProductAdmin(admin.ModelAdmin):
         "description",
     )
     prepopulated_fields = {"slug": ("title",)}
-    filter_horizontal = ("badges",)
+    filter_horizontal = ("badges", "categories")
     view_on_site = False
 
     # Одинаковые разделы помогают менеджеру и администратору видеть одну структуру.

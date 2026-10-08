@@ -441,8 +441,9 @@ def product_list_manage(request):
         products = products.filter(
             Q(title__icontains=search) |
             Q(article__icontains=search) |
-            Q(category__name__icontains=search)
-        )
+            Q(category__title__icontains=search) |
+            Q(categories__title__icontains=search)
+        ).distinct()
     
     paginator = Paginator(products, 20)
     page = request.GET.get('page')

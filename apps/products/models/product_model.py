@@ -43,9 +43,16 @@ class Product(models.Model):
         null=True,
         blank=True,
         related_name="product_items",
-        verbose_name="Категория",
+        verbose_name="Родительская категория (основная)",
+        help_text="Основная категория объекта для переноса прежнего адреса. Это не родитель категории в дереве.",
     )
     
+    categories = models.ManyToManyField(
+        Category, blank=True, related_name="category_objects",
+        verbose_name="Категории",
+        help_text="Объект отображается во всех выбранных категориях. Основная категория включается автоматически.",
+    )
+
     article = models.CharField(
         max_length=100,
         blank=True,
