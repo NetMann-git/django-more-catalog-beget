@@ -6,6 +6,7 @@ from easy_thumbnails.files import get_thumbnailer
 from .product_attribute_forms import ProductAttributeForm
 from .attribute_formsets import SingleProductAttributeFormSet
 from .multiple_attribute_forms import build_multiple_form, MultipleProductAdminForm, multiple_types
+from .category_tree_admin import CategoryTreeChangeList, category_tree_title
 from .cache import CatalogCache
 from .housing_editor_layout import HOUSING_EDITOR_SECTIONS
 from .templatetags.price_format import price_format
@@ -113,7 +114,25 @@ class BadgeAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ("title", "parent", "slug", "joomla_id", "sort_order", "is_published")
+    change_list_template = "admin/products/category/change_list.html"
+    list_display = ("tree_title", "parent", "slug", "joomla_id", "sort_order", "is_published")
+    list_display_links = None
+    sortable_by = ()
+
+    @admin.display(description="Дерево категорий")
+    def tree_title(self, obj):
+        return category_tree_title(obj)
+
+    def get_changelist(self, request, **kwargs):
+        return CategoryTreeChangeList
+
+    def get_ordering(self, request):
+        return ("sort_order", "title", "pk")
+
+    class Media:
+        css = {"all": ("products/css/admin/category-tree.css",)}
+        js = ("products/js/admin/category-tree.js",)
+
     search_fields = ("title", "slug")
     list_filter = ("is_published",)
     list_select_related = ("parent",)
