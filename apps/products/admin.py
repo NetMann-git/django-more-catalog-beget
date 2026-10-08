@@ -1,6 +1,7 @@
 # apps/products/admin.py
 
 from django.contrib import admin
+from django.db.models import Count
 from django.utils.html import format_html
 from easy_thumbnails.files import get_thumbnailer
 from .product_attribute_forms import ProductAttributeForm
@@ -115,13 +116,22 @@ class BadgeAdmin(admin.ModelAdmin):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     change_list_template = "admin/products/category/change_list.html"
-    list_display = ("tree_title", "parent", "slug", "joomla_id", "sort_order", "is_published")
+    list_display = ("tree_title", "elements_count", "parent", "slug", "joomla_id", "sort_order", "is_published")
     list_display_links = None
     sortable_by = ()
 
     @admin.display(description="Дерево категорий")
     def tree_title(self, obj):
         return category_tree_title(obj)
+
+    @admin.display(description="Элементы")
+    def elements_count(self, obj):
+        return obj.elements_count
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).annotate(
+            elements_count=Count("product_items", distinct=True),
+        )
 
     def get_changelist(self, request, **kwargs):
         return CategoryTreeChangeList
