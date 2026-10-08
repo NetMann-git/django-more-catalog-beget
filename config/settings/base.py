@@ -306,3 +306,7 @@ THUMBNAIL_ALIASES = {
 
 # Ключ JavaScript API Яндекс Карт; без него ручные координаты остаются доступны.
 YANDEX_MAPS_API_KEY = config("YANDEX_MAPS_API_KEY", default="")
+
+# Подложка редактора координат; публичная карта использует YANDEX_MAPS_API_KEY.
+MAP_EDITOR_TILE_URL = config("MAP_EDITOR_TILE_URL", default="https://tile.openstreetmap.org/{z}/{x}/{y}.png")
+MAP_EDITOR_TILE_ATTRIBUTION = config("MAP_EDITOR_TILE_ATTRIBUTION", default='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors')

@@ -8,3 +8,5 @@
 .object-map--editor { max-width:900px; margin-top:10px; }
 .object-map--editor > p { max-width:800px; font-size:13px; }
 @media (max-width:600px) { .object-map .object-map__canvas { height:320px; } }
+
+.object-map--editor .object-map__canvas { isolation:isolate; }

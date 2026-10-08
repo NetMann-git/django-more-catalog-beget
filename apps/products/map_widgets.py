@@ -7,8 +7,8 @@ from django.utils.safestring import mark_safe
 
 class MapCoordinatesWidget(forms.TextInput):
     class Media:
-        css = {"all": ("products/css/object-map.css",)}
-        js = ("products/js/object-map.js",)
+        css = {"all": ("products/vendor/leaflet/leaflet.css", "products/css/object-map.css")}
+        js = ("products/vendor/leaflet/leaflet.js", "products/js/map-editor-leaflet.js")
 
     def render(self, name, value, attrs=None, renderer=None):
         attrs = dict(attrs or {})
@@ -18,6 +18,7 @@ class MapCoordinatesWidget(forms.TextInput):
         controls = render_to_string("products/widgets/map_editor.html", {
             "marker_id": field_id, "center_id": prefix + "map_center",
             "zoom_id": prefix + "map_zoom",
-            "api_key": getattr(settings, "YANDEX_MAPS_API_KEY", ""),
+            "tile_url": settings.MAP_EDITOR_TILE_URL,
+            "tile_attribution": settings.MAP_EDITOR_TILE_ATTRIBUTION,
         })
         return mark_safe(str(field) + controls)
