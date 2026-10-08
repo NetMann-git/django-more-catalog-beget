@@ -113,7 +113,12 @@ class BadgeAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ("title", "slug")
+    list_display = ("title", "parent", "slug", "joomla_id", "sort_order", "is_published")
+    search_fields = ("title", "slug")
+    list_filter = ("is_published",)
+    list_select_related = ("parent",)
+    autocomplete_fields = ("parent",)
+    readonly_fields = ("joomla_id", "joomla_source")
     prepopulated_fields = {"slug": ("title",)}
 
 
