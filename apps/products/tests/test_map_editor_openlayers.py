@@ -5,7 +5,7 @@ from apps.products.map_data import product_map
 from apps.products.models import Product
 
 
-class LeafletEditorTests(SimpleTestCase):
+class OpenLayersEditorTests(SimpleTestCase):
     @override_settings(YANDEX_MAPS_API_KEY='')
     def test_editor_available_without_yandex_key(self):
         widget=MapCoordinatesWidget()
@@ -16,9 +16,9 @@ class LeafletEditorTests(SimpleTestCase):
         self.assertIn('data-tile-url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"',html)
         self.assertIn('OpenStreetMap',html)
         media=str(widget.media)
-        self.assertIn('vendor/leaflet/leaflet.js',media)
-        self.assertIn('vendor/leaflet/leaflet.css',media)
-        self.assertIn('map-editor-leaflet.js',media)
+        self.assertIn('vendor/openlayers/ol.js',media)
+        self.assertIn('vendor/openlayers/ol.css',media)
+        self.assertIn('map-editor-openlayers.js',media)
         self.assertNotIn('products/js/object-map.js',media)
 
     @override_settings(YANDEX_MAPS_API_KEY='public-key')

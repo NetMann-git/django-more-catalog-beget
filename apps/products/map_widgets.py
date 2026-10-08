@@ -7,8 +7,8 @@ from django.utils.safestring import mark_safe
 
 class MapCoordinatesWidget(forms.TextInput):
     class Media:
-        css = {"all": ("products/vendor/leaflet/leaflet.css", "products/css/object-map.css")}
-        js = ("products/vendor/leaflet/leaflet.js", "products/js/map-editor-leaflet.js")
+        css = {"all": ("products/vendor/openlayers/ol.css", "products/css/object-map.css")}
+        js = ("products/vendor/openlayers/ol.js", "products/js/map-editor-openlayers.js")
 
     def render(self, name, value, attrs=None, renderer=None):
         attrs = dict(attrs or {})

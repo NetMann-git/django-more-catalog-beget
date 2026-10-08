@@ -10,3 +10,7 @@
 @media (max-width:600px) { .object-map .object-map__canvas { height:320px; } }
 
 .object-map--editor .object-map__canvas { isolation:isolate; }
+
+/* Keep map controls compact despite the shared form button styles. */
+.object-map--editor .ol-control button { padding:0; border:0; border-radius:2px; background:rgba(255,255,255,.9); color:#19364c; }
+.object-map--editor .ol-attribution { max-width:100%; font-size:11px; }
