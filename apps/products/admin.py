@@ -242,7 +242,7 @@ class ProductAdmin(admin.ModelAdmin):
         )
         return super().get_form(request, obj, **kwargs)
 
-    readonly_fields = ("price_description_source", "map_source")
+    readonly_fields = ("price_description_source", "map_source", "joomla_id", "joomla_url", "joomla_source")
 
     def get_fieldsets(self, request, obj=None):
         """Не изменять общий список fieldsets между запросами пользователей."""
@@ -257,6 +257,8 @@ class ProductAdmin(admin.ModelAdmin):
         )
         if names:
             fieldsets.append(("Множественные характеристики", {"fields": names}))
+        if obj and obj.joomla_id:
+            fieldsets.append(("Импорт JBZoo (архив)", {"fields": ("joomla_id", "joomla_url", "joomla_source"), "classes": ("collapse",)}))
         return fieldsets
 
     inlines = [

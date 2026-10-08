@@ -137,9 +137,12 @@ def recently_viewed_list(request):
     return render(request, 'products/recently_viewed.html', context)
 
 # @cache_page(60 * 5)  # 5 минут
-def product_detail(request, slug):
-    product = get_object_or_404(Product.objects.select_related("brand", "location"), slug=slug, is_active=True)
-    context = {"product": product, "page": product}
+def product_detail(request, slug, _import_preview=False):
+    queryset = Product.objects.select_related("brand", "location")
+    if not _import_preview:
+        queryset = queryset.filter(is_active=True)
+    product = get_object_or_404(queryset, slug=slug)
+    context = {"product": product, "page": product, "import_preview": _import_preview}
     context.update(housing_context(product))
     context["car_order_success"] = (
         request.session.pop('car_order_success_product_id', None) == product.pk

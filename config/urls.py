@@ -6,9 +6,11 @@ from django.contrib import admin
 from django.urls import include, path
 
 from apps.home.views import home
+from apps.products.import_views import legacy_item
 from apps.home.legal_views import public_offer, privacy_policy, personal_data_consent
 
 urlpatterns = [
+    path("properties-list/<slug:slug>.html", legacy_item, name="legacy_item"),
     path('admin/', admin.site.urls),
     path('smart_selects/', include('smart_selects.urls')),  # ДОБАВИТЬ ЭТУ СТРОКУ
     path('', home, name='home'),

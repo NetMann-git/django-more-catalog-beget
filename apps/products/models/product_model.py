@@ -21,6 +21,10 @@ class Product(models.Model):
     Обычная Django-модель товара (без Wagtail).
     """
 
+    joomla_id = models.PositiveIntegerField("ID Joomla", null=True, blank=True, unique=True, editable=False)
+    joomla_url = models.CharField("Исходный URL Joomla", max_length=1000, blank=True, editable=False)
+    joomla_source = models.JSONField("Исходные данные JBZoo", default=dict, blank=True, editable=False)
+
     # Основная информация
     title = models.CharField(max_length=255, verbose_name="Название")
     slug = models.SlugField(unique=True, verbose_name="URL")

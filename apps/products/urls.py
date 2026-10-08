@@ -2,10 +2,12 @@
 from django.urls import path
 from . import views
 from . import attribute_management
+from .import_views import item_preview
 
 app_name = "catalog"
 
 urlpatterns = [
+    path("manage/<int:product_id>/preview/", item_preview, name="item_preview"),
     path("", views.catalog, name="catalog"),
     
     # Маршруты сравнения (должны быть ПЕРЕД <slug:slug>/)

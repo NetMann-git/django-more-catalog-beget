@@ -17,6 +17,10 @@
 {% endblock extra_css %}
 
 {% block content %}
+{% if import_preview %}
+<div class="container" role="status"><p><strong>Предпросмотр импорта JBZoo. Статус публикации объекта сохранён.</strong> <a href="{% url 'catalog:product_edit' product.pk %}">Редактировать объект</a></p></div>
+{% endif %}
+
 
 <div class="container car-detail housing-detail">
 
