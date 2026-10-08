@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="{% static 'appointments/css/car_inquiry.css' %}">
 <link rel="stylesheet" href="{% static 'products/css/product/car-detail.css' %}">
 <link rel="stylesheet" href="{% static 'products/css/product/housing-detail.css' %}">
+{% if housing_map %}<link rel="stylesheet" href="{% static 'products/css/object-map.css' %}">{% endif %}
 {% endblock extra_css %}
 
 {% block content %}
@@ -297,6 +298,7 @@
     </div>
 </div>
 
+{% if housing_map %}<script src="{% static 'products/js/object-map.js' %}"></script>{% endif %}
 <!-- Подключаем скрипты галереи и лайтбоксов -->
 <script src="{% static 'products/js/product_gallery.js' %}"></script>
 <script src="{% static 'products/js/review_lightbox.js' %}"></script>

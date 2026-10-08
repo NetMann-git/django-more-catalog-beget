@@ -303,3 +303,6 @@ THUMBNAIL_ALIASES = {
         'small': {'size': (100, 150), 'crop': True},
     },
 }
+
+# Ключ JavaScript API Яндекс Карт; без него ручные координаты остаются доступны.
+YANDEX_MAPS_API_KEY = config("YANDEX_MAPS_API_KEY", default="")

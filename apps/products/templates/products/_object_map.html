@@ -1,0 +1,9 @@
+<section class="description-block housing-detail__section object-map" id="housing-map" aria-labelledby="housing-map-title" data-object-map-public data-config="object-map-data">
+    <h2 id="housing-map-title">Объект на карте</h2>
+    {% if product.address %}<p>{{ product.address }}</p>{% endif %}
+    {% if housing_map.api_key %}<button type="button" class="object-map__load">Показать карту</button>{% endif %}
+    <div class="object-map__canvas" hidden aria-label="Карта расположения объекта"></div>
+    <p class="object-map__status" role="status" aria-live="polite"></p>
+    <p><a href="{{ housing_map.url }}" target="_blank" rel="noopener">Открыть в Яндекс Картах</a></p>
+    {{ housing_map|json_script:"object-map-data" }}
+</section>

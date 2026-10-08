@@ -5,6 +5,7 @@ from .models import Product, ProductGalleryImage, Badge, Brand
 from .manager_slugs import AutoSlugMixin
 from .housing_editor_layout import HOUSING_EDITOR_SECTIONS
 from .price_widgets import PricesWidget
+from .map_widgets import MapCoordinatesWidget
 from .product_category_forms import ProductCategoryFormMixin
 
 
@@ -59,6 +60,9 @@ class ProductForm(ProductCategoryFormMixin, AutoSlugMixin, forms.ModelForm):
                 'id': 'id_slug',
                 'data-slug-target': 'true'
             }),
+            'map_coordinates': MapCoordinatesWidget(attrs={'class':'form-control'}),
+            'map_center': forms.TextInput(attrs={'class':'form-control'}),
+            'map_zoom': forms.NumberInput(attrs={'class':'form-control', 'min':0, 'max':19}),
             'category': forms.Select(attrs={'class': 'form-control'}),
             'categories': forms.CheckboxSelectMultiple(),
             'brand': forms.Select(attrs={'class': 'form-control'}),

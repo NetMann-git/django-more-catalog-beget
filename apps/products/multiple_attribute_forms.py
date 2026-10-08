@@ -6,6 +6,7 @@ from django.utils.html import format_html
 
 from .models import AttributeType, AttributeValue, Product, ProductAttribute
 from .price_widgets import PricesWidget
+from .map_widgets import MapCoordinatesWidget
 from .product_category_forms import ProductCategoryFormMixin
 
 
@@ -59,7 +60,7 @@ class MultipleProductAdminForm(ProductCategoryFormMixin, MultipleAttributeMixin,
     class Meta:
         model = Product
         fields = "__all__"
-        widgets = {"price_description": PricesWidget()}
+        widgets = {"price_description": PricesWidget(), "map_coordinates": MapCoordinatesWidget()}
 
 
 def icon_label(text, icon):

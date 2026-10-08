@@ -1,6 +1,7 @@
-{% if housing_sections or housing_attributes or housing_has_contacts %}
+{% if housing_sections or housing_attributes or housing_has_contacts or housing_map %}
 <nav class="housing-detail__navigation" aria-label="Разделы объекта">
     {% for section in housing_sections %}<a href="#housing-{{ section.slug }}">{{ section.title }}</a>{% endfor %}
+    {% if housing_map %}<a href="#housing-map">На карте</a>{% endif %}
     {% if housing_attributes %}<a href="#housing-amenities">Удобства</a>{% endif %}
     {% if housing_has_contacts %}<a href="#housing-contacts">Контакты</a>{% endif %}
 </nav>
@@ -14,6 +15,7 @@
         {% endfor %}
     </section>
     {% endfor %}
+    {% if housing_map %}{% include "products/_object_map.html" %}{% endif %}
     {% if housing_attributes %}
     <section class="description-block housing-detail__section" id="housing-amenities" aria-labelledby="housing-amenities-title">
         <h2 id="housing-amenities-title">Удобства и характеристики</h2>

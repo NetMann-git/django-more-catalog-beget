@@ -3,6 +3,7 @@
 HOUSING_EDITOR_SECTIONS = (
     ("Основное", ("title", "slug", "subtitle", "category", "categories", "brand", "image")),
     ("Расположение", ("location", "district_text", "address", "location_description")),
+    ("Карта Яндекс", ("map_coordinates", "map_center", "map_zoom")),
     ("Контакты", ("contact_name", "contact_phone", "additional_contact_name", "additional_contact_phone", "contact_email")),
     ("Описание и проживание", ("short_description", "description", "rooms_description")),
     ("Питание", ("meals_description",)),

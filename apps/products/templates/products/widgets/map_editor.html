@@ -1,0 +1,11 @@
+<div class="object-map object-map--editor" data-object-map-editor data-marker-input="{{ marker_id }}" data-center-input="{{ center_id }}" data-zoom-input="{{ zoom_id }}" data-api-key="{{ api_key }}">
+    {% if api_key %}
+    <button type="button" class="object-map__load">Загрузить карту</button>
+    <p>Поставьте метку кликом или перетащите её. Перемещение карты меняет центр, а не координаты объекта.</p>
+    {% else %}
+    <p>Координаты можно ввести вручную. Для интерактивного редактора администратору нужно подключить ключ Яндекс Карт.</p>
+    {% endif %}
+    <div class="object-map__canvas" hidden aria-label="Редактор карты объекта"></div>
+    <button type="button" class="object-map__center" hidden>Центрировать на метке</button>
+    <p class="object-map__status" role="status" aria-live="polite"></p>
+</div>

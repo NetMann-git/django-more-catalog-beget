@@ -4,6 +4,8 @@ from django.urls import reverse
 
 from .badge import Badge
 from .category import Category
+from django.core.validators import MinValueValidator, MaxValueValidator
+from ..map_data import validate_coordinates
 from .brand import Brand
 
 from apps.products.constants import (
@@ -72,6 +74,23 @@ class Product(models.Model):
         blank=True,
         related_name="products",
         verbose_name="Локация",
+    )
+
+    map_coordinates = models.CharField(
+        "Координаты метки", max_length=255, blank=True, validators=[validate_coordinates],
+        help_text="Долгота, широта. Дробная часть через точку. Исходная точность сохраняется.",
+    )
+    map_center = models.CharField(
+        "Центр карты", max_length=255, blank=True, validators=[validate_coordinates],
+        help_text="Долгота, широта. Если не указан, карта центрируется на метке.",
+    )
+    map_zoom = models.PositiveSmallIntegerField(
+        "Масштаб карты", default=12, null=True, blank=True,
+        validators=[MinValueValidator(0), MaxValueValidator(19)],
+        help_text="От 0 до 19. Если не указан, используется 12.",
+    )
+    map_source = models.JSONField(
+        "Исходные данные карты JBZoo", default=dict, blank=True, editable=False,
     )
 
     # Поля жилья необязательны: существующие записи остаются совместимыми.

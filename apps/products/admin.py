@@ -242,13 +242,15 @@ class ProductAdmin(admin.ModelAdmin):
         )
         return super().get_form(request, obj, **kwargs)
 
-    readonly_fields = ("price_description_source",)
+    readonly_fields = ("price_description_source", "map_source")
 
     def get_fieldsets(self, request, obj=None):
         """Не изменять общий список fieldsets между запросами пользователей."""
         fieldsets = list(super().get_fieldsets(request, obj))
         if obj and obj.price_description_source:
             fieldsets.append(("Исходный HTML цен (архив)", {"fields": ("price_description_source",), "classes": ("collapse",)}))
+        if obj and obj.map_source:
+            fieldsets.append(("Исходные данные карты JBZoo", {"fields": ("map_source",), "classes": ("collapse",)}))
         names = tuple(
             f"multiple_attribute_{kind.pk}"
             for kind in self.editable_multiple_types(request)
