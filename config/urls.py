@@ -7,9 +7,13 @@ from django.urls import include, path
 
 from apps.home.views import home
 from apps.products.import_views import legacy_item
+from apps.products.legacy_urls import LEGACY_PREFIXES
 from apps.home.legal_views import public_offer, privacy_policy, personal_data_consent
 
 urlpatterns = [
+    *[path(f"{prefix}/<slug:slug>.html", legacy_item, {"prefix": prefix})
+      for prefix in LEGACY_PREFIXES
+      if prefix not in {"gostevye-doma", "chastnyj-sektor-loo", "properties-list"}],
     path("gostevye-doma/<slug:slug>.html", legacy_item, {"prefix":"gostevye-doma"}),
     path("chastnyj-sektor-loo/<slug:slug>.html", legacy_item, {"prefix":"chastnyj-sektor-loo"}),
     path("properties-list/<slug:slug>.html", legacy_item, name="legacy_item"),

@@ -13,7 +13,7 @@ class BatchCommandTests(TestCase):
         call_command('import_jbzoo_batch', list=True, stdout=output)
         plan = json.loads(output.getvalue())
         self.assertEqual(plan['ready_objects'] + plan['previous_objects'] + plan['review_objects'], 550)
-        self.assertEqual([len(b['objects']) for b in plan['batches']], [10, 10, 10, 10, 4])
+        self.assertEqual([len(b['objects']) for b in plan['batches']], [10, 10, 10, 10, 4, 10, 10, 10, 10, 4])
         self.assertFalse(Product.objects.exists())
 
     def test_apply_requires_one_valid_batch_and_media_source(self):

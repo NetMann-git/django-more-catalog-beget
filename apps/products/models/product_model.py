@@ -2,6 +2,7 @@
 from django.db import models
 from django.urls import reverse
 from urllib.parse import urlsplit
+from ..legacy_urls import LEGACY_PREFIXES
 
 from .badge import Badge
 from .category import Category
@@ -229,9 +230,7 @@ class Product(models.Model):
     def get_absolute_url(self):
         if self.joomla_id and self.joomla_url:
             path = urlsplit(self.joomla_url).path.replace("//", "/")
-            if path in {f"/{prefix}/{self.slug}.html" for prefix in (
-                "properties-list", "gostevye-doma", "chastnyj-sektor-loo",
-            )}:
+            if path in {f"/{prefix}/{self.slug}.html" for prefix in LEGACY_PREFIXES}:
                 return path
         return reverse("catalog:product_detail", kwargs={"slug": self.slug})
 
