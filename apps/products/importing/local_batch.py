@@ -38,8 +38,13 @@ def read_local_items(data, media_source, approved=None):
         folder_name = approved[item['id']]
         elements = item['item']['elements'].values()
         galleries = [e.get('data', {}).get('value') for e in elements if e['name'] == 'Галерея']
+        cover = next(e['data']['0']['file'] for e in elements if e['name'] == 'Главное Фото')
         if folder_name not in galleries:
-            raise ItemImportError('Папка не соответствует исходному объекту.')
+            # Only reviewed snapshots may use the original cover's folder.
+            from_cover = item.get('gallery_from_cover') is True
+            cover_folder = Path(cover).parent.as_posix()
+            if not from_cover or any(galleries) or cover_folder != 'images/uploads/' + folder_name:
+                raise ItemImportError('Папка не соответствует исходному объекту.')
         path = urlsplit(item['url']).path.replace('//', '/')
         if path != '/' + item['legacy_prefix'] + '/' + item['alias'] + '.html':
             raise ItemImportError('Исходный URL не соответствует алиасу.')
@@ -49,7 +54,6 @@ def read_local_items(data, media_source, approved=None):
         files = sorted([f for f in folder.iterdir() if f.is_file() and f.suffix.lower() in IMAGE_EXTENSIONS], key=lambda f:filename_order(f.name))
         if not files:
             raise ItemImportError(f'В папке нет фотографий: {folder}')
-        cover = next(e['data']['0']['file'] for e in elements if e['name'] == 'Главное Фото')
         if cover not in ['images/uploads/' + folder_name + '/' + f.name for f in files]:
             raise ItemImportError('Нет главного фото: ' + cover)
         item['media'] = []

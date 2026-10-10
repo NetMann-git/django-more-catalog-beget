@@ -129,3 +129,33 @@ class LocalBatchTests(TestCase):
         self.assertEqual(obj.brand.slug, 'mini-gostinitsy')
         self.assertEqual(obj.joomla_source['item'], batch[0][0]['item'])
         self.assertTrue(all(row['result'] == 'unchanged' for row in import_local_batch(batch, self.source, apply=True)))
+
+    def test_empty_gallery_requires_reviewed_cover_folder_and_preserves_raw(self):
+        data = self.raw
+        for element in data[0]['item']['elements'].values():
+            if element['name'] == 'Галерея':
+                element['data'] = {'value': ''}
+        fixture = self.root / 'cover-folder.json'
+        fixture.write_text(json.dumps(data))
+        with self.assertRaises(ItemImportError):
+            read_local_batch(fixture, self.source)
+        data[0]['gallery_from_cover'] = True
+        fixture.write_text(json.dumps(data))
+        batch = read_local_batch(fixture, self.source)
+        import_local_batch(batch, self.source, apply=True)
+        obj = Product.objects.get(joomla_id=data[0]['id'])
+        self.assertEqual(obj.joomla_source['item'], data[0]['item'])
+        self.assertEqual(obj.gallery.count(), 2)
+        self.assertEqual([Path(g.image.name).name for g in obj.gallery.all()], ['photo2.jpg', 'photo10.jpg'])
+
+    def test_reviewed_cover_folder_cannot_override_nonempty_gallery(self):
+        data = self.raw
+        data[0]['gallery_from_cover'] = True
+        for element in data[0]['item']['elements'].values():
+            if element['name'] == 'Галерея':
+                element['data'] = {'value': 'user_99999'}
+        fixture = self.root / 'conflicting-folder.json'
+        fixture.write_text(json.dumps(data))
+        with self.assertRaises(ItemImportError):
+            read_local_batch(fixture, self.source)
+        self.assertFalse(Product.objects.exists())
