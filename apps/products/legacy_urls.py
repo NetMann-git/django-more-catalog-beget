@@ -13,6 +13,7 @@ LEGACY_PREFIXES = (
     "gostevye-doma",
     "gostevye-doma-abkhazii",
     "gostevye-doma-loo",
+    "kvartiry-v-abkhazii",
     "lazarevskij-rajon",
     "novyj-afon",
     "oteli-i-gostinitsy-lazarevskoe",
