@@ -113,8 +113,11 @@ class ItemImportTests(TestCase):
         self.assertContains(response, 'Эконом')
         Product.objects.filter(pk=obj.pk).update(is_active=True)
         response = self.client.get('/properties-list/' + obj.slug + '.html')
-        self.assertEqual(response.status_code, 301)
-        self.assertEqual(response['Location'], obj.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(obj.get_absolute_url(), '/properties-list/' + obj.slug + '.html')
+        moved = self.client.get('/catalog/' + obj.slug + '/')
+        self.assertEqual(moved.status_code, 301)
+        self.assertEqual(moved['Location'], obj.get_absolute_url())
 
     def test_missing_type_is_created_only_on_apply(self):
         Brand.objects.all().delete()

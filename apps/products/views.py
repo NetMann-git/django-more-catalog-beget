@@ -142,6 +142,8 @@ def product_detail(request, slug, _import_preview=False):
     if not _import_preview:
         queryset = queryset.filter(is_active=True)
     product = get_object_or_404(queryset, slug=slug)
+    if not _import_preview and product.joomla_id and request.path != product.get_absolute_url():
+        return redirect(product.get_absolute_url(), permanent=True)
     context = {"product": product, "page": product, "import_preview": _import_preview}
     context.update(housing_context(product))
     context["car_order_success"] = (

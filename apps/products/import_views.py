@@ -21,4 +21,4 @@ def legacy_item(request, slug, prefix="properties-list"):
     product = get_object_or_404(Product, slug=slug, joomla_id__isnull=False, is_active=True)
     if urlsplit(product.joomla_url).path.replace("//", "/") != f"/{prefix}/{slug}.html":
         raise Http404
-    return redirect(product.get_absolute_url(), permanent=True)
+    return product_detail(request, product.slug)

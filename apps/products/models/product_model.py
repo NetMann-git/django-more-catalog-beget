@@ -1,6 +1,7 @@
 # apps/products/models/product_model.py
 from django.db import models
 from django.urls import reverse
+from urllib.parse import urlsplit
 
 from .badge import Badge
 from .category import Category
@@ -226,6 +227,12 @@ class Product(models.Model):
         return self.title
 
     def get_absolute_url(self):
+        if self.joomla_id and self.joomla_url:
+            path = urlsplit(self.joomla_url).path.replace("//", "/")
+            if path in {f"/{prefix}/{self.slug}.html" for prefix in (
+                "properties-list", "gostevye-doma", "chastnyj-sektor-loo",
+            )}:
+                return path
         return reverse("catalog:product_detail", kwargs={"slug": self.slug})
 
     @property
