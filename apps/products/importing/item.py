@@ -42,12 +42,12 @@ def read_snapshot(path):
         raise ItemImportError('Ожидается снимок одного объекта, schema=1.')
     if not isinstance(data.get('id'), int) or data['id'] <= 0:
         raise ItemImportError('Некорректный ID Joomla.')
-    if not re.fullmatch(r'[-a-zA-Z0-9_]{1,50}', data.get('alias', '')):
+    if not re.fullmatch(r'[-a-zA-Z0-9_]{1,255}', data.get('alias', '')):
         raise ItemImportError('Некорректный алиас.')
     parsed = urlsplit(data.get('url', ''))
     if parsed.scheme != 'https' or parsed.hostname != 'xn----7sblqcj4aok5d9b.xn--p1ai':
         raise ItemImportError('Некорректный исходный URL.')
-    if parsed.path.replace('//', '/') != '/properties-list/' + data['alias'] + '.html':
+    if parsed.path.replace('//', '/') != '/' + data.get('legacy_prefix', 'properties-list') + '/' + data['alias'] + '.html':
         raise ItemImportError('URL не соответствует алиасу.')
     return data
 
@@ -60,7 +60,7 @@ def media_plan(data, media_source):
     seen = set()
     for entry in data['media']:
         rel = entry['path']
-        if not re.fullmatch(r'images/uploads/user_606/[a-zA-Z0-9_.-]+\.(jpg|jpeg|png|mp4)', rel) or rel in seen:
+        if not re.fullmatch(r'images/uploads/user_[0-9]+/[\w .()-]+\.(jpg|jpeg|png|webp|gif|mp4)', rel, flags=re.I) or rel in seen:
             raise ItemImportError('Недопустимый или повторный путь медиа.')
         seen.add(rel)
         source = (source_root / rel).resolve()
@@ -131,7 +131,7 @@ def prepare(data, media_source):
         # Rewrite only matching media src attributes; original HTML remains archived.
         for field in set(FIELDS.values()):
             value = getattr(obj, field)
-            value = re.sub(r'(\bsrc\s*=\s*["\'])' + re.escape(rel) + r'(["\'])', lambda m: m[1] + url + m[2], value)
+            value = re.sub(r'(\bsrc\s*=\s*["\'])/?' + re.escape(rel) + r'(["\'])', lambda m: m[1] + url + m[2], value)
             setattr(obj, field, value)
     if main:
         if main not in {rel for rel, _, _ in plan}:
@@ -140,9 +140,10 @@ def prepare(data, media_source):
     if brand_name:
         obj.brand = Brand.objects.filter(name=brand_name).first()
         if obj.brand is None:
-            if brand_name != 'Гостевые дома' or Brand.objects.filter(slug='gostevye-doma').exists():
+            brand_slug = {'Гостевые дома':'gostevye-doma', 'Квартиры':'kvartiry', 'Частный сектор':'chastnyj-sektor'}.get(brand_name)
+            if not brand_slug or Brand.objects.filter(slug=brand_slug).exists():
                 raise ItemImportError('Тип жилья не сопоставлен: ' + brand_name)
-            obj.brand = Brand(name=brand_name, slug='gostevye-doma')
+            obj.brand = Brand(name=brand_name, slug=brand_slug)
             obj.brand.full_clean()
     try:
         obj.full_clean()

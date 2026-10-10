@@ -10,6 +10,8 @@ from apps.products.import_views import legacy_item
 from apps.home.legal_views import public_offer, privacy_policy, personal_data_consent
 
 urlpatterns = [
+    path("gostevye-doma/<slug:slug>.html", legacy_item, {"prefix":"gostevye-doma"}),
+    path("chastnyj-sektor-loo/<slug:slug>.html", legacy_item, {"prefix":"chastnyj-sektor-loo"}),
     path("properties-list/<slug:slug>.html", legacy_item, name="legacy_item"),
     path('admin/', admin.site.urls),
     path('smart_selects/', include('smart_selects.urls')),  # ДОБАВИТЬ ЭТУ СТРОКУ

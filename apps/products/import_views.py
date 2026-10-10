@@ -1,5 +1,7 @@
 """Предпросмотр неопубликованного объекта и сохранённый путь Joomla."""
 from django.shortcuts import get_object_or_404, redirect
+from django.http import Http404
+from urllib.parse import urlsplit
 from django.views.decorators.cache import never_cache
 
 from apps.users.decorators import role_required
@@ -15,6 +17,8 @@ def item_preview(request, product_id):
     return product_detail(request, product.slug, _import_preview=True)
 
 
-def legacy_item(request, slug):
+def legacy_item(request, slug, prefix="properties-list"):
     product = get_object_or_404(Product, slug=slug, joomla_id__isnull=False, is_active=True)
+    if urlsplit(product.joomla_url).path.replace("//", "/") != f"/{prefix}/{slug}.html":
+        raise Http404
     return redirect(product.get_absolute_url(), permanent=True)

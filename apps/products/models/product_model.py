@@ -27,7 +27,7 @@ class Product(models.Model):
 
     # Основная информация
     title = models.CharField(max_length=255, verbose_name="Название")
-    slug = models.SlugField(unique=True, verbose_name="URL")
+    slug = models.SlugField(max_length=255, unique=True, verbose_name="URL")
 
     image = ThumbnailerImageField(
         upload_to="products/",
