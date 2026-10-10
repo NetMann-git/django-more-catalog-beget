@@ -108,6 +108,7 @@ def import_local_batch(batch, media_source, apply=False):
             for data, ignored, (obj, categories, plan, archived, unchanged) in prepared:
                 if unchanged:
                     report.append({'id':data['id'], 'result':'unchanged', 'title':obj.title,
+                    'housing_type': obj.brand.name if obj.brand else None,
                         'preview_url':f'/catalog/manage/{obj.pk}/preview/', 'gallery_photos':len(data['local_gallery']), 'ignored':ignored})
                     continue
                 if apply:
@@ -133,6 +134,7 @@ def import_local_batch(batch, media_source, apply=False):
                         ProductGalleryImage.objects.create(product=obj, image='jbzoo/'+str(data['id'])+'/'+rel,
                             alt=obj.title, sort_order=order)
                 report.append({'id':data['id'], 'result':'created' if apply else 'check', 'title':obj.title,
+                    'housing_type': obj.brand.name if obj.brand else None,
                     'published':obj.is_active, 'categories':list(categories), 'primary':obj.category.slug,
                     'gallery_photos':len(data['local_gallery']), 'photos_with_cover':len(data['local_gallery'])+1,
                     'order':[Path(p).name for p in data['local_gallery']], 'ignored':ignored,

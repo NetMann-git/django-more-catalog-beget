@@ -159,3 +159,17 @@ class LocalBatchTests(TestCase):
         with self.assertRaises(ItemImportError):
             read_local_batch(fixture, self.source)
         self.assertFalse(Product.objects.exists())
+
+    def test_empty_housing_type_stays_empty_without_category_guessing(self):
+        batch = self.batch()
+        for element in batch[0][0]['item']['elements'].values():
+            if element['name'] == 'Тип жилья':
+                element['data']['0']['list-0'] = ''
+        result = import_local_batch(batch, self.source, apply=True)
+        obj = Product.objects.get(joomla_id=batch[0][0]['id'])
+        self.assertIsNone(obj.brand)
+        self.assertIsNone(result[0]['housing_type'])
+        self.assertEqual(obj.joomla_source['item'], batch[0][0]['item'])
+        repeated = import_local_batch(batch, self.source, apply=True)
+        self.assertEqual(repeated[0]['result'], 'unchanged')
+        self.assertIsNone(repeated[0]['housing_type'])
