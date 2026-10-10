@@ -104,3 +104,13 @@ class LocalBatchTests(TestCase):
         report = import_local_batch(batch, self.source, apply=True)
         self.assertIn('ADD_PHOTOS_HERE.txt',report[0]['ignored'])
         self.assertTrue(Product.objects.get(joomla_id=1096).gallery.filter(image__endswith='Фото2.JPG').exists())
+
+    def test_virtual_root_is_archived_without_creating_a_category(self):
+        batch = self.batch()
+        item = batch[0][0]
+        item['item']['categories']['extra'] = '_root'
+        import_local_batch(batch, self.source, apply=True)
+        obj = Product.objects.get(joomla_id=item['id'])
+        self.assertIn('_root', obj.joomla_source['item']['categories'].values())
+        self.assertFalse(obj.categories.filter(slug='_root').exists())
+        self.assertEqual(obj.category.slug, item['item']['config']['primary_category'])

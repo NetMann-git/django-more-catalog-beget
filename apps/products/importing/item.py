@@ -86,7 +86,8 @@ def prepare(data, media_source):
     raw = data['item']
     if raw.get('state') not in ('0', '1') or raw.get('access') != '1':
         raise ItemImportError('Неподдерживаемый статус или уровень доступа.')
-    categories = list(raw['categories'].values())
+    # _root is Joomla's virtual root, not an importable category.
+    categories = [slug for slug in raw['categories'].values() if slug != '_root']
     primary = raw['config']['primary_category']
     categories = list(dict.fromkeys(categories + [primary]))
     found = {c.slug: c for c in Category.objects.filter(slug__in=categories)}

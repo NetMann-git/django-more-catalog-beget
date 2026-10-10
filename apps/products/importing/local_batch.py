@@ -21,15 +21,16 @@ APPROVED = {1096:'user_396', 1963:'user_548', 1036:'user_378'}
 IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.webp', '.gif'}
 
 
-def read_local_batch(fixture, media_source):
+def read_local_batch(fixture, media_source, approved=None):
+    approved = APPROVED if approved is None else approved
     source = Path(media_source).resolve()
     data = json.loads(Path(fixture).read_text(encoding='utf-8'))
-    if not isinstance(data, list) or len(data) != 3 or {x['id'] for x in data} != set(APPROVED):
-        raise ItemImportError('Ожидаются только три выбранных объекта 1096, 1963 и 1036.')
+    if not isinstance(data, list) or len(data) != len(approved) or {x['id'] for x in data} != set(approved):
+        raise ItemImportError('Список объектов не соответствует выбранной группе.')
     result = []
     for original in data:
         item = copy.deepcopy(original)
-        folder_name = APPROVED[item['id']]
+        folder_name = approved[item['id']]
         elements = item['item']['elements'].values()
         galleries = [e.get('data', {}).get('value') for e in elements if e['name'] == 'Галерея']
         if folder_name not in galleries:
