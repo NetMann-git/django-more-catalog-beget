@@ -141,7 +141,7 @@ def prepare(data, media_source):
     if brand_name:
         obj.brand = Brand.objects.filter(name=brand_name).first()
         if obj.brand is None:
-            brand_slug = {'Гостевые дома':'gostevye-doma', 'Квартиры':'kvartiry', 'Частный сектор':'chastnyj-sektor'}.get(brand_name)
+            brand_slug = {'Гостевые дома':'gostevye-doma', 'Квартиры':'kvartiry', 'Частный сектор':'chastnyj-sektor', 'Мини Гостиницы':'mini-gostinitsy'}.get(brand_name)
             if not brand_slug or Brand.objects.filter(slug=brand_slug).exists():
                 raise ItemImportError('Тип жилья не сопоставлен: ' + brand_name)
             obj.brand = Brand(name=brand_name, slug=brand_slug)

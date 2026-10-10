@@ -117,3 +117,15 @@ class LocalBatchTests(TestCase):
         self.assertIn('_root', obj.joomla_source['item']['categories'].values())
         self.assertFalse(obj.categories.filter(slug='_root').exists())
         self.assertEqual(obj.category.slug, item['item']['config']['primary_category'])
+
+    def test_mini_hotels_create_their_own_type_and_keep_source(self):
+        batch = self.batch()
+        for element in batch[0][0]['item']['elements'].values():
+            if element['name'] == 'Тип жилья':
+                element['data']['0']['list-0'] = 'Мини Гостиницы'
+        import_local_batch(batch, self.source, apply=True)
+        obj = Product.objects.get(joomla_id=batch[0][0]['id'])
+        self.assertEqual(obj.brand.name, 'Мини Гостиницы')
+        self.assertEqual(obj.brand.slug, 'mini-gostinitsy')
+        self.assertEqual(obj.joomla_source['item'], batch[0][0]['item'])
+        self.assertTrue(all(row['result'] == 'unchanged' for row in import_local_batch(batch, self.source, apply=True)))
