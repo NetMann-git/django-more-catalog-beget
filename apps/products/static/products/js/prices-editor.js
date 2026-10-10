@@ -1,4 +1,4 @@
-/* TinyMCE для поля «Цены»: локальные файлы и сохранение исходника без правок. */
+/* TinyMCE для HTML-полей карточки: локальные файлы и сохранение исходника без правок. */
 (() => {
   'use strict';
   function start() {
@@ -10,7 +10,7 @@
       const preview = raw.nextElementSibling;
       const initial = preview?.classList.contains('prices-editor__initial') ? preview.value : original;
       const visual = document.createElement('textarea');
-      visual.id = raw.id + '_visual'; visual.setAttribute('aria-label', 'Цены');
+      visual.id = raw.id + '_visual'; visual.setAttribute('aria-label', document.querySelector('label[for="'+raw.id+'"]')?.textContent.trim() || 'HTML-редактор');
       visual.value = initial; raw.after(visual);
       preview?.classList.contains('prices-editor__initial') && preview.remove();
       let initialized = false, baseline = null;
@@ -25,7 +25,7 @@
         license_key: 'gpl',
         language: 'ru',
         language_url: base + '/langs/ru.js',
-        height: 560,
+        height: raw.name === 'price_description' ? 560 : 400,
         min_height: 350,
         resize: true,
         promotion: false,

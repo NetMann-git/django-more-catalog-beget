@@ -60,7 +60,14 @@ class MultipleProductAdminForm(ProductCategoryFormMixin, MultipleAttributeMixin,
     class Meta:
         model = Product
         fields = "__all__"
-        widgets = {"price_description": PricesWidget(), "map_coordinates": MapCoordinatesWidget()}
+        widgets = {
+            "price_description": PricesWidget(),
+            "map_coordinates": MapCoordinatesWidget(),
+            **{name: PricesWidget(attrs={"rows": 8}) for name in (
+                "location_description", "rooms_description", "additional_services",
+                "included_services", "paid_services",
+            )},
+        }
 
 
 def icon_label(text, icon):
