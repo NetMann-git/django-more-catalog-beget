@@ -22,9 +22,14 @@ IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.webp', '.gif'}
 
 
 def read_local_batch(fixture, media_source, approved=None):
+    data = json.loads(Path(fixture).read_text(encoding='utf-8'))
+    return read_local_items(data, media_source, approved)
+
+
+def read_local_items(data, media_source, approved=None):
+    """Проверить выбранные снимки и локальные файлы до записи."""
     approved = APPROVED if approved is None else approved
     source = Path(media_source).resolve()
-    data = json.loads(Path(fixture).read_text(encoding='utf-8'))
     if not isinstance(data, list) or len(data) != len(approved) or {x['id'] for x in data} != set(approved):
         raise ItemImportError('Список объектов не соответствует выбранной группе.')
     result = []

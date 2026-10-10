@@ -12,16 +12,16 @@ from django.db import connection
 from apps.products.importing.item import ItemImportError, import_item, prepare, read_snapshot
 
 
-def backup_database(folder):
+def backup_database(folder, label="item-2425"):
     stamp = datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S-%f')
     if connection.vendor == 'sqlite':
-        path = folder / f'db-before-item-2425-{stamp}.sqlite3'
+        path = folder / f'db-before-{label}-{stamp}.sqlite3'
         connection.ensure_connection()
         with sqlite3.connect(path) as target:
             connection.connection.backup(target)
     else:
         # Data backup includes all installed models. It does not replace a native DB dump.
-        path = folder / f'data-before-item-2425-{stamp}.json'
+        path = folder / f'data-before-{label}-{stamp}.json'
         call_command('dumpdata', all=True, output=str(path), verbosity=0)
     return path
 
