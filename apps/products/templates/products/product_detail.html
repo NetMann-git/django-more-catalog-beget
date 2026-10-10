@@ -45,13 +45,15 @@
                     <div class="gallery-thumbs-vertical">
                         {% if product.image %}
                             <img src="{% thumbnail product.image 100x75 crop %}"
-                                 data-full="{% thumbnail housing_cover 800x600 %}"
+                                 data-full="{% thumbnail housing_cover 1600x1200 quality=95 %}"
+                                 data-original="{{ housing_cover.url }}"
                                  class="gallery-thumb-vertical active"
                                  alt="{{ product.title }}">
                         {% endif %}
                         {% for photo in housing_gallery %}
                             <img src="{% thumbnail photo.image 100x75 crop %}"
-                                 data-full="{% thumbnail photo.image 800x600 %}"
+                                 data-full="{% thumbnail photo.image 1600x1200 quality=95 %}"
+                                 data-original="{{ photo.image.url }}"
                                  class="gallery-thumb-vertical{% if not product.image and forloop.first %} active{% endif %}"
                                  alt="{{ photo.alt|default:product.title }}">
                         {% endfor %}
@@ -61,7 +63,8 @@
                 <div class="main-image-wrapper">
                     {% if housing_cover %}
                         <img id="main-image"
-                             src="{% thumbnail housing_cover 800x600 %}"
+                             src="{% thumbnail housing_cover 1600x1200 quality=95 %}"
+                             data-original="{{ housing_cover.url }}"
                              alt="{{ product.title }}"
                              class="main-image"
                              style="cursor:pointer;">

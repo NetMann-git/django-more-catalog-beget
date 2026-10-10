@@ -41,6 +41,8 @@ document.addEventListener("DOMContentLoaded", function () {
         thumbs.forEach(function(thumb) {
             imageList.push({
                 src: thumb.dataset.full || thumb.src,
+                original: thumb.dataset.original || thumb.dataset.full || thumb.src,
+                thumbnail: thumb.src,
                 alt: thumb.alt || "Фото товара"
             });
         });
@@ -48,6 +50,8 @@ document.addEventListener("DOMContentLoaded", function () {
         // Если миниатюр нет, но есть главное фото — создаём одно изображение
         imageList.push({
             src: mainImage.src,
+            original: mainImage.dataset.original || mainImage.src,
+            thumbnail: mainImage.src,
             alt: mainImage.alt || "Фото товара"
         });
         // Создаём виртуальную миниатюру для отображения (скрытую)
@@ -109,6 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const imgData = imageList[index];
         if (imgData) {
             mainImage.src = imgData.src;
+            mainImage.dataset.original = imgData.original;
             mainImage.alt = imgData.alt;
         }
 
@@ -125,7 +130,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const imgData = imageList[index];
         if (imgData) {
-            lightboxImage.src = imgData.src;
+            lightboxImage.src = imgData.original;
             lightboxImage.alt = imgData.alt;
         }
         updateCounter();
@@ -159,7 +164,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         imageList.forEach(function(imgData, index) {
             const img = document.createElement("img");
-            img.src = imgData.src;
+            img.src = imgData.thumbnail;
             img.className = "lightbox-thumb";
             if (index === currentIndex) {
                 img.classList.add("active");
@@ -168,7 +173,7 @@ document.addEventListener("DOMContentLoaded", function () {
             img.addEventListener("click", function (e) {
                 e.stopPropagation();
                 currentIndex = index;
-                lightboxImage.src = imageList[index].src;
+                lightboxImage.src = imageList[index].original;
                 lightboxImage.alt = imageList[index].alt;
                 updateCounter();
                 renderLightboxThumbs();
