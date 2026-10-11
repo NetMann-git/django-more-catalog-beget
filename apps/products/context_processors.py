@@ -1,17 +1,10 @@
+"""Публичные счётчики сравнения и истории без устаревших ID."""
+from .public_lists import active_product_ids
 
-# apps/products/context_processors.py
 
 def comparison_ids(request):
-    """
-    Передаёт в шаблоны список ID товаров, добавленных в сравнение.
-    """
-    ids = request.session.get('comparison', [])
-    return {'comparison_ids': ids}
+    return {'comparison_ids': active_product_ids(request.session.get('comparison', []))}
 
 
 def recently_viewed_ids(request):
-    """
-    Передаёт в шаблоны список ID товаров, просмотренных в текущей сессии.
-    """
-    ids = request.session.get('recently_viewed', [])
-    return {'recently_viewed_ids': ids}
+    return {'recently_viewed_ids': active_product_ids(request.session.get('recently_viewed', []))}

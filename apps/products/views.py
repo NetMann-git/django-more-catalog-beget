@@ -31,6 +31,7 @@ from apps.users.decorators import role_required
 from apps.users.constants import ROLE_MANAGER, ROLE_ADMIN
 from .cache import CatalogCache
 
+from .public_lists import active_product_ids
 from .session_service import SessionService
 
 from apps.reviews.services import ReviewService
@@ -73,7 +74,8 @@ def toggle_comparison_ajax(request, product_id):
     Возвращает JSON с новым состоянием и количеством товаров.
     """
     product = get_object_or_404(Product, id=product_id, is_active=True)
-    comparison = SessionService.get_comparison(request)
+    comparison = active_product_ids(SessionService.get_comparison(request))
+    SessionService.save_comparison(request, comparison)
     is_added = False
 
     if product_id in comparison:
@@ -146,7 +148,7 @@ def recently_viewed_list(request):
                       (gallery[0].image if gallery else None)})
     context = {
         'products': products, 'cards': cards,
-        'recently_viewed_ids': recently_ids,
+        'recently_viewed_ids': [product.pk for product in products],
         'housing_public_page': True,
     }
     return render(request, 'products/recently_viewed.html', context)
@@ -259,7 +261,8 @@ def add_to_comparison(request, product_id):
         is_active=True,
     )
 
-    comparison = SessionService.get_comparison(request)
+    comparison = active_product_ids(SessionService.get_comparison(request))
+    SessionService.save_comparison(request, comparison)
 
     # Товар уже находится в сравнении
     if product_id in comparison:

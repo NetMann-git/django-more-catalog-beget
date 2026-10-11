@@ -5,6 +5,7 @@ from django.views.decorators.http import require_POST
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView
 
+from apps.products.public_lists import active_product_ids, unique_product_ids
 from apps.products.models import Product
 from .models import Favorite
 
@@ -58,9 +59,9 @@ def toggle_wishlist(request, product_id):
             is_favorite = False
         else:
             is_favorite = True
-        count = Favorite.objects.filter(user=request.user).count()
+        count = Favorite.objects.filter(user=request.user, product__is_active=True).count()
     else:
-        wishlist = request.session.get('wishlist', [])
+        wishlist = unique_product_ids(request.session.get('wishlist', []))
         if product.id in wishlist:
             wishlist.remove(product.id)
             is_favorite = False
@@ -68,7 +69,7 @@ def toggle_wishlist(request, product_id):
             wishlist.append(product.id)
             is_favorite = True
         request.session['wishlist'] = wishlist
-        count = len(wishlist)
+        count = len(active_product_ids(wishlist))
 
     return JsonResponse({
         "is_favorite": is_favorite,
