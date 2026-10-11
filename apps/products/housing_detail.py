@@ -63,7 +63,10 @@ def housing_context(product) -> dict:
         if name.strip() or phone.strip():
             contacts.append({'name': name, 'phones': phones(phone)})
     gallery = list(product.gallery.all())
+    from .category_navigation import category_navigation
+    category_links = category_navigation(product)
     return {
+        **category_links,
         'housing_sections': sections,
         'housing_map': product_map(product),
         'housing_short_description': public_html(product.short_description),

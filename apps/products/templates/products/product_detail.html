@@ -25,13 +25,21 @@
 <div class="container car-detail housing-detail">
 
     <!-- Хлебные крошки -->
-    <nav class="breadcrumbs">
+    <nav class="breadcrumbs" aria-label="Путь к объекту">
         <a href="/">Главная</a>
         <span>/</span>
-        <a href="/catalog/">Каталог</a>
+        <a href="{% url 'catalog:category_index' %}">Категории жилья</a>
+        {% for category in housing_category_path %}<span>/</span><a href="{{ category.get_absolute_url }}">{{ category.title }}</a>{% endfor %}
         <span>/</span>
         <span>{{ product.title }}</span>
     </nav>
+
+    {% if housing_categories %}
+    <nav class="housing-detail__categories" aria-label="Объект в категориях">
+        <span>Объект в категориях:</span>
+        {% for category in housing_categories %}<a href="{{ category.get_absolute_url }}">{{ category.title }}</a>{% endfor %}
+    </nav>
+    {% endif %}
 
     <!-- Основной блок -->
     <div class="dress-detail">

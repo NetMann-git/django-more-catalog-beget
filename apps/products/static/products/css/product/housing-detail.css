@@ -26,3 +26,5 @@
 @media(max-width:600px){.housing-detail__navigation{padding:10px;gap:6px}.housing-detail__navigation a{font-size:13px;padding:7px 9px}.housing-detail__amenities{grid-template-columns:minmax(0,1fr)}.housing-detail__text{font-size:15px}.housing-detail .prices-content td,.housing-detail .prices-content th{padding:8px}}
 @media(max-width:600px){body:has(.housing-detail) #search-container.header-search{display:none}}
 .housing-detail .main-image{width:100%;height:auto;min-height:0;aspect-ratio:4/3;object-fit:cover}
+
+.housing-detail__categories{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:16px 0 24px}.housing-detail__categories span{color:#526b73}.housing-detail__categories a{padding:8px 12px;border-radius:8px;background:#edf7f7;color:#087c85;text-decoration:none;overflow-wrap:anywhere}.housing-detail__categories a:focus-visible{outline:3px solid #f0b54a;outline-offset:3px}
