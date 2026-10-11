@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from apps.products.sitemap_views import housing_sitemap
 from apps.home.views import home
 from apps.products.import_views import legacy_item
 from apps.products.legacy_urls import LEGACY_PREFIXES
@@ -13,6 +14,7 @@ from apps.products.category_views import category_detail
 from apps.home.legal_views import public_offer, privacy_policy, personal_data_consent
 
 urlpatterns = [
+    path('sitemap.xml', housing_sitemap, name='housing_sitemap'),
     *[path(url.lstrip("/"), category_detail, {"slug": slug})
       for url, slug in LEGACY_CATEGORY_PATHS.items()],
     *[path(f"{prefix}/<slug:slug>.html", legacy_item, {"prefix": prefix})
