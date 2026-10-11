@@ -1,0 +1,203 @@
+{
+  "schema": 1,
+  "source_date": "2026-10-06",
+  "reason": "В JSON есть записи, но в CSV отсутствуют ID и URL. Сохранены без создания объектов жилья.",
+  "items": [
+    {
+      "alias": "zdes-mozhet-byt-vasha-reklama",
+      "item": {
+        "searchable": "1",
+        "state": "0",
+        "created": "2015-01-25 10:03:08",
+        "modified": "2018-12-05 16:13:58",
+        "hits": "826",
+        "access": "1",
+        "priority": "0",
+        "publish_up": "2015-01-25 10:03:08",
+        "publish_down": "0000-00-00 00:00:00",
+        "author": "iadmind",
+        "tags": {},
+        "content": null,
+        "metadata": {
+          "title": "",
+          "description": "",
+          "keywords": "",
+          "robots": "",
+          "author": ""
+        },
+        "config": {
+          "enable_comments": "0",
+          "primary_category": "kvartira"
+        },
+        "categories": {
+          "0": "chastnyj-gostevoj-dom",
+          "1": "chastnyj-sektor",
+          "2": "chastnaya-gostinicza",
+          "3": "kvartira",
+          "4": "abxaziya-1",
+          "5": "vse-varianty",
+          "6": "adler-otdyh-s-cenami",
+          "7": "kudepsta",
+          "8": "hosta-gostevye-doma",
+          "9": "sochi",
+          "10": "dagomys",
+          "11": "loo",
+          "12": "lazarevskoe",
+          "13": "krasnaya-polyana",
+          "14": "abhaziya-2",
+          "15": "vardane",
+          "16": "tuapse",
+          "17": "chastnyj-sektor-hosta",
+          "18": "loo-chastnyj-sektor-s-cenami-na-otdyh-u-morya",
+          "19": "gostevye-doma-loo",
+          "20": "gostevye-doma-vardane",
+          "21": "chastnyj-sektor-lazarevskoe",
+          "22": "gostevye-doma-v-abhazii",
+          "23": "kvartiry-v-abhazii",
+          "24": "oteli-i-gostinicy-lazarevskoe",
+          "25": "olimpijskij-park"
+        },
+        "elements": {
+          "db82c815-c157-4ecd-adcb-b5f67fb1d9b2": {
+            "type": "textarea",
+            "name": "Анонс",
+            "data": {
+              "0": {
+                "value": ""
+              }
+            }
+          },
+          "40c6a09b-e7f9-4219-a233-4c79f5e0684d": {
+            "type": "textarea",
+            "name": "Текст",
+            "data": {
+              "0": {
+                "value": "<p style=\"text-align: center;\"><strong>Разместите информацию сейчас объявление будет на сайте</strong></p>"
+              }
+            }
+          },
+          "c933f936-2434-4558-962a-4399db2bc3ce": {
+            "type": "jbimage",
+            "name": "Картинка",
+            "data": {
+              "0": {
+                "file": "/images/stories/2.png",
+                "title": "По вопросам размещения информации отправляйте заявку или обращайтесь по телефону +7-988-409-31-11",
+                "link": "/sdelat-zayavku-na-razmeshenie.html",
+                "target": "0",
+                "rel": ""
+              }
+            }
+          },
+          "681302ea-269b-4a15-99a9-418a1b3a8ba3": {
+            "type": "textarea",
+            "name": "Доп.Текст",
+            "data": {
+              "0": {
+                "value": "<p>&nbsp;</p>\r\n<p><span style=\"font-size: 12pt;\">тел.&nbsp;<span style=\"font-size: 12pt;\"><span style=\"color: #ff0000;\"><strong>+7-988-409-31-11</strong></span></span></span></p>\r\n<p><span style=\"font-size: 12pt;\">тел. <strong><span style=\"color: #ff0000;\"><span style=\"font-size: 12pt;\"><span style=\"color: #ff0000;\">+7-918-004-19-80</span></span></span></strong></span></p>"
+              }
+            }
+          }
+        },
+        "group": "Реклама",
+        "name": "Здесь может быть Ваша реклама"
+      }
+    },
+    {
+      "alias": "zdes-mozhet-byt-vasha-reklama-2",
+      "item": {
+        "searchable": "1",
+        "state": "0",
+        "created": "2015-01-26 10:10:46",
+        "modified": "2016-02-23 18:58:12",
+        "hits": "7",
+        "access": "1",
+        "priority": "0",
+        "publish_up": "2015-01-25 10:03:08",
+        "publish_down": "0000-00-00 00:00:00",
+        "author": "iadmind",
+        "tags": {},
+        "content": null,
+        "metadata": {
+          "title": "",
+          "description": "",
+          "keywords": "",
+          "robots": "",
+          "author": ""
+        },
+        "config": {
+          "enable_comments": "0",
+          "primary_category": "kvartira"
+        },
+        "categories": {
+          "0": "chastnyj-gostevoj-dom",
+          "1": "chastnyj-sektor",
+          "2": "chastnaya-gostinicza",
+          "3": "kvartira",
+          "4": "abxaziya-1",
+          "5": "vse-varianty",
+          "6": "adler-otdyh-s-cenami",
+          "7": "kudepsta",
+          "8": "hosta-gostevye-doma",
+          "9": "sochi",
+          "10": "dagomys",
+          "11": "loo",
+          "12": "lazarevskoe",
+          "13": "krasnaya-polyana",
+          "14": "abhaziya-2",
+          "15": "vardane",
+          "16": "tuapse",
+          "17": "chastnyj-sektor-hosta",
+          "18": "loo-chastnyj-sektor-s-cenami-na-otdyh-u-morya",
+          "19": "gostevye-doma-loo",
+          "20": "gostevye-doma-vardane",
+          "21": "chastnyj-sektor-lazarevskoe"
+        },
+        "elements": {
+          "db82c815-c157-4ecd-adcb-b5f67fb1d9b2": {
+            "type": "textarea",
+            "name": "Анонс",
+            "data": {
+              "0": {
+                "value": ""
+              }
+            }
+          },
+          "40c6a09b-e7f9-4219-a233-4c79f5e0684d": {
+            "type": "textarea",
+            "name": "Текст",
+            "data": {
+              "0": {
+                "value": "<p style=\"text-align: center;\"><strong>Разместите информацию сейчас объявление будет на сайте <span style=\"color: #ff0000;\">бесплатно</span></strong></p>"
+              }
+            }
+          },
+          "c933f936-2434-4558-962a-4399db2bc3ce": {
+            "type": "jbimage",
+            "name": "Картинка",
+            "data": {
+              "0": {
+                "file": "/images/stories/2.png",
+                "title": "По вопросам размещения информации отправляйте заявку или обращайтесь по телефону +7-988-409-31-11",
+                "link": "/sdelat-zayavku-na-razmeshenie.html",
+                "target": "0",
+                "rel": ""
+              }
+            }
+          },
+          "681302ea-269b-4a15-99a9-418a1b3a8ba3": {
+            "type": "textarea",
+            "name": "Доп.Текст",
+            "data": {
+              "0": {
+                "value": "<p>&nbsp;</p>\r\n<p><span style=\"font-size: 12pt;\">тел. <span style=\"color: #ff0000;\"><strong>+7-988-409-31-11</strong></span></span></p>\r\n<p style=\"margin-bottom: 0cm; page-break-before: always;\"><em><strong>МАЙ </strong></em><em><strong>ГОСТЕВОЙ ДОМ &laquo;РУЗАНА&raquo;</strong></em><em> </em><em>цены</em><em> на проживание 2016 г.</em></p>\r\n<table border=\"1\" style=\"width: 100%;\"><colgroup><col /> <col /> </colgroup>\r\n<tbody>\r\n<tr>\r\n<td>\r\n<p>Категория номеров</p>\r\n</td>\r\n<td>\r\n<p>Проживание с 1-го человека</p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>2-х местный эконом</p>\r\n</td>\r\n<td>\r\n<p><strong>200 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>3-х местный эконом</p>\r\n</td>\r\n<td>\r\n<p><strong>200 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>4-х местный эконом</p>\r\n</td>\r\n<td>\r\n<p><strong>200 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>2-х местный Люкс</p>\r\n</td>\r\n<td>\r\n<p><strong>400 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>3-х местный Люкс</p>\r\n</td>\r\n<td>\r\n<p><strong>400 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td colspan=\"2\" width=\"731\">\r\n<p><strong>Дети до 7 лет на дополнительное место (кресло,раскладушка) в номер Люкс скидка 50 %</strong></p>\r\n</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n<p style=\"margin-bottom: 0cm;\"><em><strong>ИЮНЬ</strong></em></p>\r\n<table border=\"1\" style=\"width: 100%;\"><colgroup><col /> <col /> </colgroup>\r\n<tbody>\r\n<tr>\r\n<td>\r\n<p>Категория номеров</p>\r\n</td>\r\n<td>\r\n<p>Проживание с 1-го человека</p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>2-х местный эконом</p>\r\n</td>\r\n<td>\r\n<p><strong>250 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>3-х местный эконом</p>\r\n</td>\r\n<td>\r\n<p><strong>250 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>4-х местный эконом</p>\r\n</td>\r\n<td>\r\n<p><strong>250 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>2-х местный Люкс</p>\r\n</td>\r\n<td>\r\n<p><strong>450 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>3-х местный Люкс</p>\r\n</td>\r\n<td>\r\n<p><strong>450 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td colspan=\"2\">\r\n<p><strong>Дети до 7 лет на дополнительное место (кресло,раскладушка) в номер Люкс скидка 50 %</strong></p>\r\n</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n<p style=\"margin-bottom: 0cm;\"><em><strong>ИЮЛЬ</strong></em></p>\r\n<table border=\"1\" style=\"width: 100%;\"><colgroup><col /> <col /> </colgroup>\r\n<tbody>\r\n<tr>\r\n<td>\r\n<p>Категория номеров</p>\r\n</td>\r\n<td>\r\n<p>Проживание с 1-го человека</p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>2-х местный эконом</p>\r\n</td>\r\n<td>\r\n<p><strong>300 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>3-х местный эконом</p>\r\n</td>\r\n<td>\r\n<p><strong>300 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>4-х местный эконом</p>\r\n</td>\r\n<td>\r\n<p><strong>300 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>2-х местный Люкс</p>\r\n</td>\r\n<td>\r\n<p><strong>500 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>3-х местный Люкс</p>\r\n</td>\r\n<td>\r\n<p><strong>500 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td colspan=\"2\">\r\n<p><strong>Дети до 7 лет на дополнительное место (кресло,раскладушка) в номер Люкс скидка 50 %</strong></p>\r\n</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n<p style=\"margin-bottom: 0cm;\"><em><strong>АВГУСТ</strong></em></p>\r\n<table border=\"1\" style=\"width: 100%;\"><colgroup><col /> <col /> </colgroup>\r\n<tbody>\r\n<tr>\r\n<td>\r\n<p>Категория номеров</p>\r\n</td>\r\n<td>\r\n<p>Проживание с 1-го человека</p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>2-х местный эконом</p>\r\n</td>\r\n<td>\r\n<p><strong>350 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>3-х местный эконом</p>\r\n</td>\r\n<td>\r\n<p><strong>350 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>4-х местный эконом</p>\r\n</td>\r\n<td>\r\n<p><strong>350 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>2-х местный Люкс</p>\r\n</td>\r\n<td>\r\n<p><strong>600 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>3-х местный Люкс</p>\r\n</td>\r\n<td>\r\n<p><strong>600 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td colspan=\"2\">\r\n<p><strong>Дети до 7 лет на дополнительное место (кресло,раскладушка) в номер Люкс скидка 50 %</strong></p>\r\n</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n<p style=\"margin-bottom: 0cm;\"><em><strong>СЕНТЯБРЬ</strong></em></p>\r\n<table border=\"1\" style=\"width: 100%;\"><colgroup><col /> <col /> </colgroup>\r\n<tbody>\r\n<tr>\r\n<td>\r\n<p>Категория номеров</p>\r\n</td>\r\n<td>\r\n<p>Проживание с 1-го человека</p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>2-х местный эконом</p>\r\n</td>\r\n<td>\r\n<p><strong>200 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>3-х местный эконом</p>\r\n</td>\r\n<td>\r\n<p><strong>200 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>4-х местный эконом</p>\r\n</td>\r\n<td>\r\n<p><strong>200 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>2-х местный Люкс</p>\r\n</td>\r\n<td>\r\n<p><strong>400 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td>\r\n<p>3-х местный Люкс</p>\r\n</td>\r\n<td>\r\n<p><strong>400 рублей</strong></p>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td colspan=\"2\">\r\n<p><strong>Дети до 7 лет на дополнительное место (кресло,раскладушка) в номер Люкс скидка 50 %</strong></p>\r\n</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n<p style=\"margin-bottom: 0cm;\">Контакты : г.Сочи Вардане 8918-617-58-22 Олеся</p>\r\n<p>&nbsp;</p>"
+              }
+            }
+          }
+        },
+        "group": "Реклама",
+        "name": "Здесь может быть Ваша реклама"
+      }
+    }
+  ]
+}

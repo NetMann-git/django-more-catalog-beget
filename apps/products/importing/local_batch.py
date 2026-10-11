@@ -1,4 +1,4 @@
-"""Три проверенных объекта с фотографиями из локальных папок пользователя."""
+"""Проверенные объекты с локальными медиа или явно подтверждённым отсутствием фото."""
 import copy
 import hashlib
 import json
@@ -40,23 +40,42 @@ def read_local_items(data, media_source, approved=None):
         elements = item['item']['elements'].values()
         galleries = [e.get('data', {}).get('value') for e in elements if e['name'] == 'Галерея']
         cover = next(e['data']['0']['file'] for e in elements if e['name'] == 'Главное Фото')
-        if folder_name not in galleries:
-            # Only reviewed snapshots may use the original cover's folder.
+        path = urlsplit(item['url']).path.replace('//', '/')
+        if path != '/' + item['legacy_prefix'] + '/' + item['alias'] + '.html':
+            raise ItemImportError('Исходный URL не соответствует алиасу.')
+        secondary = [e.get('data', {}).get('0', {}).get('file', '')
+                     for e in elements if e['name'] == 'Фото:']
+        from_secondary = item.get('gallery_from_secondary') is True
+        if item.get('without_media') is True:
+            local_refs = any(tag['src'].startswith(('images/', '/images/'))
+                for e in elements for value in e.get('data', {}).values()
+                if isinstance(value, dict) and isinstance(value.get('value'), str)
+                for tag in BeautifulSoup(value['value'], 'html.parser').find_all(src=True))
+            if folder_name is not None or cover or any(secondary) or any(galleries) or local_refs or from_secondary:
+                raise ItemImportError('Режим без медиа противоречит исходным данным.')
+            item.update(media=[], local_gallery=[], gallery_complete=True)
+            result.append((item, []))
+            continue
+        if not isinstance(folder_name, str):
+            raise ItemImportError('Не указана проверенная папка фотографий.')
+        if from_secondary:
+            files_secondary = [value for value in secondary if value]
+            if cover or any(galleries) or len(files_secondary) != 1 or Path(files_secondary[0]).parent.as_posix() != 'images/uploads/' + folder_name:
+                raise ItemImportError('Папка не соответствует вторичному фото.')
+        elif folder_name not in galleries:
             from_cover = item.get('gallery_from_cover') is True
             cover_folder = Path(cover).parent.as_posix()
             if not from_cover or any(galleries) or cover_folder != 'images/uploads/' + folder_name:
                 raise ItemImportError('Папка не соответствует исходному объекту.')
-        path = urlsplit(item['url']).path.replace('//', '/')
-        if path != '/' + item['legacy_prefix'] + '/' + item['alias'] + '.html':
-            raise ItemImportError('Исходный URL не соответствует алиасу.')
         folder = source / 'images/uploads' / folder_name
         if not folder.is_dir() or not folder.resolve().is_relative_to(source):
             raise ItemImportError(f'Добавьте папку: {folder}')
         files = sorted([f for f in folder.iterdir() if f.is_file() and f.suffix.lower() in IMAGE_EXTENSIONS], key=lambda f:filename_order(f.name))
         if not files:
             raise ItemImportError(f'В папке нет фотографий: {folder}')
-        if cover not in ['images/uploads/' + folder_name + '/' + f.name for f in files]:
-            raise ItemImportError('Нет главного фото: ' + cover)
+        required_photo = files_secondary[0] if from_secondary else cover
+        if required_photo not in ['images/uploads/' + folder_name + '/' + f.name for f in files]:
+            raise ItemImportError('Отсутствует обязательное фото: ' + required_photo)
         item['media'] = []
         for file in files:
             if not file.resolve().is_relative_to(folder.resolve()) or not re.fullmatch(r'[\w .()-]+\.(jpg|jpeg|png|webp|gif)', file.name, flags=re.I):
@@ -145,7 +164,7 @@ def import_local_batch(batch, media_source, apply=False):
                 report.append({'id':data['id'], 'result':'created' if apply else 'check', 'title':obj.title,
                     'housing_type': obj.brand.name if obj.brand else None,
                     'published':obj.is_active, 'categories':list(categories), 'primary':obj.category.slug,
-                    'gallery_photos':len(data['local_gallery']), 'photos_with_cover':len(data['local_gallery'])+1,
+                    'gallery_photos':len(data['local_gallery']), 'photos_with_cover':len(data['local_gallery'])+int(bool(obj.image)),
                     'order':[Path(p).name for p in data['local_gallery']], 'ignored':ignored,
                     'archived_elements':archived, 'preview_url':f'/catalog/manage/{obj.pk}/preview/' if obj.pk else None})
             if apply:

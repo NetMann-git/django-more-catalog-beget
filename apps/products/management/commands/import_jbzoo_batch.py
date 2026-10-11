@@ -34,7 +34,7 @@ class Command(BaseCommand):
                     'review_objects': len(plan['review']),
                     'batches': [{'number': b['number'], 'objects': [
                         {'id': d['id'], 'title': d['item']['name'],
-                         'folder': 'images/uploads/' + d['gallery_folder'],
+                         'folder': 'images/uploads/' + d['gallery_folder'] if d['gallery_folder'] else None,
                          'url': d['url'], 'published': d['item']['state'] == '1'}
                         for d in b['items']]} for b in plan['batches']],
                 }, ensure_ascii=False, indent=2))
