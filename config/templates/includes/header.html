@@ -9,6 +9,7 @@
 
         <nav class="main-nav" aria-label="Основная навигация">
             <a href="{% url 'home' %}" class="nav-link">Главная</a>
+            <a href="{% url 'catalog:housing_catalog' %}" class="nav-link{% if request.resolver_match.url_name == 'housing_catalog' %} is-active{% endif %}">Подбор жилья</a>
             {% if request.resolver_match.url_name == 'home' or hide_catalog_navigation %}
             <a href="{% url 'home' %}#housing-catalog" class="nav-link">О каталоге жилья</a>
             {% else %}
@@ -44,6 +45,7 @@
 
     <nav class="mobile-nav" aria-label="Мобильная навигация" data-mobile-nav>
         <a href="{% url 'home' %}" class="nav-link">Главная</a>
+            <a href="{% url 'catalog:housing_catalog' %}" class="nav-link{% if request.resolver_match.url_name == 'housing_catalog' %} is-active{% endif %}">Подбор жилья</a>
         {% if request.resolver_match.url_name == 'home' or hide_catalog_navigation %}
         <a href="{% url 'home' %}#housing-catalog" class="nav-link">О каталоге жилья</a>
         {% else %}

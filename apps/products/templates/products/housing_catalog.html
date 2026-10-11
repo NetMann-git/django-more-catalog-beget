@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %}
+{% block body_class %}housing-category-page{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/housing_categories.css' %}">{% endblock %}
+{% block content %}
+<main class="housing-category">
+  <nav class="housing-category__breadcrumbs" aria-label="Путь к каталогу"><a href="{% url 'home' %}">Главная</a> / <a href="{% url 'catalog:category_index' %}">Категории жилья</a></nav>
+  <h1>Подбор жилья</h1>
+  <form method="get" class="housing-filter" action="{% url 'catalog:housing_catalog' %}">
+    {% for field in filter_form %}<div class="housing-filter__field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}<div class="housing-filter__error" role="alert">{{ field.errors }}</div>{% endif %}</div>{% endfor %}
+    <div class="housing-filter__actions"><button type="submit">Найти жильё</button><a href="{% url 'catalog:housing_catalog' %}">Сбросить</a></div>
+  </form>
+  {% if filter_form.errors %}<p role="status">Проверьте выбранные условия поиска.</p>{% else %}<p class="housing-category__count">Найдено объектов: {{ page_obj.paginator.count }}</p>{% endif %}
+  {% include "products/_housing_cards.html" with empty_text="По выбранным условиям жильё не найдено. Попробуйте другую категорию или сбросьте фильтры." %}
+  {% if page_obj.paginator.num_pages > 1 %}<nav class="housing-category__pagination" aria-label="Страницы объектов">
+    {% if page_obj.has_previous %}<a href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_obj.previous_page_number }}" rel="prev">← Назад</a>{% endif %}
+    <span aria-current="page">{{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_obj.next_page_number }}" rel="next">Далее →</a>{% endif %}
+  </nav>{% endif %}
+</main>
+{% endblock %}

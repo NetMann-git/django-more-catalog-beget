@@ -9,18 +9,7 @@
   {% if description_html %}<div class="housing-category__description">{{ description_html }}</div>{% endif %}
   {% if children %}<nav class="housing-category__links" aria-label="Подкатегории">{% for child in children %}<a href="{{ child.get_absolute_url }}">{{ child.title }}</a>{% endfor %}</nav>{% endif %}
   <p class="housing-category__count">Объектов: {{ page_obj.paginator.count }}</p>
-  <div class="housing-category__grid">
-  {% for card in cards %}
-    <article class="housing-category__card">
-      <a href="{{ card.product.get_absolute_url }}" class="housing-category__photo" aria-label="{{ card.product.title }}">{% if card.cover %}<img src="{{ card.cover.url }}" alt="{{ card.product.title }}" loading="lazy" decoding="async">{% else %}<span>Фото пока нет</span>{% endif %}</a>
-      <div class="housing-category__body"><h2><a href="{{ card.product.get_absolute_url }}">{{ card.product.title }}</a></h2>
-      {% if card.product.brand %}<p class="housing-category__type">{{ card.product.brand.name }}</p>{% endif %}
-      {% if card.product.address %}<p>{{ card.product.address }}</p>{% endif %}
-      {% if card.product.short_description %}<p>{{ card.product.short_description|striptags|truncatechars:220 }}</p>{% endif %}
-      <a class="housing-category__details" href="{{ card.product.get_absolute_url }}">Подробнее об объекте →</a></div>
-    </article>
-  {% empty %}<p>В этой категории пока нет опубликованных объектов.</p>{% endfor %}
-  </div>
+  {% include "products/_housing_cards.html" %}
   {% if page_obj.paginator.num_pages > 1 %}<nav class="housing-category__pagination" aria-label="Страницы объектов">
     {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" rel="prev">← Назад</a>{% endif %}
     <span aria-current="page">{{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
