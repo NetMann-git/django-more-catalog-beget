@@ -1,12 +1,14 @@
 # apps/products/urls.py
 from django.urls import path
-from . import views
+from . import views, category_views
 from . import attribute_management
 from .import_views import item_preview
 
 app_name = "catalog"
 
 urlpatterns = [
+    path("categories/", category_views.category_index, name="category_index"),
+    path("category/<slug:slug>/", category_views.category_detail, name="category_detail"),
     path("manage/<int:product_id>/preview/", item_preview, name="item_preview"),
     path("", views.catalog, name="catalog"),
     

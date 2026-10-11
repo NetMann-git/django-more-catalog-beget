@@ -31,6 +31,12 @@ class Category(models.Model):
     def __str__(self):
         return self.title
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        from apps.products.category_urls import LEGACY_CATEGORY_PATHS
+        return next((path for path, slug in LEGACY_CATEGORY_PATHS.items() if slug == self.slug),
+                    reverse('catalog:category_detail', kwargs={'slug': self.slug}))
+
     def clean(self):
         super().clean()
         current = self.parent_id

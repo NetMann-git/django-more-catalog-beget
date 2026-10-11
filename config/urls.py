@@ -8,9 +8,13 @@ from django.urls import include, path
 from apps.home.views import home
 from apps.products.import_views import legacy_item
 from apps.products.legacy_urls import LEGACY_PREFIXES
+from apps.products.category_urls import LEGACY_CATEGORY_PATHS
+from apps.products.category_views import category_detail
 from apps.home.legal_views import public_offer, privacy_policy, personal_data_consent
 
 urlpatterns = [
+    *[path(url.lstrip("/"), category_detail, {"slug": slug})
+      for url, slug in LEGACY_CATEGORY_PATHS.items()],
     *[path(f"{prefix}/<slug:slug>.html", legacy_item, {"prefix": prefix})
       for prefix in LEGACY_PREFIXES
       if prefix not in {"gostevye-doma", "chastnyj-sektor-loo", "properties-list"}],
