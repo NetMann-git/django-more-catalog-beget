@@ -46,7 +46,7 @@ class ProductService:
         products = Product.objects.filter(
             id__in=recent_ids,
             is_active=True,
-        )
+        ).select_related('brand').prefetch_related('gallery')
 
         order = {
             product_id: index

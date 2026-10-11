@@ -172,9 +172,9 @@ def product_detail(request, slug, _import_preview=False):
     context["wishlist_ids"] = wishlist_ids
 
     
-    context["similar_products"] = (
-        ProductService.get_similar_products(product)
-    )
+    from .housing_related import housing_cards, related_housing
+    context["similar_products"] = related_housing(product)
+    context["housing_similar_cards"] = housing_cards(context["similar_products"])
     
     # Сохраняем товар в список недавно просмотренных
     SessionService.save_recently_viewed(
@@ -191,6 +191,8 @@ def product_detail(request, slug, _import_preview=False):
             product,
         )
     )
+
+    context["housing_recent_cards"] = housing_cards(context["recently_viewed_products"])
 
     # Отзывы – фильтрация и сортировка
     

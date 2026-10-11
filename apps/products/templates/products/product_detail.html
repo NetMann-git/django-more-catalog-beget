@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="{% static 'products/css/availability.css' %}">
 <link rel="stylesheet" href="{% static 'products/css/product/product.css' %}">
 <link rel="stylesheet" href="{% static 'products/css/catalog/catalog.css' %}">
+<link rel="stylesheet" href="{% static 'products/css/housing_categories.css' %}">
 <link rel="stylesheet" href="{% static 'reviews/css/reviews.css' %}">
 <link rel="stylesheet" href="{% static 'appointments/css/car_inquiry.css' %}">
 <link rel="stylesheet" href="{% static 'products/css/product/car-detail.css' %}">
@@ -152,7 +153,7 @@
                     Уточнить условия
                 </a>
                 <a href="{% url 'appointments:car_inquiry' product.id %}?type=order" class="btn btn-outline car-inquiry__trigger">Оставить заявку</a>
-                <a href="/catalog/" class="car-detail__back">← Вернуться в каталог</a>
+                <a href="{% url 'catalog:housing_catalog' %}" class="car-detail__back">← Вернуться к подбору жилья</a>
             </div>
 
 
@@ -175,10 +176,8 @@
                 ✕ Очистить историю
             </button>
         </div>
-        <div id="recently-viewed-grid" class="products-grid">
-            {% for p in recently_viewed_products %}
-                {% include "products/_product_card.html" with product=p %}
-            {% endfor %}
+        <div id="recently-viewed-grid">
+            <div class="housing-category__grid">{% for card in housing_recent_cards %}{% include "products/_housing_history_card.html" with product=card.product %}{% endfor %}</div>
         </div>
     </section>
     {% endif %}
@@ -189,11 +188,7 @@
     {% if similar_products %}
     <section class="similar_products">
         <h2 class="similar-title">Похожие варианты жилья</h2>
-        <div class="products-grid">
-            {% for similar in similar_products %}
-                {% include "products/_product_card.html" with product=similar %}
-            {% endfor %}
-        </div>
+        <div class="housing-category__grid">{% for card in housing_similar_cards %}{% include "products/_housing_history_card.html" with product=card.product %}{% endfor %}</div>
     </section>
     {% endif %}
 
