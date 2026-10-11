@@ -37,33 +37,22 @@ def suggest(request):
 
 
 def search(request):
-    """
-    Страница результатов поиска по товарам (без Wagtail).
-    """
-    search_query = request.GET.get("query", None)
-    page = request.GET.get("page", 1)
-
-    # Поиск по товарам
-    if search_query:
-        service = SearchService()
-        search_results = service.search(search_query)
-    else:
-        search_results = []
-
-    # Пагинация
-    paginator = Paginator(search_results, 10)
+    """Публичные результаты поиска жилья со старыми адресами объектов."""
+    search_query = request.GET.get('query', '').strip()[:120]
+    queryset = SearchService.search(search_query).select_related('brand').prefetch_related('gallery')
+    paginator = Paginator(queryset, 12)
     try:
-        search_results = paginator.page(page)
+        page = paginator.page(request.GET.get('page', 1))
     except PageNotAnInteger:
-        search_results = paginator.page(1)
+        page = paginator.page(1)
     except EmptyPage:
-        search_results = paginator.page(paginator.num_pages)
-
-    return TemplateResponse(
-        request,
-        "search/search.html",
-        {
-            "search_query": search_query,
-            "search_results": search_results,
-        },
-    )
+        page = paginator.page(paginator.num_pages)
+    cards = []
+    for product in page:
+        gallery = list(product.gallery.all())
+        cards.append({'product': product, 'cover': product.image or
+                      (gallery[0].image if gallery else None)})
+    return TemplateResponse(request, 'search/search.html', {
+        'search_query': search_query, 'search_results': page,
+        'cards': cards, 'housing_public_page': True,
+    })

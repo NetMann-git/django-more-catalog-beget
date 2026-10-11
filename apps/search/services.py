@@ -29,16 +29,17 @@ class SearchService:
         """
         Поиск товаров по запросу (для страницы результатов).
         """
+        query = (query or '').strip().casefold()
         if not query:
-            return []
-        
-        q = Q()
-        q |= Q(title__icontains=query)
-        q |= Q(article__icontains=query)
-        q |= Q(short_description__icontains=query)
-        q |= Q(description__icontains=query)
-        
-        return Product.objects.filter(q, is_active=True)
+            return Product.objects.none()
+        # SQLite не выполняет регистронезависимый поиск кириллицы через LIKE.
+        fields = ('title', 'article', 'short_description', 'description',
+                  'address', 'district_text')
+        matched_ids = [row[0] for row in
+                       Product.objects.filter(is_active=True)
+                       .values_list('pk', *fields).iterator()
+                       if any(query in (value or '').casefold() for value in row[1:])]
+        return Product.objects.filter(pk__in=matched_ids, is_active=True).order_by('title', 'pk')
 
     @staticmethod
     def suggest(query, request=None):
