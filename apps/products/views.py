@@ -116,23 +116,24 @@ def catalog(request):
     return render(request, "products/catalog.html", context)
 
 def recently_viewed_list(request):
-    """
-    Страница со списком всех просмотренных товаров + блок рекомендаций.
-    """
+    """История опубликованных объектов в порядке последних просмотров."""
     recently_ids = request.session.get('recently_viewed', [])
-    products = Product.objects.filter(
-        id__in=recently_ids, is_active=True
-    ) if recently_ids else Product.objects.none()
-
-    # Получаем рекомендации на основе просмотренных товаров
-    recommended_products = RecommendationService.get_similar_products(
-        products, limit=4
-    )
-
+    products_by_id = {
+        product.pk: product
+        for product in Product.objects.filter(pk__in=recently_ids, is_active=True)
+        .select_related('brand').prefetch_related('gallery')
+    }
+    products = [products_by_id[pk] for pk in dict.fromkeys(recently_ids)
+                if pk in products_by_id]
+    cards = []
+    for product in products:
+        gallery = list(product.gallery.all())
+        cards.append({'product': product, 'cover': product.image or
+                      (gallery[0].image if gallery else None)})
     context = {
-        'products': products,
+        'products': products, 'cards': cards,
         'recently_viewed_ids': recently_ids,
-        'recommended_products': recommended_products,
+        'housing_public_page': True,
     }
     return render(request, 'products/recently_viewed.html', context)
 

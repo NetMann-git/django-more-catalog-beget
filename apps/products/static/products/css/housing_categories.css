@@ -6,3 +6,9 @@
 
 .housing-filter{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding:22px;border:1px solid #dbe6e8;border-radius:14px;background:#fff;margin:24px 0}.housing-filter__field label{display:block;font-weight:600;margin-bottom:8px}.housing-filter input,.housing-filter select{box-sizing:border-box;width:100%;min-height:44px;padding:10px;border:1px solid #a8bec3;border-radius:6px;font:inherit;background:#fff;color:#18333d}.housing-filter__actions{grid-column:1/-1;display:flex;align-items:center;gap:20px}.housing-filter button{background:#087c85;color:#fff;border:0;border-radius:8px;padding:12px 22px;font:inherit;cursor:pointer}.housing-filter__error{color:#9a2424;font-size:14px}.housing-filter__error ul{padding-left:18px}.housing-filter input:focus-visible,.housing-filter select:focus-visible,.housing-filter button:focus-visible{outline:3px solid #f0b54a;outline-offset:3px}@media(max-width:700px){.housing-filter{grid-template-columns:1fr;padding:16px}}
 @media(max-width:900px){body.housing-category-page #search-container{display:none}}
+
+/* History actions remain readable on the light housing cards. */
+.history-page .card-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.history-page .card-actions .wishlist-btn,.history-page .card-actions .compare-btn{position:static;display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:8px 12px;border:1px solid #bfd5d9;border-radius:8px;background:#edf7f7;color:#18333d;font:inherit;font-size:14px;cursor:pointer}
+.history-page .card-actions .active{background:#087c85;color:#fff}
+.history-page .card-actions button:focus-visible{outline:3px solid #f0b54a;outline-offset:3px}

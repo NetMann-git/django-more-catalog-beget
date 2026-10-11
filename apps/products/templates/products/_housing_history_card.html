@@ -1,0 +1,13 @@
+<article class="housing-category__card" data-product-id="{{ product.id }}">
+  <a class="housing-category__photo" href="{{ product.get_absolute_url }}" aria-label="{{ product.title }}">{% if card.cover %}<img src="{{ card.cover.url }}" alt="{{ product.title }}" loading="lazy" decoding="async">{% else %}<span>Фото пока нет</span>{% endif %}</a>
+  <div class="housing-category__body">
+    <h2><a href="{{ product.get_absolute_url }}">{{ product.title }}</a></h2>
+    {% if product.brand %}<p class="housing-category__type">{{ product.brand.name }}</p>{% endif %}
+    {% if product.address %}<p>{{ product.address }}</p>{% endif %}
+    <a class="housing-category__details" href="{{ product.get_absolute_url }}">Подробнее об объекте →</a>
+    <div class="card-actions">
+      {% include "wishlist/_button.html" with product=product %}
+      <button class="action-btn compare-btn {% if product.id in comparison_ids %}active{% endif %}" data-product-id="{{ product.id }}" data-url="{% url 'catalog:toggle_comparison_ajax' product.id %}" type="button"><span>{% if product.id in comparison_ids %}Убрать{% else %}Сравнить{% endif %}</span></button>
+    </div>
+  </div>
+</article>
