@@ -4,10 +4,8 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView
-from django.contrib.auth import login
 
 from apps.products.models import Product
-from apps.recommendations.services import RecommendationService
 from .models import Favorite
 
 
@@ -19,32 +17,32 @@ class WishlistView(ListView):
 
     def get_queryset(self):
         if self.request.user.is_authenticated:
-            return Favorite.objects.filter(user=self.request.user).select_related("product")
+            return Favorite.objects.filter(user=self.request.user, product__is_active=True).select_related("product", "product__brand").prefetch_related("product__gallery")
         return Favorite.objects.none()  # для гостей пустой queryset, товары будем брать из сессии
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         if self.request.user.is_authenticated:
-            # Для авторизованных: список товаров уже в favorites
-            products = [f.product for f in context["favorites"]]
-            wishlist_ids = list(self.request.user.favorites.values_list("product_id", flat=True))
+            products = [favorite.product for favorite in context['favorites']]
+            wishlist_ids = [product.pk for product in products]
         else:
-            # Для гостей: берём товары из сессии
             wishlist_ids = self.request.session.get('wishlist', [])
-            products = Product.objects.filter(id__in=wishlist_ids, is_active=True)
+            by_id = {product.pk: product for product in
+                     Product.objects.filter(pk__in=wishlist_ids, is_active=True)
+                     .select_related('brand').prefetch_related('gallery')}
+            products = [by_id[pk] for pk in reversed(list(dict.fromkeys(wishlist_ids)))
+                        if pk in by_id]
+            wishlist_ids = [product.pk for product in products]
 
-        # Получаем рекомендации для страницы «Избранное»
-        recommended_products = RecommendationService.get_similar_products(
-            viewed_products=products,
-            page='wishlist',
-            limit=4
-        )
-
-        context["products"] = products
-        context["wishlist_ids"] = wishlist_ids
-        context["is_guest"] = not self.request.user.is_authenticated
-        context["recommended_products"] = recommended_products
+        cards = []
+        for product in products:
+            gallery = list(product.gallery.all())
+            cards.append({'product': product, 'cover': product.image or
+                          (gallery[0].image if gallery else None)})
+        context.update(products=products, cards=cards, wishlist_ids=wishlist_ids,
+                       is_guest=not self.request.user.is_authenticated,
+                       housing_public_page=True)
 
         return context
 

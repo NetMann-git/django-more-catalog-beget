@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function handleWishlistToggle(btn) {
         const url = btn.dataset.url;
-        const card = btn.closest('.dress-card, .product-card');
+        const card = btn.closest('.dress-card, .product-card, .housing-category__card');
 
         fetch(url, {
             method: 'POST',
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             card.remove();
                         }
 
-                        const remainingCards = wishlistGrid.querySelectorAll('.product-card, .dress-card').length;
+                        const remainingCards = wishlistGrid.querySelectorAll('.product-card, .dress-card, .housing-category__card').length;
                         if (remainingCards === 0) {
                             wishlistProducts.style.display = 'none';
                             emptyWishlist.style.display = 'block';
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.success) {
                 const grid = document.getElementById('wishlist-grid');
                 if (grid) {
-                    const cards = grid.querySelectorAll('.product-card, .dress-card');
+                    const cards = grid.querySelectorAll('.product-card, .dress-card, .housing-category__card');
                     cards.forEach(card => {
                         const btn = card.querySelector('.wishlist-btn');
                         if (btn) {
