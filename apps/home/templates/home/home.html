@@ -14,28 +14,41 @@
 
 {% block content %}
 <main id="main-content" class="sea-home__main">
-  {# Заготовка первого экрана без фотографий и видео старого сайта. #}
+  {# Подбор направляет в общий каталог жилья с GET-фильтрами. #}
   <section class="sea-home__hero" aria-labelledby="sea-home-title">
     <div class="sea-home__container">
       <p class="sea-home__eyebrow">ДИКАРЬ-СОЧИ · ОТДЫХ У МОРЯ</p>
       <h1 id="sea-home-title">Ваше место<br>для отдыха у моря</h1>
       <p class="sea-home__intro">Гостевые дома, квартиры и мини-гостиницы в Сочи и на побережье. Выбирайте место, где хочется провести отпуск.</p>
-      <a class="sea-home__button" href="#housing-catalog">О каталоге жилья <span aria-hidden="true">↓</span></a>
+      <form class="sea-home__filter" method="get" action="{% url 'catalog:housing_catalog' %}">
+        {% for field in housing_filter_form %}<div><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}</div>{% endfor %}
+        <button type="submit" class="sea-home__button">Найти жильё →</button>
+      </form>
       <div class="sea-home__destinations" aria-label="Направления отдыха">
-        <span>Адлер</span><span>Хоста</span><span>Сочи</span><span>Лазаревское</span>
+        {% for category in housing_destinations %}<a href="{{ category.get_absolute_url }}">{{ category.title }}</a>{% endfor %}
       </div>
     </div>
   </section>
-  {# Здесь появится выдача объектов после подключения приложения housing. #}
+
   <section id="housing-catalog" class="sea-home__catalog sea-home__container" aria-labelledby="housing-catalog-title">
     <p class="sea-home__eyebrow">КАТАЛОГ ЖИЛЬЯ</p>
     <h2 id="housing-catalog-title">Выбирайте отдых под себя</h2>
-    <p class="sea-home__muted">Готовим новый каталог. Здесь появятся фотографии, условия проживания, цены и отзывы.</p>
+    <p class="sea-home__muted">Опубликовано объектов: {{ housing_count }}. Выберите категорию или задайте условия поиска.</p>
     <div class="sea-home__grid">
-      <article class="sea-home__card"><span class="sea-home__number">01</span><h3>Гостевые дома</h3><p>Для спокойного отдыха и знакомства с побережьем.</p></article>
-      <article class="sea-home__card"><span class="sea-home__number">02</span><h3>Квартиры</h3><p>Больше самостоятельности и привычного домашнего комфорта.</p></article>
-      <article class="sea-home__card"><span class="sea-home__number">03</span><h3>Мини-гостиницы</h3><p>Удобный формат для короткой поездки или отпуска.</p></article>
+      {% for brand in housing_home_types %}<article class="sea-home__card"><h3><a href="{% url 'catalog:housing_catalog' %}?housing_type={{ brand.slug|urlencode }}">{{ brand.name }}</a></h3><p><a href="{% url 'catalog:housing_catalog' %}?housing_type={{ brand.slug|urlencode }}">Посмотреть объекты →</a></p></article>{% empty %}<p>Типы жилья появятся после публикации объектов.</p>{% endfor %}
     </div>
+  </section>
+  <section class="sea-home__catalog sea-home__container" aria-labelledby="sea-home-latest-title">
+    <h2 id="sea-home-latest-title">Недавно добавленные объекты</h2>
+    <div class="sea-home__grid">
+    {% for card in housing_home_cards %}
+      <article class="sea-home__listing">
+        <a class="sea-home__photo" href="{{ card.product.get_absolute_url }}" aria-label="{{ card.product.title }}">{% if card.cover %}<img src="{{ card.cover.url }}" alt="{{ card.product.title }}" loading="lazy" decoding="async">{% else %}<span>Фото пока нет</span>{% endif %}</a>
+        <div class="sea-home__listing-body"><h3><a href="{{ card.product.get_absolute_url }}">{{ card.product.title }}</a></h3>{% if card.product.address %}<p>{{ card.product.address }}</p>{% endif %}<a href="{{ card.product.get_absolute_url }}">Подробнее об объекте →</a></div>
+      </article>
+    {% empty %}<p>Опубликованные объекты пока не добавлены.</p>{% endfor %}
+    </div>
+    <p><a class="sea-home__button" href="{% url 'catalog:housing_catalog' %}">Все объекты →</a> <a class="sea-home__more" href="{% url 'catalog:category_index' %}">Все категории →</a></p>
   </section>
 </main>
 {% endblock %}
