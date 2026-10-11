@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block body_class %}housing-category-page{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/housing_categories.css' %}"><link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ canonical_path }}">{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/housing_categories.css' %}">{% endblock %}
 {% block content %}
 <main class="housing-category">
   <nav class="housing-category__breadcrumbs" aria-label="Путь к категории"><a href="{% url 'home' %}">Главная</a> / <a href="{% url 'catalog:category_index' %}">Категории жилья</a>{% for ancestor in ancestors %} / <a href="{{ ancestor.get_absolute_url }}">{{ ancestor.title }}</a>{% endfor %}</nav>

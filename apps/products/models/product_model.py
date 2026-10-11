@@ -250,10 +250,5 @@ class Product(models.Model):
 
     @property
     def search_description(self):
-        if self.meta_description:
-            return self.meta_description
-        if self.short_description:
-            return self.short_description
-        if self.description:
-            return self.description[:160]
-        return ""
+        from apps.products.seo_text import description_metadata
+        return description_metadata(self.meta_description, self.short_description, self.description)

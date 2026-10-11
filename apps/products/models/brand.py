@@ -51,4 +51,8 @@ class Brand(models.Model):
 
     @property
     def seo_description(self):
-        return self.meta_description or self.description[:160] if self.description else ""
+        return self.search_description
+    @property
+    def search_description(self):
+        from apps.products.seo_text import description_metadata
+        return description_metadata(self.meta_description, self.description)

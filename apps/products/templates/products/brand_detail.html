@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static seo_metadata %}
 {% block body_class %}housing-category-page{% endblock %}
-{% block title %}{{ brand.seo_title }}{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/housing_categories.css' %}"><link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ brand.get_absolute_url }}{% if page_obj.number > 1 %}?page={{ page_obj.number }}{% endif %}">{% endblock %}
+{% block title %}{{ brand.seo_title|seo_plain }}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/housing_categories.css' %}">{% endblock %}
 {% block content %}
 <main class="housing-category">
   <nav class="housing-category__breadcrumbs" aria-label="Путь к типу жилья"><a href="{% url 'home' %}">Главная</a> / <a href="{% url 'catalog:housing_catalog' %}">Подбор жилья</a> / {{ brand.name }}</nav>
