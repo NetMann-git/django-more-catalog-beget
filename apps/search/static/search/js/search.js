@@ -1,179 +1,97 @@
-// apps/search/static/search/js/search.js
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('search-input');
-    const resultsContainer = document.getElementById('search-results');
-
-    if (!searchInput) return;
-
-    const priceFormatter = new Intl.NumberFormat('ru-RU', {maximumFractionDigits: 2});
-    const formatPrice = value => {
-        const number = Number(value);
-        return Number.isFinite(number) ? priceFormatter.format(number) : '';
-    };
-
-    let debounceTimer;
-
-    // Показываем популярные запросы при фокусе (если поле пустое)
-    searchInput.addEventListener('focus', function() {
-        const query = this.value.trim();
-        if (query.length === 0 && resultsContainer.children.length === 0) {
-            fetch('/search/popular/')
-                .then(response => response.json())
-                .then(data => {
-                    renderPopular(data.popular);
-                })
-                .catch(error => console.error('Ошибка загрузки популярных запросов:', error));
-        }
-    });
-
-    // Поиск по вводу (с debounce)
-    searchInput.addEventListener('input', function() {
-        clearTimeout(debounceTimer);
-        const query = this.value.trim();
-
-        if (query.length < 2) {
-            resultsContainer.style.display = 'none';
-            return;
-        }
-
-        debounceTimer = setTimeout(() => {
-            fetch(`/search/suggest/?q=${encodeURIComponent(query)}`, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('search-input');
+    const container = document.getElementById('search-results');
+    if (!input || !container) return;
+    let timer, revision = 0;
+    const searchUrl = query => '/search/?query=' + encodeURIComponent(query);
+    const hide = () => { container.style.display = 'none'; };
+    function text(tag, value, className) {
+        const node = document.createElement(tag);
+        node.textContent = value || '';
+        if (className) node.className = className;
+        return node;
+    }
+    function title(value, query) {
+        const node = text('div', '', 'search-item-title');
+        const source = String(value || '');
+        const start = source.toLocaleLowerCase('ru').indexOf(query.toLocaleLowerCase('ru'));
+        if (!query || start < 0) node.textContent = source;
+        else node.append(document.createTextNode(source.slice(0, start)),
+            text('mark', source.slice(start, start + query.length)),
+            document.createTextNode(source.slice(start + query.length)));
+        return node;
+    }
+    function render(results, query, popular = false) {
+        container.replaceChildren();
+        if (!results.length) {
+            if (popular) { hide(); return; }
+            container.append(text('div', 'Ничего не найдено', 'search-empty'));
+        } else {
+            const list = text('ul', '', 'search-dropdown');
+            results.forEach(result => {
+                const item = text('li', '', 'search-item ' + (popular ? 'popular' : result.type));
+                item.dataset.url = popular ? searchUrl(result) : result.url;
+                if (!popular && result.image) {
+                    const image = document.createElement('img');
+                    image.src = result.image; image.alt = result.product_title || result.title;
+                    image.loading = 'lazy';
+                    const wrapper = text('div', '', 'search-item-image');
+                    wrapper.append(image); item.append(wrapper);
                 }
-            })
-            .then(response => response.json())
-            .then(data => {
-                renderResults(data.results, query);
-            })
-            .catch(error => console.error('Ошибка поиска:', error));
+                const content = text('div', '', 'search-item-content');
+                content.append(title(popular ? result : result.title, query));
+                if (!popular) {
+                    const meta = result.type === 'product' ? [result.brand, result.address].filter(Boolean).join(' · ')
+                        : result.type === 'attribute' ? result.product_title : 'Категория жилья';
+                    content.append(text('div', meta, 'search-item-meta'));
+                }
+                item.append(content); list.append(item);
+            });
+            container.append(list);
+        }
+        container.style.display = 'block';
+    }
+    input.addEventListener('focus', () => {
+        if (input.value.trim()) return;
+        const token = ++revision;
+        fetch('/search/popular/').then(r => r.json()).then(data => {
+            if (token === revision && !input.value.trim() && document.activeElement === input)
+                render(data.popular || [], '', true);
+        }).catch(hide);
+    });
+    input.addEventListener('input', () => {
+        clearTimeout(timer);
+        const query = input.value.trim(), token = ++revision;
+        hide();
+        if (query.length < 2) return;
+        timer = setTimeout(() => {
+            fetch('/search/suggest/?q=' + encodeURIComponent(query)).then(r => r.json()).then(data => {
+                if (token === revision && document.activeElement === input) render(data.results || [], query);
+            }).catch(hide);
         }, 250);
     });
-
-    function renderResults(results, query) {
-        if (!results || results.length === 0) {
-            resultsContainer.innerHTML = '<div class="search-empty">Ничего не найдено</div>';
-            resultsContainer.style.display = 'block';
-            return;
-        }
-
-        let html = '<ul class="search-dropdown">';
-        results.forEach(item => {
-            if (item.type === 'product') {
-                html += `
-                    <li class="search-item product" data-url="${item.url}">
-                        <div class="search-item-image">
-                            ${item.image ? `<img src="${item.image}" alt="${item.title}">` : ''}
-                        </div>
-                        <div class="search-item-content">
-                            <div class="search-item-title">${highlightText(item.title, query)}</div>
-                            <div class="search-item-meta">
-                                ${item.price !== null && item.price !== undefined && item.price !== '' ? `<span class="price">${formatPrice(item.price)} ${item.currency}</span>` : '<span class="price">Цена по запросу</span>'}
-                                ${item.category ? `<span class="category">${item.category}</span>` : ''}
-                            </div>
-                            ${item.badges && item.badges.length ? `<div class="search-item-badges">${item.badges.map(b => `<span class="badge badge-${b.slug}">${b.title}</span>`).join('')}</div>` : ''}
-                        </div>
-                    </li>
-                `;
-            } else if (item.type === 'attribute') {
-                html += `
-                    <li class="search-item attribute" data-url="${item.url}">
-                        <div class="search-item-image">
-                            ${item.image ? `<img src="${item.image}" alt="${item.product_title}">` : ''}
-                        </div>
-                        <div class="search-item-content">
-                            <div class="search-item-title">${highlightText(item.title, query)}</div>
-                            <div class="search-item-meta">
-                                ${item.price !== null && item.price !== undefined && item.price !== '' ? `<span class="price">${formatPrice(item.price)} ${item.currency}</span>` : '<span class="price">Цена по запросу</span>'}
-                                <span class="search-item-type">Характеристика</span>
-                            </div>
-                        </div>
-                    </li>
-                `;
-            } else {
-                html += `
-                    <li class="search-item category" data-url="${item.url}">
-                        <span class="search-item-title">${highlightText(item.title, query)}</span>
-                        <span class="search-item-type">${item.type === 'category' ? 'Категория' : 'Бейдж'}</span>
-                    </li>
-                `;
-            }
-        });
-        html += '</ul>';
-        resultsContainer.innerHTML = html;
-        resultsContainer.style.display = 'block';
-    }
-
-    function renderPopular(queries) {
-        if (!queries || queries.length === 0) {
-            resultsContainer.style.display = 'none';
-            return;
-        }
-        let html = '<ul class="search-dropdown popular">';
-        queries.forEach(q => {
-            html += `<li class="search-item popular" data-query="${q}">🔍 ${q}</li>`;
-        });
-        html += '</ul>';
-        resultsContainer.innerHTML = html;
-        resultsContainer.style.display = 'block';
-    }
-
-    // Подсветка совпадений
-    function highlightText(text, query) {
-        if (!query) return text;
-        const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-        return text.replace(regex, '<mark>$1</mark>');
-    }
-
-    // Клик по результату – переход по ссылке
-    document.addEventListener('click', function(e) {
-        const item = e.target.closest('.search-item');
-        if (item) {
-            if (item.classList.contains('popular')) {
-                const query = item.dataset.query;
-                window.location.href = `/catalog/?q=${encodeURIComponent(query)}`;
-                return;
-            }
-            if (item.dataset.url) {
-                window.location.href = item.dataset.url;
-            }
-        } else if (!e.target.closest('#search-container')) {
-            resultsContainer.style.display = 'none';
-        }
+    container.addEventListener('click', event => {
+        const item = event.target.closest('.search-item');
+        if (item && item.dataset.url) location.href = item.dataset.url;
     });
-
-    // Клавиатура (↓ ↑ Enter Esc)
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            resultsContainer.style.display = 'none';
-            searchInput.blur();
-        }
-        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-            e.preventDefault();
-            const items = resultsContainer.querySelectorAll('.search-item');
+    document.addEventListener('click', event => {
+        if (!event.target.closest('#search-container')) { ++revision; hide(); }
+    });
+    input.addEventListener('keydown', event => {
+        if (event.key === 'Escape') { ++revision; hide(); return; }
+        const items = container.style.display === 'none' ? [] : [...container.querySelectorAll('.search-item')];
+        if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
             if (!items.length) return;
-            let currentIndex = Array.from(items).findIndex(el => el.classList.contains('active'));
-            if (e.key === 'ArrowDown') {
-                if (currentIndex < items.length - 1) currentIndex++;
-                else currentIndex = 0;
-            } else {
-                if (currentIndex > 0) currentIndex--;
-                else currentIndex = items.length - 1;
-            }
-            items.forEach(el => el.classList.remove('active'));
-            items[currentIndex].classList.add('active');
-            items[currentIndex].scrollIntoView({ block: 'nearest' });
-        }
-        if (e.key === 'Enter') {
-            const active = resultsContainer.querySelector('.search-item.active');
-            if (active) {
-                if (active.classList.contains('popular')) {
-                    const query = active.dataset.query;
-                    window.location.href = `/catalog/?q=${encodeURIComponent(query)}`;
-                } else if (active.dataset.url) {
-                    window.location.href = active.dataset.url;
-                }
-            }
+            event.preventDefault();
+            let index = items.findIndex(item => item.classList.contains('active'));
+            index = event.key === 'ArrowDown' ? (index + 1) % items.length : (index <= 0 ? items.length : index) - 1;
+            items.forEach(item => item.classList.remove('active'));
+            items[index].classList.add('active'); items[index].scrollIntoView({block: 'nearest'});
+        } else if (event.key === 'Enter') {
+            event.preventDefault();
+            const active = items.find(item => item.classList.contains('active'));
+            if (active) location.href = active.dataset.url;
+            else if (input.value.trim()) location.href = searchUrl(input.value.trim());
         }
     });
 });

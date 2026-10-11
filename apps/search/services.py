@@ -1,28 +1,11 @@
 # apps/search/services.py
 
-from django.core.cache import cache
-from django.db.models import Q
-from easy_thumbnails.files import get_thumbnailer
-from apps.products.models import Product, Category, Badge, ProductAttribute
+from apps.products.models import Product, ProductAttribute
 from .models import SearchQuery
 
 
 class SearchService:
     LIMIT = 8
-
-    @staticmethod
-    def _thumbnail_url(image, size=(80, 120)):
-        """Возвращает URL миниатюры для изображения."""
-        if not image:
-            return None
-        try:
-            thumbnail = get_thumbnailer(image).get_thumbnail({
-                'size': size,
-                'crop': True,
-            })
-            return thumbnail.url
-        except Exception:
-            return image.url
 
     @staticmethod
     def search(query):
@@ -43,104 +26,49 @@ class SearchService:
 
     @staticmethod
     def suggest(query, request=None):
-        cache_key = f"search_suggest_{query.lower()}"
-        results = cache.get(cache_key)
-        if results is not None:
-            return results
-
-        # Нормализуем запрос (регистронезависимое сравнение)
+        from apps.products.category_views import public_tree
+        query = (query or '').strip()[:120]
+        if len(query) < 2:
+            return []
         q = query.casefold()
+        categories = sorted(public_tree(), key=lambda item: (item.title, item.pk))
+        visible_ids = {category.pk for category in categories}
 
-        # 1. Товары – фильтрация в Python
-        products = Product.objects.filter(is_active=True).select_related('category', 'brand').prefetch_related('badges')
-        matched_products = []
-        for product in products:
-            if (q in (product.title or "").casefold() or
-                q in (product.article or "").casefold() or
-                q in (product.short_description or "").casefold() or
-                q in (product.description or "").casefold()):
-                matched_products.append(product)
-            if len(matched_products) >= SearchService.LIMIT:
-                break
+        def cover(product):
+            gallery = list(product.gallery.all())
+            image = product.image or (gallery[0].image if gallery else None)
+            return image.url if image else None
 
-        product_results = []
-        for product in matched_products:
-            product_results.append({
-                'type': 'product',
-                'id': product.id,
-                'title': product.title,
-                'price': str(product.price) if product.price is not None else None,
-                'currency': product.currency,
-                'url': product.get_absolute_url(),
-                'image': SearchService._thumbnail_url(product.image),
-                'badges': [{'title': b.title, 'slug': b.slug} for b in product.badges.all()],
-                'category': product.category.title if product.category else None,
-                'brand': product.brand.name if product.brand else None,
-            })
-
-        # 2. Категории – фильтрация в Python
-        categories = Category.objects.all()
-        matched_categories = []
-        for cat in categories:
-            if q in (cat.title or "").casefold():
-                matched_categories.append(cat)
-            if len(matched_categories) >= 3:
-                break
-        category_results = [
-            {'type': 'category', 'title': c.title, 'url': '/catalog/?category=' + str(c.pk)}
-            for c in matched_categories
-        ]
-
-        # 3. Бейджи – фильтрация в Python
-        badges = Badge.objects.all()
-        matched_badges = []
-        for badge in badges:
-            if q in (badge.title or "").casefold():
-                matched_badges.append(badge)
-            if len(matched_badges) >= 3:
-                break
-        badge_results = [
-            {'type': 'badge', 'title': b.title, 'url': '/catalog/?badge=' + b.slug}
-            for b in matched_badges
-        ]
-
-        # 4. Характеристики – фильтрация в Python
-        attrs = ProductAttribute.objects.select_related('product', 'attribute_type', 'attribute_value').all()
-        matched_attrs = []
+        products = SearchService.search(query).select_related('category', 'brand').prefetch_related('gallery')[:SearchService.LIMIT]
+        results = [{
+            'type': 'product', 'id': product.pk, 'title': product.title,
+            'url': product.get_absolute_url(), 'image': cover(product),
+            'address': product.address,
+            'brand': product.brand.name if product.brand else None,
+            'category': product.category.title if product.category_id in visible_ids else None,
+            'price': str(product.price) if product.price is not None else None,
+            'currency': product.currency, 'badges': [],
+        } for product in products]
+        results += [{'type': 'category', 'title': category.title,
+                     'url': category.get_absolute_url()}
+                    for category in categories if q in category.title.casefold()][:3]
+        attrs = ProductAttribute.objects.filter(product__is_active=True, attribute_value__isnull=False).select_related(
+            'product', 'attribute_type', 'attribute_value').prefetch_related('product__gallery').order_by('pk')
+        matched = []
         for attr in attrs:
-            product = attr.product
-            if not product or not product.is_active:
-                continue
-            if (q in (attr.attribute_type.name or "").casefold() or
-                q in (attr.attribute_value.value or "").casefold()):
-                matched_attrs.append(attr)
-            if len(matched_attrs) >= 5:
-                break
-
-        attribute_results = []
-        for attr in matched_attrs:
-            product = attr.product
-            attribute_results.append({
-                'type': 'attribute',
-                'title': f"{attr.attribute_type.name}: {attr.attribute_value.value}",
-                'product_title': product.title,
-                'url': product.get_absolute_url(),
-                'image': SearchService._thumbnail_url(product.image),
-                'price': str(product.price) if product.price is not None else None,
-                'currency': product.currency,
-            })
-
-        # Собираем все результаты
-        results = product_results + category_results + badge_results + attribute_results
-        results = results[:10]
-
-        cache.set(cache_key, results, 300)
-
-        # Сохраняем историю
+            if q in attr.attribute_type.name.casefold() or q in attr.attribute_value.value.casefold():
+                product = attr.product
+                matched.append({'type': 'attribute',
+                    'title': f'{attr.attribute_type.name}: {attr.attribute_value.value}',
+                    'product_title': product.title, 'url': product.get_absolute_url(),
+                    'image': cover(product), 'price': str(product.price) if product.price is not None else None,
+                    'currency': product.currency})
+                if len(matched) >= 5:
+                    break
         if request:
             SearchService.save_query(query, request)
-
-        return results
+        # Не кешировать опубликованность: скрытый объект исчезает сразу.
+        return (results + matched)[:10]
 
     @staticmethod
     def get_popular_queries(limit=10):

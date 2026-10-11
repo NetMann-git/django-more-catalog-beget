@@ -299,3 +299,8 @@ body.sticky-header .site-header {
 
 /* Public housing pages share the same compact mobile header. */
 @media(max-width:900px){body.housing-public-page #search-container{display:none}.housing-public-page .header-inner{display:flex;justify-content:space-between;gap:10px}.housing-public-page .header-actions{flex:0 0 auto}.housing-public-page .logo{min-width:0}}
+
+@media(min-width:901px){
+ .housing-public-page .site-header .main-nav{flex-wrap:wrap}
+ .housing-public-page #search-results{left:auto;right:0;width:340px;max-width:calc(100vw - 32px)}
+}

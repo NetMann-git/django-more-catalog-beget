@@ -32,3 +32,29 @@ class HousingSearchResultsTests(TestCase):
         self.assertContains(response, 'query=%D0%B4%D0%BE%D0%BC&amp;page=2')
         response = self.client.get(reverse('search:search'), {'query': 'дом', 'page': 2})
         self.assertEqual(response.context['cards'][0]['product'].title, 'Дом 12')
+
+
+class HousingSuggestionsTests(TestCase):
+    def test_address_cover_and_hidden_changes(self):
+        product = Product.objects.create(title='Дом', slug='house', joomla_id=9401, address='Морская', price=None)
+        ProductGalleryImage.objects.create(product=product, image='housing/original.jpg')
+        response = self.client.get('/search/suggest/', {'q': 'морская'}).json()
+        item = response['results'][0]
+        self.assertEqual(item['url'], product.get_absolute_url())
+        self.assertEqual(item['image'], '/media/housing/original.jpg')
+        product.is_active = False
+        product.save()
+        self.assertEqual(self.client.get('/search/suggest/', {'q': 'морская'}).json()['results'], [])
+
+    def test_visible_category_urls_and_hidden_ancestors(self):
+        from apps.products.models import Category
+        visible = Category.objects.create(title='Морской курорт', slug='sea')
+        hidden = Category.objects.create(title='Морской скрытый', slug='hidden', is_published=False)
+        Category.objects.create(title='Морской дочерний', slug='child', parent=hidden)
+        results = self.client.get('/search/suggest/', {'q': 'морской'}).json()['results']
+        self.assertEqual(results, [{'type': 'category', 'title': visible.title, 'url': visible.get_absolute_url()}])
+
+    def test_short_query_and_guest_history(self):
+        self.assertEqual(self.client.get('/search/suggest/', {'q': 'а'}).json()['results'], [])
+        self.client.get('/search/suggest/', {'q': '  море  '})
+        self.assertEqual(self.client.session['search_history'][0], 'море')

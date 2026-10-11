@@ -33,7 +33,7 @@
         <div class="header-actions">
             {% if request.resolver_match.url_name != 'home' and not hide_catalog_navigation %}
             <div id="search-container" class="header-search">
-                <input type="text" id="search-input" placeholder="Поиск по каталогу..." autocomplete="off" aria-label="Поиск по каталогу">
+                <input type="text" id="search-input" placeholder="Поиск жилья..." maxlength="120" autocomplete="off" aria-label="Поиск жилья">
                 <div id="search-results" class="search-results" style="display:none;"></div>
             </div>
 

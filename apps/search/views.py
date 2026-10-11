@@ -23,7 +23,7 @@ def suggest(request):
     AJAX-эндпоинт для автодополнения поиска.
     Возвращает JSON со списком товаров, категорий, бейджей.
     """
-    query = request.GET.get('q', '').strip()
+    query = request.GET.get('q', '').strip()[:120]
     if len(query) < 2:
         return JsonResponse({'results': []}, status=200)
 
