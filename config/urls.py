@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from config.seo import robots_txt
 from apps.products.sitemap_views import housing_sitemap
 from apps.home.views import home
 from apps.products.import_views import legacy_item
@@ -15,6 +16,7 @@ from apps.home.legal_views import public_offer, privacy_policy, personal_data_co
 
 urlpatterns = [
     path('sitemap.xml', housing_sitemap, name='housing_sitemap'),
+    path('robots.txt', robots_txt, name='robots_txt'),
     *[path(url.lstrip("/"), category_detail, {"slug": slug})
       for url, slug in LEGACY_CATEGORY_PATHS.items()],
     *[path(f"{prefix}/<slug:slug>.html", legacy_item, {"prefix": prefix})

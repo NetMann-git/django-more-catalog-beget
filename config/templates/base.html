@@ -24,7 +24,7 @@
     {% endif %}
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="{% if request.seo_noindex %}noindex, follow{% else %}index, follow{% endif %}">
     <meta property="og:title" content="{% if page and page.seo_title %}{{ page.seo_title }}{% else %}Дикарь-Сочи — жильё для отдыха у моря{% endif %}">
     <meta property="og:description" content="{% if page and page.search_description %}{{ page.search_description }}{% else %}Гостевые дома, квартиры и мини-гостиницы для отдыха в Сочи и на побережье.{% endif %}">
     <meta property="og:type" content="website">
