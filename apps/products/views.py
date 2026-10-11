@@ -43,12 +43,26 @@ from apps.recommendations.services import RecommendationService
 
 
 def brand_detail(request, slug):
+    """Страница типа жилья с опубликованными объектами и пагинацией."""
+    from django.core.paginator import InvalidPage
+    from django.http import Http404
+    from .housing_detail import public_html
     brand = get_object_or_404(Brand, slug=slug)
-    products = CatalogRepository.by_brand(brand)
+    products = Product.objects.filter(brand=brand, is_active=True).select_related('brand').prefetch_related('gallery').order_by('title', 'pk')
+    try:
+        page_obj = Paginator(products, 12).page(request.GET.get('page', 1))
+    except InvalidPage as exc:
+        raise Http404 from exc
+    cards = []
+    for product in page_obj:
+        gallery = list(product.gallery.all())
+        cards.append({'product': product, 'cover': product.image or
+                      (gallery[0].image if gallery else None)})
     context = {
-        'brand': brand,
-        'products': products,
-        'page': brand,  # для SEO (чтобы работал base.html)
+        'brand': brand, 'products': page_obj, 'cards': cards,
+        'page_obj': page_obj, 'page': brand,
+        'description_html': public_html(brand.description),
+        'housing_public_page': True,
     }
     return render(request, 'products/brand_detail.html', context)
 

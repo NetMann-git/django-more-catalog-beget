@@ -1,29 +1,22 @@
-<!-- apps/products/templates/products/brand_detail.html -->
-
 {% extends "base.html" %}
 {% load static %}
-
+{% block body_class %}housing-category-page{% endblock %}
 {% block title %}{{ brand.seo_title }}{% endblock %}
-
+{% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/housing_categories.css' %}"><link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ brand.get_absolute_url }}{% if page_obj.number > 1 %}?page={{ page_obj.number }}{% endif %}">{% endblock %}
 {% block content %}
-<div class="container">
-    <h1>{{ brand.name }}</h1>
-    {% if brand.logo %}
-        <img src="{{ brand.logo.url }}" alt="{{ brand.name }}" class="brand-logo">
-    {% endif %}
-    {% if brand.description %}
-        <div class="brand-description">{{ brand.description|linebreaks }}</div>
-    {% endif %}
-
-    <h2>Жильё этого типа</h2>
-    {% if products %}
-        <div class="product-grid">
-            {% for product in products %}
-                {% include "products/_product_card.html" with product=product %}
-            {% endfor %}
-        </div>
-    {% else %}
-        <p>Жильё этого типа пока не добавлено.</p>
-    {% endif %}
-</div>
+<main class="housing-category">
+  <nav class="housing-category__breadcrumbs" aria-label="Путь к типу жилья"><a href="{% url 'home' %}">Главная</a> / <a href="{% url 'catalog:housing_catalog' %}">Подбор жилья</a> / {{ brand.name }}</nav>
+  <h1>{{ brand.name }}</h1>
+  {% if brand.logo %}<img src="{{ brand.logo.url }}" alt="{{ brand.name }}" width="120" height="90" style="max-width:100%;object-fit:contain" loading="lazy">{% endif %}
+  {% if description_html %}<div class="housing-category__description">{{ description_html }}</div>{% endif %}
+  <nav class="housing-category__links"><a href="{% url 'catalog:housing_catalog' %}?housing_type={{ brand.slug|urlencode }}">Подобрать {{ brand.name }} по курорту</a></nav>
+  <h2>Жильё этого типа</h2>
+  <p class="housing-category__count">Объектов: {{ page_obj.paginator.count }}</p>
+  {% include "products/_housing_cards.html" with empty_text='Жильё этого типа пока не опубликовано.' %}
+  {% if page_obj.paginator.num_pages > 1 %}<nav class="housing-category__pagination" aria-label="Страницы объектов">
+    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" rel="prev">← Назад</a>{% endif %}
+    <span aria-current="page">{{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" rel="next">Далее →</a>{% endif %}
+  </nav>{% endif %}
+</main>
 {% endblock %}
