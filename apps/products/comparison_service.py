@@ -24,7 +24,7 @@ class ComparisonService:
         products = Product.objects.filter(
             id__in=ids,
             is_active=True,
-        )
+        ).select_related("brand").prefetch_related("gallery")
 
         order = {
             product_id: index

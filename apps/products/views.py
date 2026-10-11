@@ -314,17 +314,15 @@ def comparison_list(request):
         products,
     )
 
-    # Получаем рекомендации для страницы сравнения
-    recommended_products = RecommendationService.get_similar_products(
-        viewed_products=products,
-        page='comparison',
-        limit=4
-    )
-
+    cards = []
+    for product in products:
+        gallery = list(product.gallery.all())
+        cards.append({'product': product, 'cover': product.image or
+                      (gallery[0].image if gallery else None)})
     context = {
-        'products': products,
+        'products': products, 'cards': cards,
         'attributes_rows': attributes_rows,
-        'recommended_products': recommended_products,
+        'housing_public_page': True,
     }
 
     return render(

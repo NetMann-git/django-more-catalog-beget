@@ -68,12 +68,16 @@ class NullablePriceTests(TestCase):
     def test_other_templates_display_unknown_price(self):
         for template, context in [
             ("products/manage_list.html", {"products": [self.unknown]}),
-            ("products/comparison.html", {"products": [self.unknown]}),
             ("appointments/appointment_form.html", {"product": self.unknown}),
             ("appointments/_appointment_form_ajax.html", {"product": self.unknown}),
         ]:
             with self.subTest(template=template):
                 self.assertIn("Цена по запросу", render_to_string(template, context))
+
+    def test_housing_comparison_links_to_price_conditions(self):
+        html = render_to_string("products/comparison.html", {"products": [self.unknown]})
+        self.assertIn("Уточнить в карточке", html)
+        self.assertNotIn("Цена по запросу", html)
 
 
 class NullablePriceMigrationTests(TransactionTestCase):
