@@ -30,6 +30,7 @@ def public_tree():
 def category_index(request):
     categories = public_tree()
     return render(request, 'products/housing_categories.html', {
+        'housing_public_page': True, 'housing_section': 'categories',
         'roots': [category for category in categories if category.parent_id is None],
         'categories': categories,
         'page': SimpleNamespace(seo_title='Категории жилья', search_description='Жильё для отдыха по курортам и типам размещения.'),
@@ -72,6 +73,7 @@ def category_detail(request, slug):
         ancestors.append(ancestor)
         parent = ancestor.parent_id
     return render(request, 'products/housing_category.html', {
+        'housing_public_page': True, 'housing_section': 'categories',
         'category': category, 'description_html': public_html(category.description),
         'ancestors': list(reversed(ancestors)),
         'children': [entry for entry in categories if entry.parent_id == category.pk],

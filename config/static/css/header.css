@@ -296,3 +296,6 @@ body.sticky-header .site-header {
         font-size: 0.78rem;
     }
 }
+
+/* Public housing pages share the same compact mobile header. */
+@media(max-width:900px){body.housing-public-page #search-container{display:none}.housing-public-page .header-inner{display:flex;justify-content:space-between;gap:10px}.housing-public-page .header-actions{flex:0 0 auto}.housing-public-page .logo{min-width:0}}

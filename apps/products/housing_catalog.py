@@ -73,6 +73,7 @@ def housing_catalog(request):
     params = request.GET.copy()
     params.pop('page', None)
     return render(request, 'products/housing_catalog.html', {
+        'housing_public_page': True, 'housing_section': 'housing',
         'filter_form': form, 'cards': cards, 'page_obj': page_obj,
         'pagination_query': params.urlencode(),
         'page': SimpleNamespace(seo_title='Подбор жилья для отдыха', search_description='Подбор гостевых домов, квартир и гостиниц по курорту, категории и типу жилья.'),

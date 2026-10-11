@@ -10,10 +10,11 @@
         <nav class="main-nav" aria-label="Основная навигация">
             <a href="{% url 'home' %}" class="nav-link">Главная</a>
             <a href="{% url 'catalog:housing_catalog' %}" class="nav-link{% if request.resolver_match.url_name == 'housing_catalog' %} is-active{% endif %}">Подбор жилья</a>
+            {% if housing_public_page %}<a href="{% url 'catalog:category_index' %}" class="nav-link{% if housing_section == 'categories' %} is-active{% endif %}">Категории жилья</a>{% endif %}
             {% if request.resolver_match.url_name == 'home' or hide_catalog_navigation %}
-            <a href="{% url 'home' %}#housing-catalog" class="nav-link">О каталоге жилья</a>
+            {% if not housing_public_page %}<a href="{% url 'home' %}#housing-catalog" class="nav-link">О каталоге жилья</a>{% endif %}
             {% else %}
-            <a href="{% url 'catalog:catalog' %}" class="nav-link{% if request.resolver_match.namespace == 'catalog' %} is-active{% endif %}">Каталог</a>
+            {% if not housing_public_page %}<a href="{% url 'catalog:catalog' %}" class="nav-link{% if request.resolver_match.namespace == 'catalog' %} is-active{% endif %}">Каталог</a>{% endif %}
             <a href="{% url 'catalog:comparison' %}" class="nav-link">Сравнение <span class="badge-count" id="comparison-count">{{ comparison_ids|length }}</span></a>
             <a href="{% url 'wishlist:list' %}" class="nav-link">Избранное <span class="badge-count" id="wishlist-count">{{ wishlist_count }}</span></a>
             <a href="{% url 'catalog:recently_viewed' %}" class="nav-link">История <span class="badge-count" id="recently-viewed-count">{{ recently_viewed_ids|length }}</span></a>
@@ -46,10 +47,11 @@
     <nav class="mobile-nav" aria-label="Мобильная навигация" data-mobile-nav>
         <a href="{% url 'home' %}" class="nav-link">Главная</a>
             <a href="{% url 'catalog:housing_catalog' %}" class="nav-link{% if request.resolver_match.url_name == 'housing_catalog' %} is-active{% endif %}">Подбор жилья</a>
-        {% if request.resolver_match.url_name == 'home' or hide_catalog_navigation %}
-        <a href="{% url 'home' %}#housing-catalog" class="nav-link">О каталоге жилья</a>
+        {% if housing_public_page %}<a href="{% url 'catalog:category_index' %}" class="nav-link{% if housing_section == 'categories' %} is-active{% endif %}">Категории жилья</a>{% endif %}
+            {% if request.resolver_match.url_name == 'home' or hide_catalog_navigation %}
+        {% if not housing_public_page %}<a href="{% url 'home' %}#housing-catalog" class="nav-link">О каталоге жилья</a>{% endif %}
         {% else %}
-        <a href="{% url 'catalog:catalog' %}" class="nav-link">Каталог</a>
+        {% if not housing_public_page %}<a href="{% url 'catalog:catalog' %}" class="nav-link">Каталог</a>{% endif %}
         <a href="{% url 'catalog:comparison' %}" class="nav-link">Сравнение <span class="badge-count" data-comparison-count>{{ comparison_ids|length }}</span></a>
         <a href="{% url 'wishlist:list' %}" class="nav-link">Избранное <span class="badge-count" data-wishlist-count>{{ wishlist_count }}</span></a>
         <a href="{% url 'catalog:recently_viewed' %}" class="nav-link">История <span class="badge-count" data-recently-viewed-count>{{ recently_viewed_ids|length }}</span></a>

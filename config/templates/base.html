@@ -65,7 +65,7 @@
     <link rel="stylesheet" href="{% static 'css/scroll-to-top.css' %}">
 </head>
 
-<body class="sticky-header {% block body_class %}{% endblock %}{% block body_theme_class %} {{ current_theme }}-theme{% endblock %}">
+<body class="sticky-header {% if housing_public_page %}housing-public-page {% endif %}{% block body_class %}{% endblock %}{% block body_theme_class %} {{ current_theme }}-theme{% endblock %}">
     <script>
     function getCookie(name) {
         let value = null;
@@ -98,7 +98,7 @@
 
         {% block content %}{% endblock %}
 
-        {% if request.resolver_match.namespace == 'catalog' %}
+        {% if request.resolver_match.namespace == 'catalog' and not housing_public_page %}
             {% catalog_contacts %}
         {% endif %}
 

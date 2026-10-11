@@ -66,6 +66,7 @@ def housing_context(product) -> dict:
     from .category_navigation import category_navigation
     category_links = category_navigation(product)
     return {
+        'housing_public_page': True,
         **category_links,
         'housing_sections': sections,
         'housing_map': product_map(product),

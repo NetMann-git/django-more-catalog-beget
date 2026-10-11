@@ -20,6 +20,7 @@ def home(request: HttpRequest) -> HttpResponse:
         gallery = list(product.gallery.all())
         cards.append({'product': product, 'cover': product.image or (gallery[0].image if gallery else None)})
     return render(request, 'home/home.html', {
+        'housing_public_page': True,
         'housing_filter_form': HousingFilterForm(categories=categories, brands=brands),
         'housing_count': products.count(), 'housing_home_cards': cards,
         'housing_home_types': brands,
