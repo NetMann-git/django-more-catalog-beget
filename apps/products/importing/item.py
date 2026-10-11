@@ -13,6 +13,7 @@ from django.db import transaction
 from apps.products.cache import CatalogCache
 from apps.products.map_data import apply_map_import
 from apps.products.models import Brand, Category, Product
+from .media_paths import valid_media_path
 
 
 class ItemImportError(ValueError):
@@ -60,7 +61,7 @@ def media_plan(data, media_source):
     seen = set()
     for entry in data['media']:
         rel = entry['path']
-        if not re.fullmatch(r'images/uploads/user_[0-9]+/[\w .()-]+\.(jpg|jpeg|png|webp|gif|mp4)', rel, flags=re.I) or rel in seen:
+        if not valid_media_path(rel, data['id']) or rel in seen:
             raise ItemImportError('Недопустимый или повторный путь медиа.')
         seen.add(rel)
         source = (source_root / rel).resolve()

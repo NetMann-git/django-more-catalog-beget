@@ -16,6 +16,7 @@ from apps.products.cache import CatalogCache
 from apps.products.models import ProductGalleryImage
 from .gallery import filename_order
 from .item import FIELDS, ItemImportError, prepare
+from .media_paths import EXTRA_MEDIA, valid_media_path
 
 APPROVED = {1096:'user_396', 1963:'user_548', 1036:'user_378'}
 IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.webp', '.gif'}
@@ -83,14 +84,22 @@ def read_local_items(data, media_source, approved=None):
                         rel = src.lstrip('/')
                         if rel in known:
                             continue
-                        if not rel.startswith('images/uploads/' + folder_name + '/') or not re.fullmatch(r'images/uploads/user_[0-9]+/[\w .()-]+\.(jpg|jpeg|png|webp|gif|mp4)', rel, flags=re.I):
+                        extra = rel in EXTRA_MEDIA.get(item['id'], set())
+                        if not valid_media_path(rel, item['id']) or (not extra and not rel.startswith('images/uploads/' + folder_name + '/')):
                             raise ItemImportError('Дополнительное медиа требует явного переноса: ' + src)
                         file = (source / rel).resolve()
-                        if not file.is_relative_to(folder.resolve()) or not file.is_file():
+                        allowed_root = source if extra else folder.resolve()
+                        if not file.is_relative_to(allowed_root) or not file.is_file():
                             raise ItemImportError('Отсутствует медиа из HTML: ' + rel)
+                        if file.suffix.lower() in IMAGE_EXTENSIONS:
+                            try:
+                                with Image.open(file) as image:
+                                    image.verify()
+                            except (OSError, ValueError) as exc:
+                                raise ItemImportError('Повреждённое изображение из HTML: ' + rel) from exc
                         item['media'].append({'path':rel,'size':file.stat().st_size,'sha256':hashlib.sha256(file.read_bytes()).hexdigest()})
                         known.add(rel)
-        item['local_gallery'] = [e['path'] for e in item['media'] if Path(e['path']).suffix.lower() in IMAGE_EXTENSIONS and e['path'] != cover]
+        item['local_gallery'] = [e['path'] for e in item['media'] if e['path'].startswith('images/uploads/' + folder_name + '/') and Path(e['path']).suffix.lower() in IMAGE_EXTENSIONS and e['path'] != cover]
         item['gallery_complete'] = True
         ignored = [f.name for f in folder.iterdir() if f.is_dir() or f.suffix.lower() not in IMAGE_EXTENSIONS and 'images/uploads/'+folder_name+'/'+f.name not in known]
         result.append((item, ignored))
