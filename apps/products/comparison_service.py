@@ -1,6 +1,6 @@
 # apps/products/comparison_service.py
 
-from apps.products.models import Product
+from apps.products.models import Product, ProductAttribute
 
 from .session_service import SessionService
 
@@ -41,41 +41,28 @@ class ComparisonService:
 
     @staticmethod
     def get_attributes_rows(products):
-        """
-        Формирует строки характеристик
-        для таблицы сравнения.
-        """
-
+        """Собрать все значения каждой характеристики одним запросом."""
+        products = list(products)
+        if not products:
+            return []
         attributes_data = {}
-
-        for product in products:
-            for attr in product.attributes.select_related(
-                "attribute_type",
-            ).all():
-                key = attr.attribute_type.name
-
-                if key not in attributes_data:
-                    attributes_data[key] = {}
-
-                attributes_data[key][product.id] = (
-                    attr.attribute_value.value
-                    if attr.attribute_value
-                    else "—"
-                )
-
-        attributes_rows = []
-
-        for attr_name, values in attributes_data.items():
-            row = {
-                "name": attr_name,
-            }
-
+        attributes = ProductAttribute.objects.filter(
+            product_id__in=[product.pk for product in products]
+        ).select_related('attribute_type', 'attribute_value').order_by(
+            'attribute_type__name', 'sort_order', 'attribute_value__sort_order', 'pk'
+        )
+        for attr in attributes:
+            values = attributes_data.setdefault(attr.attribute_type.name, {})
+            selected = values.setdefault(attr.product_id, [])
+            if attr.attribute_value_id:
+                value = attr.attribute_value.value
+                if value.strip() and value not in selected:
+                    selected.append(value)
+        rows = []
+        for name, values in attributes_data.items():
+            row = {'name': name}
             for product in products:
-                row[product.id] = values.get(
-                    product.id,
-                    "—",
-                )
-
-            attributes_rows.append(row)
-
-        return attributes_rows
+                selected = values.get(product.pk, [])
+                row[product.pk] = '; '.join(selected) if selected else '—'
+            rows.append(row)
+        return rows
