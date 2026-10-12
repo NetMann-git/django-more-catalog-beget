@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     # Приложения проекта
     'apps.home',
     'apps.products',
+    'apps.information',
     'apps.wishlist',
     'apps.reviews',
     'apps.appointments',
