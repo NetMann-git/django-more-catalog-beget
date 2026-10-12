@@ -52,3 +52,18 @@ class InformationMaterial(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        from .legacy_urls import LEGACY_MATERIAL_PATHS
+        return next((path for path, joomla_id in LEGACY_MATERIAL_PATHS.items() if joomla_id == self.joomla_id),
+                    reverse('information:material', kwargs={'slug': self.slug}))
+
+    @property
+    def seo_title(self):
+        return self.meta_title or self.title
+
+    @property
+    def search_description(self):
+        from apps.products.seo_text import description_metadata
+        return description_metadata(self.meta_description, self.intro, self.subtitle)

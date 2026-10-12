@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% load static %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'information/information.css' %}">{% endblock %}
+{% block content %}<main class="info-page">
+<nav aria-label="Путь к странице"><a href="{% url 'home' %}">Главная</a> / <a href="{% url 'information:index' %}">Информация</a>{% if category %} / {{ category.title }}{% endif %}</nav>
+<h1>{{ title }}</h1>{{ category_description }}
+<nav class="info-page__categories" aria-label="Категории материалов"><a href="{% url 'information:index' %}">Все материалы</a><a href="{% url 'information:maps' %}">Материалы с картами</a>{% for row in categories %}<a href="{% url 'information:category' row.slug %}">{{ row.title }}</a>{% endfor %}</nav>
+<p>Материалов: {{ page_obj.paginator.count }}</p>
+<div class="info-page__grid">{% for material in page_obj %}<article class="info-page__card"><h2><a href="{{ material.get_absolute_url }}">{{ material.title }}</a></h2>{% if material.subtitle %}<p>{{ material.subtitle }}</p>{% endif %}<p>{{ material.search_description|truncatechars:220 }}</p><a href="{{ material.get_absolute_url }}">Читать материал →</a></article>{% empty %}<p>В этом разделе пока нет опубликованных материалов.</p>{% endfor %}</div>
+{% if page_obj.paginator.num_pages > 1 %}<nav class="info-page__pagination" aria-label="Страницы материалов">{% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" rel="prev">← Назад</a>{% endif %}<span>{{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" rel="next">Далее →</a>{% endif %}</nav>{% endif %}
+</main>{% endblock %}

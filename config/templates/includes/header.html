@@ -14,6 +14,7 @@
             {% if request.resolver_match.url_name == 'home' or hide_catalog_navigation %}
             {% if not housing_public_page %}<a href="{% url 'home' %}#housing-catalog" class="nav-link">О каталоге жилья</a>{% endif %}
             {% else %}
+            {% if housing_public_page %}<a href="{% url 'information:index' %}" class="nav-link{% if information_public_page or request.resolver_match.namespace == 'information' %} is-active{% endif %}">Информация</a>{% endif %}
             {% if not housing_public_page %}<a href="{% url 'catalog:catalog' %}" class="nav-link{% if request.resolver_match.namespace == 'catalog' %} is-active{% endif %}">Каталог</a>{% endif %}
             <a href="{% url 'catalog:comparison' %}" class="nav-link">Сравнение <span class="badge-count" id="comparison-count">{{ comparison_ids|length }}</span></a>
             <a href="{% url 'wishlist:list' %}" class="nav-link">Избранное <span class="badge-count" id="wishlist-count">{{ wishlist_count }}</span></a>
@@ -51,6 +52,7 @@
             {% if request.resolver_match.url_name == 'home' or hide_catalog_navigation %}
         {% if not housing_public_page %}<a href="{% url 'home' %}#housing-catalog" class="nav-link">О каталоге жилья</a>{% endif %}
         {% else %}
+        {% if housing_public_page %}<a href="{% url 'information:index' %}" class="nav-link">Информация</a>{% endif %}
         {% if not housing_public_page %}<a href="{% url 'catalog:catalog' %}" class="nav-link">Каталог</a>{% endif %}
         <a href="{% url 'catalog:comparison' %}" class="nav-link">Сравнение <span class="badge-count" data-comparison-count>{{ comparison_ids|length }}</span></a>
         <a href="{% url 'wishlist:list' %}" class="nav-link">Избранное <span class="badge-count" data-wishlist-count>{{ wishlist_count }}</span></a>
