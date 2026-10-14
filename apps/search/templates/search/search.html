@@ -1,24 +1,24 @@
 {% extends "base.html" %}
 {% load static %}
 {% block body_class %}housing-category-page{% endblock %}
-{% block title %}Поиск жилья{% endblock %}
+{% block title %}Поиск по сайту{% endblock %}
 {% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/housing_categories.css' %}">{% endblock %}
 {% block content %}
 <main class="housing-category">
   <nav class="housing-category__breadcrumbs" aria-label="Путь к странице"><a href="{% url 'home' %}">Главная</a> / <a href="{% url 'catalog:housing_catalog' %}">Подбор жилья</a> / Поиск</nav>
-  <h1>Поиск жилья</h1>
+  <h1>Поиск по сайту</h1>
   <form class="housing-filter" action="{% url 'search:search' %}" method="get">
-    <div class="housing-filter__field"><label for="housing-search-query">Название, адрес или описание</label><input id="housing-search-query" name="query" type="search" maxlength="120" value="{{ search_query }}"></div>
-    <div class="housing-filter__actions"><button type="submit">Найти жильё</button><a href="{% url 'catalog:housing_catalog' %}">Подбор по категории и типу</a></div>
+    <div class="housing-filter__field"><label for="housing-search-query">Название, адрес или текст материала</label><input id="housing-search-query" name="query" type="search" maxlength="120" value="{{ search_query }}"></div>
+    <div class="housing-filter__actions"><button type="submit">Найти</button><a href="{% url 'catalog:housing_catalog' %}">Подбор по категории и типу</a></div>
   </form>
   {% if search_query %}
-    <p class="housing-category__count">По запросу «{{ search_query }}» найдено объектов: {{ search_results.paginator.count }}</p>
-    {% include "products/_housing_cards.html" with empty_text='По этому запросу объектов не найдено. Попробуйте другое название или адрес.' %}
+    <p class="housing-category__count">По запросу «{{ search_query }}» найдено результатов: {{ search_results.paginator.count }}</p>
+    {% include "search/_result_cards.html" %}
     {% if search_results.paginator.num_pages > 1 %}<nav class="housing-category__pagination" aria-label="Страницы результатов">
       {% if search_results.has_previous %}<a href="?query={{ search_query|urlencode }}&amp;page={{ search_results.previous_page_number }}" rel="prev">← Назад</a>{% endif %}
       <span aria-current="page">{{ search_results.number }} из {{ search_results.paginator.num_pages }}</span>
       {% if search_results.has_next %}<a href="?query={{ search_query|urlencode }}&amp;page={{ search_results.next_page_number }}" rel="next">Далее →</a>{% endif %}
     </nav>{% endif %}
-  {% else %}<p>Введите название, адрес или описание объекта.</p>{% endif %}
+  {% else %}<p>Введите название, адрес или текст материала.</p>{% endif %}
 </main>
 {% endblock %}

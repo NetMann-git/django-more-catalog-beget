@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 content.append(title(popular ? result : result.title, query));
                 if (!popular) {
                     const meta = result.type === 'product' ? [result.brand, result.address].filter(Boolean).join(' · ')
+                        : result.type === 'information' ? (result.kind === 'map' ? 'Материал с картой' : 'Информационный материал')
                         : result.type === 'attribute' ? result.product_title : 'Категория жилья';
                     content.append(text('div', meta, 'search-item-meta'));
                 }

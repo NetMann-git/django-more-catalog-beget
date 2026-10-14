@@ -34,7 +34,7 @@
         <div class="header-actions">
             {% if request.resolver_match.url_name != 'home' and not hide_catalog_navigation %}
             <div id="search-container" class="header-search">
-                <input type="text" id="search-input" placeholder="Поиск жилья..." maxlength="120" autocomplete="off" aria-label="Поиск жилья">
+                <input type="text" id="search-input" placeholder="Поиск по сайту..." maxlength="120" autocomplete="off" aria-label="Поиск по сайту">
                 <div id="search-results" class="search-results" style="display:none;"></div>
             </div>
 
@@ -52,7 +52,7 @@
             {% if request.resolver_match.url_name == 'home' or hide_catalog_navigation %}
         {% if not housing_public_page %}<a href="{% url 'home' %}#housing-catalog" class="nav-link">О каталоге жилья</a>{% endif %}
         {% else %}
-        {% if housing_public_page %}<a href="{% url 'information:index' %}" class="nav-link">Информация</a>{% endif %}
+        {% if housing_public_page %}<a href="{% url 'information:index' %}" class="nav-link">Информация</a><a href="{% url 'search:search' %}" class="nav-link">Поиск по сайту</a>{% endif %}
         {% if not housing_public_page %}<a href="{% url 'catalog:catalog' %}" class="nav-link">Каталог</a>{% endif %}
         <a href="{% url 'catalog:comparison' %}" class="nav-link">Сравнение <span class="badge-count" data-comparison-count>{{ comparison_ids|length }}</span></a>
         <a href="{% url 'wishlist:list' %}" class="nav-link">Избранное <span class="badge-count" data-wishlist-count>{{ wishlist_count }}</span></a>

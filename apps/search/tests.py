@@ -19,7 +19,7 @@ class HousingSearchResultsTests(TestCase):
 
     def test_empty_missing_and_escaped_query(self):
         self.assertContains(self.client.get(reverse('search:search')), 'Введите название')
-        self.assertContains(self.client.get(reverse('search:search'), {'query': 'нет такого жилья'}), 'объектов не найдено')
+        self.assertContains(self.client.get(reverse('search:search'), {'query': 'нет такого жилья'}), 'результатов не найдено')
         response = self.client.get(reverse('search:search'), {'query': '<script>alert(1)</script>'})
         self.assertNotContains(response, '<script>alert(1)</script>')
         self.assertContains(response, '&lt;script&gt;')

@@ -25,6 +25,27 @@ class SearchService:
         return Product.objects.filter(pk__in=matched_ids, is_active=True).order_by('title', 'pk')
 
     @staticmethod
+    def information_search(query):
+        from apps.information.models import InformationMaterial
+        query = (query or '').strip().casefold()
+        if not query:
+            return InformationMaterial.objects.none()
+        fields = ('title', 'subtitle', 'intro', 'body', 'extra_body')
+        ids = [row[0] for row in InformationMaterial.objects.filter(is_active=True)
+               .values_list('pk', *fields).iterator()
+               if any(query in (value or '').casefold() for value in row[1:])]
+        return InformationMaterial.objects.filter(pk__in=ids, is_active=True).defer(
+            'source', 'body', 'extra_body', 'html_insert').order_by('title', 'pk')
+
+    @staticmethod
+    def combined_search(query):
+        results = [{'kind': 'housing', 'object': product} for product in
+                   SearchService.search(query).select_related('brand').prefetch_related('gallery')]
+        results += [{'kind': 'information', 'object': material} for material in
+                    SearchService.information_search(query)]
+        return sorted(results, key=lambda row: (row['object'].title.casefold(), row['kind'], row['object'].pk))
+
+    @staticmethod
     def suggest(query, request=None):
         from apps.products.category_views import public_tree
         query = (query or '').strip()[:120]
@@ -49,7 +70,13 @@ class SearchService:
             'price': str(product.price) if product.price is not None else None,
             'currency': product.currency, 'badges': [],
         } for product in products]
-        results += [{'type': 'category', 'title': category.title,
+        material_results = [{'type': 'information', 'id': material.pk, 'title': material.title,
+                             'kind': material.kind, 'url': material.get_absolute_url(),
+                             'image': material.cover_url}
+                            for material in SearchService.information_search(query)[:4]]
+        from itertools import zip_longest
+        results = [item for pair in zip_longest(results, material_results) for item in pair if item is not None]
+        category_results = [{'type': 'category', 'title': category.title,
                      'url': category.get_absolute_url()}
                     for category in categories if q in category.title.casefold()][:3]
         attrs = ProductAttribute.objects.filter(product__is_active=True, attribute_value__isnull=False).select_related(
@@ -68,7 +95,7 @@ class SearchService:
         if request:
             SearchService.save_query(query, request)
         # Не кешировать опубликованность: скрытый объект исчезает сразу.
-        return (results + matched)[:10]
+        return (results[:10 - len(category_results)] + category_results + matched)[:10]
 
     @staticmethod
     def get_popular_queries(limit=10):

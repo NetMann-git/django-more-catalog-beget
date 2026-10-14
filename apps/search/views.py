@@ -37,9 +37,9 @@ def suggest(request):
 
 
 def search(request):
-    """Публичные результаты поиска жилья со старыми адресами объектов."""
+    """Общие результаты поиска жилья и материалов по каноническим адресам."""
     search_query = request.GET.get('query', '').strip()[:120]
-    queryset = SearchService.search(search_query).select_related('brand').prefetch_related('gallery')
+    queryset = SearchService.combined_search(search_query)
     paginator = Paginator(queryset, 12)
     try:
         page = paginator.page(request.GET.get('page', 1))
@@ -48,11 +48,18 @@ def search(request):
     except EmptyPage:
         page = paginator.page(paginator.num_pages)
     cards = []
-    for product in page:
-        gallery = list(product.gallery.all())
-        cards.append({'product': product, 'cover': product.image or
-                      (gallery[0].image if gallery else None)})
+    result_cards = []
+    for row in page:
+        obj = row['object']
+        if row['kind'] == 'housing':
+            gallery = list(obj.gallery.all())
+            cover = obj.image or (gallery[0].image if gallery else None)
+            cards.append({'product': obj, 'cover': cover})
+            image_url = cover.url if cover else None
+        else:
+            image_url = obj.cover_url
+        result_cards.append({**row, 'image_url': image_url})
     return TemplateResponse(request, 'search/search.html', {
         'search_query': search_query, 'search_results': page,
-        'cards': cards, 'housing_public_page': True,
+        'cards': cards, 'result_cards': result_cards, 'housing_public_page': True,
     })

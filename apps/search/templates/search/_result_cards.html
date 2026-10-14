@@ -1,0 +1,11 @@
+<div class="housing-category__grid">
+{% for card in result_cards %}{% with obj=card.object %}
+<article class="housing-category__card">
+  {% if card.image_url %}<a class="housing-category__photo" href="{{ obj.get_absolute_url }}"><img src="{{ card.image_url }}" alt="{{ obj.title }}" loading="lazy" decoding="async"></a>{% endif %}
+  <div class="housing-category__body"><p class="housing-category__type">{% if card.kind == 'housing' %}Жильё{% else %}{% if obj.kind == 'map' %}Материал с картой{% else %}Информационный материал{% endif %}{% endif %}</p>
+  <h2><a href="{{ obj.get_absolute_url }}">{{ obj.title }}</a></h2>
+  {% if card.kind == 'housing' %}{% if obj.brand %}<p>{{ obj.brand.name }}</p>{% endif %}{% if obj.address %}<p>{{ obj.address }}</p>{% endif %}<p>{{ obj.short_description|striptags|truncatechars:220 }}</p>{% else %}<p>{{ obj.search_description|truncatechars:220 }}</p>{% endif %}
+  <a class="housing-category__details" href="{{ obj.get_absolute_url }}">{% if card.kind == 'housing' %}Подробнее об объекте{% else %}Читать материал{% endif %} →</a></div>
+</article>
+{% endwith %}{% empty %}<p>По этому запросу результатов не найдено. Попробуйте другое название, адрес или тему.</p>{% endfor %}
+</div>
