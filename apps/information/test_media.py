@@ -70,7 +70,7 @@ class InformationMediaTests(TestCase):
 
     def test_known_absent_media_are_not_required(self):
         from .media import EXCLUDED_MEDIA, material_paths
-        self.assertEqual(len(EXCLUDED_MEDIA),34)
+        self.assertEqual(len(EXCLUDED_MEDIA),35)
         self.obj.body += ''.join(f'<img src="{path}">' for path in EXCLUDED_MEDIA)
         self.obj.save()
         paths=material_paths(self.obj)
@@ -78,3 +78,5 @@ class InformationMediaTests(TestCase):
         self.run_import(apply=True)
         self.obj.refresh_from_db()
         self.assertIn('images/camera/mor-vokzal.jpg',self.obj.body)
+        self.assertIn('images/sputnik.jpg',self.obj.body)
+        self.assertEqual(media_plan([self.obj],self.source)['expected_files'],2)
