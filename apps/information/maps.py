@@ -13,7 +13,7 @@ MAP_REGIONS = {
 }
 
 
-def material_map(material):
+def material_products(material):
     if material.kind != 'map':
         return None
     categories = public_tree()
@@ -30,10 +30,16 @@ def material_map(material):
         if expanded == selected:
             break
         selected = expanded
-    points = []
-    products = Product.objects.filter(is_active=True).filter(
+    return Product.objects.filter(is_active=True).filter(
         Q(category_id__in=selected) | Q(categories__pk__in=selected)
     ).distinct().order_by('title', 'pk')
+
+
+def material_map(material):
+    products = material_products(material)
+    if products is None:
+        return None
+    points = []
     for product in products:
         try:
             marker = coordinate_pair(product.map_coordinates)
