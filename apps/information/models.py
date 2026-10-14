@@ -3,7 +3,7 @@ from django.db import models
 
 
 class InformationCategory(models.Model):
-    joomla_id = models.PositiveIntegerField('ID Joomla', unique=True)
+    joomla_id = models.PositiveIntegerField('ID Joomla', unique=True, null=True, blank=True)
     title = models.CharField('Название', max_length=255)
     slug = models.SlugField('Псевдоним', max_length=255, unique=True)
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.PROTECT, verbose_name='Родительская категория')
@@ -25,12 +25,18 @@ class InformationCategory(models.Model):
 
 class InformationMaterial(models.Model):
     KINDS = (('info', 'Информационный материал'), ('map', 'Материал с картой'))
-    joomla_id = models.PositiveIntegerField('ID Joomla', unique=True)
+    joomla_id = models.PositiveIntegerField('ID Joomla', unique=True, null=True, blank=True)
     kind = models.CharField('Тип', max_length=10, choices=KINDS)
     title = models.CharField('Название', max_length=500)
     slug = models.SlugField('Псевдоним', max_length=255, unique=True)
     categories = models.ManyToManyField(InformationCategory, blank=True, related_name='materials', verbose_name='Категории')
     primary_category = models.ForeignKey(InformationCategory, null=True, blank=True, on_delete=models.PROTECT, related_name='primary_materials', verbose_name='Основная категория')
+    map_mode = models.CharField('Состав карты', max_length=20, default='legacy',
+        choices=(('legacy', 'Исходный курорт Joomla'), ('categories', 'Выбранные категории жилья')),
+        help_text='Исходный курорт действует для десяти перенесённых карт. Для новой карты выберите категории жилья.')
+    map_categories = models.ManyToManyField('products.Category', blank=True, related_name='information_maps',
+        verbose_name='Категории жилья на карте',
+        help_text='Используются в режиме «Выбранные категории жилья», вместе с опубликованными вложенными категориями. Пустой выбор даёт пустую карту.')
     subtitle = models.TextField('Подзаголовок', blank=True)
     intro = models.TextField('Анонс', blank=True)
     body = models.TextField('Текст', blank=True)

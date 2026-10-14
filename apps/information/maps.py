@@ -14,11 +14,17 @@ MAP_REGIONS = {
 
 
 def material_map(material):
-    regions = MAP_REGIONS.get(material.joomla_id) if material.kind == 'map' else None
-    if regions is None:
+    if material.kind != 'map':
         return None
     categories = public_tree()
-    selected = {row.pk for row in categories if row.joomla_id in regions}
+    if material.map_mode == 'categories':
+        chosen = set(material.map_categories.values_list('pk', flat=True)) if material.pk else set()
+        selected = {row.pk for row in categories if row.pk in chosen}
+    else:
+        regions = MAP_REGIONS.get(material.joomla_id)
+        if regions is None:
+            return None
+        selected = {row.pk for row in categories if row.joomla_id in regions}
     while True:
         expanded = selected | {row.pk for row in categories if row.parent_id in selected}
         if expanded == selected:

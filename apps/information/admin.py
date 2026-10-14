@@ -25,10 +25,15 @@ class MaterialAdmin(admin.ModelAdmin):
     list_display = ('title', 'joomla_id', 'kind', 'primary_category', 'is_active')
     list_filter = ('kind', 'is_active', 'categories')
     search_fields = ('title', 'slug', 'body')
-    filter_horizontal = ('categories',)
+    filter_horizontal = ('categories', 'map_categories')
+    prepopulated_fields = {'slug': ('title',)}
     readonly_fields = ('joomla_id', 'legacy_url', 'source')
+
+    def get_changeform_initial_data(self, request):
+        return {**super().get_changeform_initial_data(request), 'map_mode': 'categories', 'kind': 'info'}
     fieldsets = (
         (None, {'fields': ('title', 'slug', 'kind', 'is_active', 'categories', 'primary_category')}),
+        ('Карта жилья', {'fields': ('map_mode', 'map_categories'), 'description': 'Настройки применяются только к материалам типа «Материал с картой».'}),
         ('Содержимое', {'fields': ('subtitle', 'intro', 'body', 'extra_body', 'html_insert', 'image_source')}),
         ('SEO', {'fields': ('meta_title', 'meta_description', 'meta_keywords', 'meta_robots')}),
         ('Исходники Joomla', {'classes': ('collapse',), 'fields': ('joomla_id', 'legacy_url', 'source')}),

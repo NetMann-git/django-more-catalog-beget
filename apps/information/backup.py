@@ -13,7 +13,7 @@ def backup_database():
         raise CommandError('Требуется файловая SQLite-база для резервной копии.')
     folder = Path(settings.BASE_DIR) / 'patch-backups'
     folder.mkdir(parents=True, exist_ok=True)
-    target = folder / ('information-step57-' + datetime.now().strftime('%Y%m%d-%H%M%S-%f') + '.sqlite3')
+    target = folder / ('information-db-' + datetime.now().strftime('%Y%m%d-%H%M%S-%f') + '.sqlite3')
     with sqlite3.connect(source.as_uri()+'?mode=ro', uri=True) as src, sqlite3.connect(target) as dst:
         src.backup(dst)
     return target
