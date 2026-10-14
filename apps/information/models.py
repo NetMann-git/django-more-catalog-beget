@@ -67,3 +67,8 @@ class InformationMaterial(models.Model):
     def search_description(self):
         from apps.products.seo_text import description_metadata
         return description_metadata(self.meta_description, self.intro, self.subtitle)
+
+    @property
+    def cover_url(self):
+        from .media import media_url
+        return media_url(self.image_source)

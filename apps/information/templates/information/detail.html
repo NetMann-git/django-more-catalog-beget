@@ -2,7 +2,7 @@
 {% block extra_css %}<link rel="stylesheet" href="{% static 'information/information.css' %}">{% endblock %}
 {% block content %}<main class="info-page">
 <nav aria-label="Путь к материалу"><a href="{% url 'home' %}">Главная</a> / <a href="{% url 'information:index' %}">Информация</a></nav>
-<article><h1>{{ material.title }}</h1>{% if material.subtitle %}<p class="info-page__subtitle">{{ material.subtitle }}</p>{% endif %}
+<article><h1>{{ material.title }}</h1>{% with cover=material.cover_url %}{% if cover %}<img class="info-page__cover" src="{{ cover }}" alt="{{ material.title }}" decoding="async"><p><a href="{{ cover }}" target="_blank" rel="noopener">Открыть фото в полном размере</a></p>{% endif %}{% endwith %}{% if material.subtitle %}<p class="info-page__subtitle">{{ material.subtitle }}</p>{% endif %}
 <nav class="info-page__categories" aria-label="Категории материала">{% for category in material_categories %}<a href="{% url 'information:category' category.slug %}">{{ category.title }}</a>{% endfor %}</nav>
 {% if material.kind == 'map' %}<p class="info-page__notice">Интерактивная карта пока недоступна.</p>{% endif %}
 <div class="info-page__text">{% for block in blocks %}{{ block }}{% endfor %}</div>
