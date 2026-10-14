@@ -42,7 +42,7 @@ class HousingSitemapTests(TestCase):
 
     def test_empty_catalog_and_host_scheme(self):
         urls = self.urls()
-        self.assertEqual(set(urls), {'http://testserver/', 'http://testserver/catalog/housing/', 'http://testserver/catalog/categories/'})
+        self.assertEqual(set(urls), {'http://testserver/', 'http://testserver/catalog/housing/', 'http://testserver/catalog/categories/', 'http://testserver/information/', 'http://testserver/information/maps/'})
         response = self.client.get('/sitemap.xml', secure=True)
         urls = [e.text for e in fromstring(response.content).findall('{*}url/{*}loc')]
         self.assertTrue(all(url.startswith('https://testserver/') for url in urls))

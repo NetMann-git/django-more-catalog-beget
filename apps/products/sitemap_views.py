@@ -4,6 +4,7 @@ from xml.etree.ElementTree import Element, SubElement, tostring
 from django.http import HttpResponse
 from django.urls import reverse
 
+from apps.information.sitemap import public_information_paths
 from .category_views import public_tree
 from .models import Brand, Product
 
@@ -20,6 +21,7 @@ def housing_sitemap(request):
                  Brand.objects.filter(products__is_active=True).distinct())
     paths.update(product.get_absolute_url() for product in
                  Product.objects.filter(is_active=True).only('pk', 'slug', 'joomla_id', 'joomla_url'))
+    paths.update(public_information_paths())
     root = Element('urlset', {'xmlns': SITEMAP_NAMESPACE})
     for path in sorted(paths):
         node = SubElement(root, 'url')

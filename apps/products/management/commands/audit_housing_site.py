@@ -13,6 +13,8 @@ from django.db import connection
 from django.test import Client, override_settings
 from django.urls import reverse
 
+from apps.information.models import InformationMaterial
+from apps.information.sitemap import public_information_paths
 from apps.products.category_views import public_tree
 from apps.products.models import Brand, Product
 
@@ -35,6 +37,8 @@ def audit():
     paths.update(product.get_absolute_url() for product in products)
     paths.update(category.get_absolute_url() for category in public_tree())
     paths.update(brand.get_absolute_url() for brand in Brand.objects.filter(products__is_active=True).distinct())
+    paths.update(public_information_paths())
+    information_count = InformationMaterial.objects.filter(is_active=True).count()
     issues = []
     checked = 0
 
@@ -106,7 +110,7 @@ def audit():
     response = fetch('/robots.txt')
     if response is not None and (response.status_code != 200 or b'Sitemap: https://audit.local/sitemap.xml' not in response.content):
         issue('/robots.txt', 'robots_sitemap_missing')
-    return {'published_objects': len(products), 'public_pages_checked': checked,
+    return {'published_objects': len(products), 'published_information_materials': information_count, 'public_pages_checked': checked,
             'utility_pages_checked': len(utility), 'issues': issues, 'ok': not issues}
 
 
