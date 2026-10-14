@@ -7,3 +7,8 @@
 .info-map__popup {background: white; padding: 12px; border-radius: 6px; box-shadow: 0 2px 12px #0003; max-width: 260px; overflow-wrap: anywhere;}
 .info-map__popup p {margin: 8px 0;}
 @media (max-width: 600px) {.info-map__canvas {height: 360px;}}
+
+.info-map__popup {width: 260px; max-width: calc(100vw - 60px); box-sizing: border-box; max-height: 250px; overflow-y: auto;}
+.info-map__popup-list {list-style: none; padding: 0; margin: 12px 0 0;}
+.info-map__popup-list li + li {border-top: 1px solid #dbe6e8; padding-top: 10px; margin-top: 10px;}
+.info-map__popup-list a {display: inline-block; padding: 4px 0;}

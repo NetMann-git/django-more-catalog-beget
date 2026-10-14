@@ -6,7 +6,7 @@
 <nav class="info-page__categories" aria-label="Категории материала">{% for category in material_categories %}<a href="{% url 'information:category' category.slug %}">{{ category.title }}</a>{% endfor %}</nav>
 {% if map_data %}<section class="info-map" aria-label="Жильё на карте">
 <p>Объектов с координатами: {{ map_data.points|length }}.</p>
-{% if map_data.points %}<button type="button" class="info-map__load">Показать карту</button><p>При открытии карты подложка загружается с внешнего сервиса.</p><div class="info-map__canvas" hidden tabindex="0" aria-label="Интерактивная карта объектов"></div><p class="info-map__status" role="status"></p>
+{% if map_data.points %}<button type="button" class="info-map__load">Показать карту</button><p>Число на метке — количество объектов рядом. Нажмите на метку, чтобы выбрать объект; при увеличении карты группы разделяются. При открытии карты подложка загружается с внешнего сервиса.</p><div class="info-map__canvas" hidden tabindex="0" aria-label="Интерактивная карта объектов"></div><p class="info-map__status" role="status"></p>
 {{ map_data|json_script:"information-map-data" }}
 <details><summary>Список объектов на карте</summary><ul>{% for point in map_data.points %}<li><a href="{{ point.url }}">{{ point.title }}</a>{% if point.address %} — {{ point.address }}{% endif %}</li>{% endfor %}</ul></details>
 {% else %}<p>В этом курорте пока нет опубликованных объектов с координатами.</p>{% endif %}</section>
