@@ -21,8 +21,16 @@ class MaterialForm(forms.ModelForm):
         widgets = {name: PricesWidget(attrs={'rows': 12}) for name in ('intro', 'body', 'extra_body', 'html_insert')}
 
 
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = InformationCategory
+        fields = '__all__'
+        widgets = {'description': PricesWidget(attrs={'rows': 12})}
+
+
 @admin.register(InformationCategory)
 class CategoryAdmin(admin.ModelAdmin):
+    form = CategoryForm
     change_list_template = 'admin/products/category/change_list.html'
     list_display = ('tree_title', 'elements_count', 'parent', 'slug', 'joomla_id', 'sort_order', 'is_published')
     list_display_links = None
