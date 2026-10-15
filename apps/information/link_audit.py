@@ -15,6 +15,7 @@ from apps.products.prices_html import convert_joomla_source
 # Только публичные страницы чтения. Не вызываем обработчики действий и админку.
 PUBLIC_VIEWS = {
     ('apps.information.views', 'material_detail'),
+    ('apps.information.views', 'legacy_content_redirect'),
     ('apps.information.views', 'material_list'),
     ('apps.products.import_views', 'legacy_item'),
     ('apps.products.views', 'product_detail'),

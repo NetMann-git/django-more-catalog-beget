@@ -3,7 +3,9 @@ from types import SimpleNamespace
 from urllib.parse import urlencode
 from django.core.paginator import Paginator, InvalidPage
 from django.db.models import Q
-from django.http import Http404
+from django.http import Http404, HttpResponsePermanentRedirect
+from django.views.decorators.http import require_safe
+from .content_links import content_aliases, REVIEWS_ALIAS
 from django.shortcuts import get_object_or_404, redirect, render
 from .models import InformationCategory, InformationMaterial
 from .forms import InformationSearchForm
@@ -93,3 +95,19 @@ def material_detail_context(material, selected_id=''):
         'material': material, 'page': material,
         'related_materials': related_materials(material, visible, {row.pk for row in category_rows}),
         'map_category_links': map_category_links(material), **navigation, 'blocks': blocks, 'map_data': select_map_point(material_map(material), selected_id)}
+
+
+@require_safe
+def legacy_content_redirect(request):
+    destination = content_aliases().get(request.path_info)
+    if destination is None:
+        raise Http404
+    if request.path_info == REVIEWS_ALIAS:
+        # Не делаем публичным переход на скрытый или отсутствующий материал.
+        material = get_object_or_404(InformationMaterial.objects.only('joomla_id', 'slug'),
+                                     joomla_id=131, is_active=True)
+        destination = material.get_absolute_url()
+    query = request.META.get('QUERY_STRING', '')
+    if query:
+        destination += '?' + query
+    return HttpResponsePermanentRedirect(destination)

@@ -5,7 +5,8 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-from apps.information.views import material_detail
+from apps.information.views import material_detail, legacy_content_redirect
+from apps.information.content_links import LEGACY_CONTENT_ALIAS_PATHS
 from apps.information.legacy_urls import LEGACY_MATERIAL_PATHS
 from config.seo import robots_txt
 from apps.products.sitemap_views import housing_sitemap
@@ -17,6 +18,7 @@ from apps.products.category_views import category_detail
 from apps.home.legal_views import public_offer, privacy_policy, personal_data_consent
 
 urlpatterns = [
+    *[path(url.lstrip('/'), legacy_content_redirect) for url in LEGACY_CONTENT_ALIAS_PATHS],
     *[path(url.lstrip('/'), material_detail, {'joomla_id': joomla_id})
       for url, joomla_id in LEGACY_MATERIAL_PATHS.items()],
     path('information/', include('apps.information.urls')),

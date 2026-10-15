@@ -5,7 +5,14 @@ from .legacy_urls import LEGACY_MATERIAL_PATHS
 
 
 LEGACY_HOSTS = {'дикарь-сочи.рф'.encode('idna').decode('ascii')}
+MAPS_ALIAS = '/karta-sochi.html'
+REVIEWS_ALIAS = '/otzyvy-ob-otdyxe-v-sochi-adlere.html'
+LEGACY_CONTENT_ALIAS_PATHS = (MAPS_ALIAS, REVIEWS_ALIAS)
 REVIEW_PATH = next(path for path, joomla_id in LEGACY_MATERIAL_PATHS.items() if joomla_id == 131)
+
+
+def content_aliases():
+    return {MAPS_ALIAS: reverse('information:maps'), REVIEWS_ALIAS: REVIEW_PATH}
 
 
 def normalize_content_link(value):
@@ -30,8 +37,7 @@ def normalize_content_link(value):
         elif not parsed.path or parsed.path.startswith('//'):
             return value
         path = '/' + parsed.path.lstrip('/') if parsed.path else '/'
-        aliases = {'/karta-sochi.html': reverse('information:maps'),
-                   '/otzyvy-ob-otdyxe-v-sochi-adlere.html': REVIEW_PATH}
+        aliases = content_aliases()
         if path in aliases:
             destination = aliases[path]
         elif path in LEGACY_MATERIAL_PATHS or path == '/':
