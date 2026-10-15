@@ -10,6 +10,7 @@ from .forms import InformationSearchForm
 from .rendering import material_html
 from .maps import material_map, select_map_point
 from .map_navigation import map_category_links
+from .related import related_materials
 
 
 def public_categories():
@@ -76,7 +77,10 @@ def material_detail(request, slug=None, joomla_id=None):
     if request.path != material.get_absolute_url():
         return redirect(material.get_absolute_url(), permanent=True)
     visible = {row.pk for row in public_categories()}
-    categories = [row for row in material.categories.all() if row.pk in visible]
+    category_rows = list(material.categories.all())
+    categories = [row for row in category_rows if row.pk in visible]
     blocks = [material_html(value) for value in (material.intro, material.body, material.extra_body, material.html_insert) if value.strip()]
     return render(request, 'information/detail.html', {'housing_public_page': True, 'information_public_page': True,
-        'material': material, 'page': material, 'map_category_links': map_category_links(material), 'material_categories': categories, 'blocks': blocks, 'map_data': select_map_point(material_map(material), request.GET.get('object', ''))})
+        'material': material, 'page': material,
+        'related_materials': related_materials(material, visible, {row.pk for row in category_rows}),
+        'map_category_links': map_category_links(material), 'material_categories': categories, 'blocks': blocks, 'map_data': select_map_point(material_map(material), request.GET.get('object', ''))})

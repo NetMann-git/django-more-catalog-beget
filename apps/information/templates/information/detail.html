@@ -18,7 +18,15 @@
 {% else %}<p>В этом курорте пока нет опубликованных объектов с координатами.</p>{% endif %}</section>
 {% elif material.kind == 'map' %}<p class="info-page__notice">Карта этого материала пока не настроена.</p>{% endif %}
 <div class="info-page__text">{% for block in blocks %}{{ block }}{% endfor %}</div>
-</article><p><a href="{% url 'information:index' %}">← Все материалы</a></p>
+</article>
+{% if related_materials %}<section class="info-related" aria-labelledby="info-related-title">
+<h2 id="info-related-title">{% if material.kind == 'map' %}Другие карты{% else %}Другие материалы по теме{% endif %}</h2>
+<div class="info-page__grid">{% for related in related_materials %}<article class="info-page__card">
+{% with cover=related.cover_url %}{% if cover %}<a href="{{ related.get_absolute_url }}"><img class="info-page__card-photo" src="{{ cover }}" alt="{{ related.title }}" loading="lazy" decoding="async"></a>{% endif %}{% endwith %}
+<h3><a href="{{ related.get_absolute_url }}">{{ related.title }}</a></h3>
+<p>{{ related.search_description|truncatechars:180 }}</p><a href="{{ related.get_absolute_url }}">{% if material.kind == 'map' %}Открыть карту →{% else %}Читать материал →{% endif %}</a>
+</article>{% endfor %}</div></section>{% endif %}
+<p><a href="{% url 'information:index' %}">← Все материалы</a></p>
 </main>{% endblock %}
 
 {% block extra_js %}{% if map_data.points %}<script src="{% static 'products/vendor/openlayers/ol.js' %}" defer></script><script src="{% static 'information/maps.js' %}" defer></script>{% endif %}{% endblock %}

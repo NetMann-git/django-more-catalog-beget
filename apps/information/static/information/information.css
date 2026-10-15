@@ -40,3 +40,7 @@
 .info-search button {padding: 11px 20px; background: #087c85; color: white; border: 0; border-radius: 6px; font: inherit; cursor: pointer;}
 .info-search .errorlist {color: #9a2424; padding-left: 20px;}
 @media (max-width: 600px) {.info-search {grid-template-columns: minmax(0, 1fr);}}
+
+.info-related {margin: 36px 0 24px; padding-top: 22px; border-top: 1px solid #dbe6e8;}
+.info-related h2 {font-size: clamp(23px, 3vw, 29px); margin: 0 0 20px;}
+.info-related h3 {font-size: 20px; line-height: 1.4; margin: 0 0 14px;}
