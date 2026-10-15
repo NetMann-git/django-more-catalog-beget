@@ -32,3 +32,11 @@
 
 .info-map__catalog {display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 22px 0;}
 .info-map__catalog a {padding: 9px 12px; background: #edf7f7; border-radius: 8px; text-decoration: none;}
+
+.info-search {display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; align-items: end; padding: 18px; background: #edf7f7; border-radius: 10px; margin: 24px 0;}
+.info-search label {display: block; font-weight: 600; margin-bottom: 8px;}
+.info-search input {width: 100%; min-width: 0; padding: 10px; box-sizing: border-box; font: inherit;}
+.info-search__actions {display: flex; align-items: center; flex-wrap: wrap; gap: 14px;}
+.info-search button {padding: 11px 20px; background: #087c85; color: white; border: 0; border-radius: 6px; font: inherit; cursor: pointer;}
+.info-search .errorlist {color: #9a2424; padding-left: 20px;}
+@media (max-width: 600px) {.info-search {grid-template-columns: minmax(0, 1fr);}}

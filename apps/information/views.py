@@ -1,10 +1,12 @@
 """Публичные материалы, категории и сохранённые адреса Joomla."""
 from types import SimpleNamespace
+from urllib.parse import urlencode
 from django.core.paginator import Paginator, InvalidPage
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from .models import InformationCategory, InformationMaterial
+from .forms import InformationSearchForm
 from .rendering import material_html
 from .maps import material_map, select_map_point
 from .map_navigation import map_category_links
@@ -41,13 +43,27 @@ def material_list(request, slug=None, maps=False):
             ids = expanded
         products = products.filter(Q(categories__pk__in=ids) | Q(primary_category_id__in=ids)).distinct()
         title = category.title
+    form = InformationSearchForm(request.GET)
+    valid_search = form.is_valid()
+    query = form.cleaned_data.get('q', '') if valid_search else ''
+    search_active = bool(request.GET.get('q', '').strip())
+    if search_active:
+        request.seo_noindex = True
+    if not valid_search:
+        products = products.none()
+    elif query:
+        from apps.search.services import SearchService
+        products = products.filter(pk__in=SearchService.information_search(query).values_list('pk', flat=True))
+    query_string = urlencode({'q': query}) if query else ''
     try:
         page_obj = Paginator(products.order_by('title', 'pk'), 12).page(request.GET.get('page', 1))
     except InvalidPage as error:
         raise Http404 from error
     return render(request, 'information/list.html', {
         'housing_public_page': True, 'information_public_page': True, 'categories': categories, 'category': category,
-        'page_obj': page_obj, 'title': title,
+        'page_obj': page_obj, 'title': title, 'search_form': form, 'search_query': query,
+        'search_active': search_active, 'search_query_string': query_string,
+        'pagination_prefix': '?' + query_string + ('&' if query_string else ''),
         'category_description': material_html(category.description) if category else '',
         'page': SimpleNamespace(seo_title=category.meta_title or title if category else title,
                               search_description=category.meta_description if category else 'Полезная информация об отдыхе в Сочи и на побережье.'),
