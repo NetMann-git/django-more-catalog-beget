@@ -7,6 +7,7 @@ from django.test import Client
 from django.urls import resolve, Resolver404, reverse
 from .models import InformationMaterial
 from .rendering import material_html
+from .content_links import normalize_content_link
 from .media import legacy_media_path
 from apps.products.prices_html import convert_joomla_source
 
@@ -109,7 +110,8 @@ def audit_information_links():
             value = getattr(material, field)
             soup = BeautifulSoup(material_html(value), 'html.parser')
             source_soup = BeautifulSoup(convert_joomla_source(value), 'html.parser')
-            source_hrefs = {node.get('href', '') for node in source_soup.find_all('a', href=True)}
+            original_hrefs = {node.get('href', '') for node in source_soup.find_all('a', href=True)}
+            source_hrefs = {normalize_content_link(href) for href in original_hrefs}
             # Одинаковая ссылка в одном поле требует одной записи в отчёте.
             rendered_hrefs = {node.get('href', '') for node in soup.find_all('a', href=True)}
             # Медиа могут штатно переписываться/скрываться; их проверяет импорт медиа.
@@ -122,7 +124,8 @@ def audit_information_links():
                 origin = {'material_id': material.pk, 'joomla_id': material.joomla_id,
                           'title': material.title, 'material_url': base,
                           'admin_url': reverse('admin:information_informationmaterial_change', args=[material.pk]),
-                          'field': field, 'href': href}
+                          'field': field, 'href': href,
+                          'source_hrefs': sorted(raw for raw in original_hrefs if normalize_content_link(raw) == href)}
                 if href in removed_hrefs:
                     issues.append({**origin, 'problem': 'link_not_rendered'})
                     continue
