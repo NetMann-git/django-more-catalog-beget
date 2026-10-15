@@ -1,10 +1,14 @@
 from django import forms
 from django.contrib import admin
+from django.urls import reverse
+from django.utils.html import format_html
+from urllib.parse import urlencode
 from django.db.models import Q, Count, OuterRef, Subquery, Value
 from django.db.models.functions import Coalesce
 from apps.products.category_tree_admin import CategoryTreeChangeList, category_tree_title
 from apps.products.price_widgets import PricesWidget
 from .models import InformationCategory, InformationMaterial
+from .admin_filters import MaterialCategoryFilter, MaterialCategoryScopeFilter
 
 
 class MaterialForm(forms.ModelForm):
@@ -33,7 +37,9 @@ class CategoryAdmin(admin.ModelAdmin):
 
     @admin.display(description='Элементы')
     def elements_count(self, obj):
-        return obj.elements_count
+        url = reverse('admin:information_informationmaterial_changelist') + '?' + urlencode(
+            {'material_category': obj.pk, 'category_scope': 'direct'})
+        return format_html('<a href="{}">{}</a>', url, obj.elements_count)
 
     def get_queryset(self, request):
         return super().get_queryset(request).annotate(elements_count=Coalesce(Subquery(
@@ -57,7 +63,7 @@ class CategoryAdmin(admin.ModelAdmin):
 class MaterialAdmin(admin.ModelAdmin):
     form = MaterialForm
     list_display = ('title', 'joomla_id', 'kind', 'primary_category', 'is_active')
-    list_filter = ('kind', 'is_active', 'categories')
+    list_filter = ('kind', 'is_active', MaterialCategoryFilter, MaterialCategoryScopeFilter)
     search_fields = ('title', 'slug', 'body')
     filter_horizontal = ('categories', 'map_categories')
     prepopulated_fields = {'slug': ('title',)}
