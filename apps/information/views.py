@@ -80,12 +80,16 @@ def material_detail(request, slug=None, joomla_id=None):
     material = get_object_or_404(InformationMaterial, is_active=True, **lookup)
     if request.path != material.get_absolute_url():
         return redirect(material.get_absolute_url(), permanent=True)
+    return render(request, 'information/detail.html', material_detail_context(material, request.GET.get('object', '')))
+
+
+def material_detail_context(material, selected_id=''):
     public_rows = public_categories()
     visible = {row.pk for row in public_rows}
     category_rows = list(material.categories.all())
     navigation = material_navigation(material, public_rows, category_rows)
     blocks = [material_html(value) for value in (material.intro, material.body, material.extra_body, material.html_insert) if value.strip()]
-    return render(request, 'information/detail.html', {'housing_public_page': True, 'information_public_page': True,
+    return {'housing_public_page': True, 'information_public_page': True,
         'material': material, 'page': material,
         'related_materials': related_materials(material, visible, {row.pk for row in category_rows}),
-        'map_category_links': map_category_links(material), **navigation, 'blocks': blocks, 'map_data': select_map_point(material_map(material), request.GET.get('object', ''))})
+        'map_category_links': map_category_links(material), **navigation, 'blocks': blocks, 'map_data': select_map_point(material_map(material), selected_id)}

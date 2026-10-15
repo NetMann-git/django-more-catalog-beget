@@ -1,6 +1,9 @@
 from django import forms
 from django.contrib import admin
-from django.urls import reverse
+from django.urls import reverse, path
+from django.core.exceptions import PermissionDenied
+from django.http import Http404
+from django.shortcuts import render
 from django.utils.html import format_html
 from urllib.parse import urlencode
 from django.db.models import Q, Count, OuterRef, Subquery, Value
@@ -62,17 +65,43 @@ class CategoryAdmin(admin.ModelAdmin):
 @admin.register(InformationMaterial)
 class MaterialAdmin(admin.ModelAdmin):
     form = MaterialForm
-    list_display = ('title', 'joomla_id', 'kind', 'primary_category', 'is_active')
+    list_display = ('title', 'joomla_id', 'kind', 'primary_category', 'is_active', 'preview_link')
     list_filter = ('kind', 'is_active', MaterialCategoryFilter, MaterialCategoryScopeFilter)
     search_fields = ('title', 'slug', 'body')
     filter_horizontal = ('categories', 'map_categories')
     prepopulated_fields = {'slug': ('title',)}
-    readonly_fields = ('joomla_id', 'legacy_url', 'source')
+    readonly_fields = ('joomla_id', 'legacy_url', 'source', 'preview_link')
+
+    def get_urls(self):
+        return [path('<int:object_id>/preview/', self.admin_site.admin_view(self.preview_view),
+                     name='information_informationmaterial_preview')] + super().get_urls()
+
+    @admin.display(description='Предпросмотр')
+    def preview_link(self, obj):
+        if not obj or not obj.pk:
+            return 'Сначала сохраните материал.'
+        return format_html('<a href="{}" target="_blank" rel="noopener">Открыть предпросмотр</a>',
+                           reverse('admin:information_informationmaterial_preview', args=[obj.pk]))
+
+    def preview_view(self, request, object_id):
+        from .views import material_detail_context
+        obj = self.get_object(request, str(object_id))
+        if obj is None:
+            raise Http404
+        if not self.has_view_or_change_permission(request, obj):
+            raise PermissionDenied
+        request.seo_noindex = True
+        context = material_detail_context(obj, request.GET.get('object', ''))
+        context.update(information_preview=True, preview_edit_url=reverse(
+            'admin:information_informationmaterial_change', args=[obj.pk]))
+        response = render(request, 'information/detail.html', context)
+        response['X-Robots-Tag'] = 'noindex, follow'
+        return response
 
     def get_changeform_initial_data(self, request):
         return {**super().get_changeform_initial_data(request), 'map_mode': 'categories', 'kind': 'info'}
     fieldsets = (
-        (None, {'fields': ('title', 'slug', 'kind', 'is_active', 'categories', 'primary_category')}),
+        (None, {'fields': ('title', 'slug', 'kind', 'is_active', 'preview_link', 'categories', 'primary_category')}),
         ('Карта жилья', {'fields': ('map_mode', 'map_categories'), 'description': 'Настройки применяются только к материалам типа «Материал с картой».'}),
         ('Содержимое', {'fields': ('subtitle', 'intro', 'body', 'extra_body', 'html_insert', 'image_source')}),
         ('SEO', {'fields': ('meta_title', 'meta_description', 'meta_keywords', 'meta_robots')}),
