@@ -38,6 +38,7 @@ def category_index(request):
 
 
 def category_detail(request, slug):
+    from apps.information.map_navigation import category_map_links
     categories = public_tree()
     category = next((category for category in categories if category.slug == slug), None)
     if category is None:
@@ -74,6 +75,7 @@ def category_detail(request, slug):
         parent = ancestor.parent_id
     return render(request, 'products/housing_category.html', {
         'housing_public_page': True, 'housing_section': 'categories',
+        'category_map_links': category_map_links(category, categories),
         'category': category, 'description_html': public_html(category.description),
         'ancestors': list(reversed(ancestors)),
         'children': [entry for entry in categories if entry.parent_id == category.pk],

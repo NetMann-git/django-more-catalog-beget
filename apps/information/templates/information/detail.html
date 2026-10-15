@@ -4,6 +4,7 @@
 <nav aria-label="Путь к материалу"><a href="{% url 'home' %}">Главная</a> / <a href="{% url 'information:index' %}">Информация</a></nav>
 <article><h1>{{ material.title }}</h1>{% with cover=material.cover_url %}{% if cover %}<img class="info-page__cover" src="{{ cover }}" alt="{{ material.title }}" decoding="async"><p><a href="{{ cover }}" target="_blank" rel="noopener">Открыть фото в полном размере</a></p>{% endif %}{% endwith %}{% if material.subtitle %}<p class="info-page__subtitle">{{ material.subtitle }}</p>{% endif %}
 <nav class="info-page__categories" aria-label="Категории материала">{% for category in material_categories %}<a href="{% url 'information:category' category.slug %}">{{ category.title }}</a>{% endfor %}</nav>
+{% if map_category_links %}<nav class="info-map__catalog" aria-label="Категории жилья этой карты"><span>Выбрать жильё в каталоге:</span>{% for category in map_category_links %}<a href="{{ category.url }}">{{ category.title }}</a>{% endfor %}</nav>{% endif %}
 {% if map_data %}<section id="housing-resort-map" class="info-map" aria-label="Жильё на карте">
 {% if map_data.selected_point %}<p class="info-map__selection">Выбранный объект: <a href="{{ map_data.selected_point.url }}">{{ map_data.selected_point.title }}</a></p>{% endif %}
 <p>Объектов с координатами: {{ map_data.points|length }}.</p>

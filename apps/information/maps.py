@@ -13,18 +13,28 @@ MAP_REGIONS = {
 }
 
 
-def material_category_ids(material, categories=None):
+def material_root_categories(material, categories=None):
+    """Публичные категории, явно заданные в настройке карты, без потомков."""
     if material.kind != 'map':
         return None
     categories = public_tree() if categories is None else categories
     if material.map_mode == 'categories':
         chosen = {row.pk for row in material.map_categories.all()} if material.pk else set()
-        selected = {row.pk for row in categories if row.pk in chosen}
-    else:
-        regions = MAP_REGIONS.get(material.joomla_id)
-        if regions is None:
-            return None
-        selected = {row.pk for row in categories if row.joomla_id in regions}
+        return [row for row in categories if row.pk in chosen]
+    regions = MAP_REGIONS.get(material.joomla_id)
+    if regions is None:
+        return None
+    return [row for row in categories if row.joomla_id in regions]
+
+
+def material_category_ids(material, categories=None):
+    if material.kind != 'map':
+        return None
+    categories = public_tree() if categories is None else categories
+    roots = material_root_categories(material, categories)
+    if roots is None:
+        return None
+    selected = {row.pk for row in roots}
     while True:
         expanded = selected | {row.pk for row in categories if row.parent_id in selected}
         if expanded == selected:

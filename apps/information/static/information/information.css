@@ -29,3 +29,6 @@
 .info-map__filter-fields input, .info-map__filter-fields select {width: 100%; padding: 10px; font: inherit; box-sizing: border-box; min-width: 0;}
 .info-map__type-label {display: inline-block; font-size: 14px; color: #526b73;}
 @media (max-width: 600px) {.info-map__filter-fields {grid-template-columns: minmax(0, 1fr);}}
+
+.info-map__catalog {display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 22px 0;}
+.info-map__catalog a {padding: 9px 12px; background: #edf7f7; border-radius: 8px; text-decoration: none;}

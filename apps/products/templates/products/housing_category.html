@@ -8,6 +8,11 @@
   <h1>{{ category.title }}</h1>
   {% if description_html %}<div class="housing-category__description">{{ description_html }}</div>{% endif %}
   {% if children %}<nav class="housing-category__links" aria-label="Подкатегории">{% for child in children %}<a href="{{ child.get_absolute_url }}">{{ child.title }}</a>{% endfor %}</nav>{% endif %}
+  {% if category_map_links %}<section class="housing-category__map-links" aria-labelledby="category-map-links-title">
+  <h2 id="category-map-links-title">Посмотреть жильё на карте</h2>
+  <p>Карта может включать другие категории и типы жилья этого курорта. Для отбора используйте поиск и фильтры на карте.</p>
+  <nav class="housing-category__links" aria-label="Карты курорта">{% for map in category_map_links %}<a href="{{ map.url }}">{{ map.title }}</a>{% endfor %}</nav>
+  </section>{% endif %}
   <p class="housing-category__count">Объектов: {{ page_obj.paginator.count }}</p>
   {% include "products/_housing_cards.html" %}
   {% if page_obj.paginator.num_pages > 1 %}<nav class="housing-category__pagination" aria-label="Страницы объектов">
