@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.urls import reverse, path
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils.html import format_html
 from urllib.parse import urlencode
 from django.db.models import Q, Count, OuterRef, Subquery, Value
@@ -97,6 +97,20 @@ class MaterialAdmin(admin.ModelAdmin):
         response = render(request, 'information/detail.html', context)
         response['X-Robots-Tag'] = 'noindex, follow'
         return response
+
+    def _save_preview_response(self, request, obj, default_response):
+        if ('_save_preview' in request.POST and '_popup' not in request.POST
+                and self.has_view_or_change_permission(request, obj)):
+            return redirect('admin:information_informationmaterial_preview', object_id=obj.pk)
+        return default_response
+
+    def response_add(self, request, obj, post_url_continue=None):
+        response = super().response_add(request, obj, post_url_continue)
+        return self._save_preview_response(request, obj, response)
+
+    def response_change(self, request, obj):
+        response = super().response_change(request, obj)
+        return self._save_preview_response(request, obj, response)
 
     def get_changeform_initial_data(self, request):
         return {**super().get_changeform_initial_data(request), 'map_mode': 'categories', 'kind': 'info'}

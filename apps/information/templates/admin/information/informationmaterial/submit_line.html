@@ -1,0 +1,5 @@
+{% extends "admin/submit_line.html" %}
+{% block submit-row %}
+{{ block.super }}
+{% if show_save and has_view_permission and not is_popup %}<input type="submit" name="_save_preview" value="Сохранить и открыть предпросмотр">{% endif %}
+{% endblock %}
