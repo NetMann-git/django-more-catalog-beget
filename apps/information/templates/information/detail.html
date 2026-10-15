@@ -8,11 +8,12 @@
 {% if map_data.selected_point %}<p class="info-map__selection">Выбранный объект: <a href="{{ map_data.selected_point.url }}">{{ map_data.selected_point.title }}</a></p>{% endif %}
 <p>Объектов с координатами: {{ map_data.points|length }}.</p>
 {% if map_data.points %}<div class="info-map__filter" hidden>
-<label for="information-map-search">Найти объект на этой карте</label>
-<div class="info-map__filter-controls"><input id="information-map-search" type="search" maxlength="200" autocomplete="off" placeholder="Название или адрес"><button type="button" class="info-map__reset">Сбросить поиск</button><button type="button" class="info-map__fit" hidden>Показать найденные на карте</button></div>
+<div class="info-map__filter-fields"><div><label for="information-map-search">Найти объект на этой карте</label><input id="information-map-search" type="search" maxlength="200" autocomplete="off" placeholder="Название или адрес"></div>
+<div><label for="information-map-type">Тип жилья</label><select id="information-map-type"><option value="">Все типы</option>{% for type in map_data.housing_types %}<option value="{{ type.value }}">{{ type.label }} ({{ type.count }})</option>{% endfor %}</select></div></div>
+<div class="info-map__filter-controls"><button type="button" class="info-map__reset">Сбросить фильтры</button><button type="button" class="info-map__fit" hidden>Показать найденные на карте</button></div>
 <p class="info-map__results" role="status" aria-live="polite"></p></div><button type="button" class="info-map__load">Показать карту</button><p>Число на метке — количество объектов рядом. Нажмите на метку, чтобы выбрать объект; при увеличении карты группы разделяются. При открытии карты подложка загружается с внешнего сервиса.</p><div class="info-map__canvas" hidden tabindex="0" aria-label="Интерактивная карта объектов"></div><button type="button" class="info-map__all" hidden>Показать все объекты карты</button><p class="info-map__status" role="status"></p>
 {{ map_data|json_script:"information-map-data" }}
-<details class="info-map__objects"><summary>Список объектов на карте</summary><ul>{% for point in map_data.points %}<li data-object-id="{{ point.id }}"{% if point.id == map_data.selected_id %} class="info-map__selected-item"{% endif %}><a href="{{ point.url }}">{{ point.title }}</a>{% if point.address %} — {{ point.address }}{% endif %}</li>{% endfor %}</ul></details>
+<details class="info-map__objects"><summary>Список объектов на карте</summary><ul>{% for point in map_data.points %}<li data-object-id="{{ point.id }}"{% if point.id == map_data.selected_id %} class="info-map__selected-item"{% endif %}><a href="{{ point.url }}">{{ point.title }}</a> <span class="info-map__type-label">{{ point.housing_type_label }}</span>{% if point.address %} — {{ point.address }}{% endif %}</li>{% endfor %}</ul></details>
 {% else %}<p>В этом курорте пока нет опубликованных объектов с координатами.</p>{% endif %}</section>
 {% elif material.kind == 'map' %}<p class="info-page__notice">Карта этого материала пока не настроена.</p>{% endif %}
 <div class="info-page__text">{% for block in blocks %}{{ block }}{% endfor %}</div>

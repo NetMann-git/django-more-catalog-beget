@@ -12,6 +12,7 @@
         catch { status.textContent = 'Не удалось прочитать данные карты.'; return; }
         const filter = root.querySelector('.info-map__filter');
         const input = root.querySelector('#information-map-search');
+        const type = root.querySelector('#information-map-type');
         const results = root.querySelector('.info-map__results');
         const fitButton = root.querySelector('.info-map__fit');
         const rows = [...root.querySelectorAll('.info-map__objects li[data-object-id]')];
@@ -21,18 +22,19 @@
         let updateMap = () => {};
         const applyFilter = () => {
             const words = normalize(input?.value).trim().split(/\s+/).filter(Boolean);
-            visibleIds = new Set(data.points.filter(point => words.every(word => searchText.get(point.id).includes(word))).map(point => point.id));
+            visibleIds = new Set(data.points.filter(point => (!type?.value || point.housing_type === type.value) && words.every(word => searchText.get(point.id).includes(word))).map(point => point.id));
             rows.forEach(row => { row.hidden = !visibleIds.has(Number(row.dataset.objectId)); });
             const objectList = root.querySelector('.info-map__objects');
-            if (words.length && objectList) objectList.open = true;
-            if (results) results.textContent = 'Найдено: ' + visibleIds.size + ' из ' + data.points.length + (visibleIds.size ? '' : '. Измените запрос или сбросьте поиск.');
+            if ((words.length || type?.value) && objectList) objectList.open = true;
+            if (results) results.textContent = 'Найдено: ' + visibleIds.size + ' из ' + data.points.length + (visibleIds.size ? '' : '. Измените запрос или сбросьте фильтры.');
             if (fitButton) fitButton.disabled = !visibleIds.size;
             updateMap();
         };
         if (filter && input) {
             filter.hidden = false;
             input.addEventListener('input', applyFilter);
-            root.querySelector('.info-map__reset').addEventListener('click', () => { input.value = ''; applyFilter(); input.focus(); });
+            if (type) type.addEventListener('change', applyFilter);
+            root.querySelector('.info-map__reset').addEventListener('click', () => { input.value = ''; if (type) type.value = ''; applyFilter(); input.focus(); });
             applyFilter();
         }
         button.addEventListener('click', () => {
@@ -89,7 +91,8 @@
                         }
                         const link = document.createElement('a'); link.href = point.url; link.textContent = point.title;
                         const address = document.createElement('p'); address.textContent = point.address;
-                        item.append(link, address); list.append(item);
+                        const kind = document.createElement('p'); kind.className = 'info-map__type-label'; kind.textContent = point.housing_type_label || '';
+                        item.append(link, kind, address); list.append(item);
                     });
                     const close = document.createElement('button'); close.type='button'; close.textContent='Закрыть';
                     close.addEventListener('click', () => overlay.setPosition(undefined));
@@ -104,7 +107,7 @@
                 map.getView().on('change:resolution', () => overlay.setPosition(undefined));
                 const allButton = root.querySelector('.info-map__all');
                 if (allButton) { allButton.hidden = false; allButton.addEventListener('click', () => {
-                    if (input) input.value = ''; applyFilter(); showAll();
+                    if (input) input.value = ''; if (type) type.value = ''; applyFilter(); showAll();
                 }); }
                 if (fitButton) { fitButton.hidden = false; fitButton.addEventListener('click', showAll); }
                 const highlight = new ol.source.Vector();

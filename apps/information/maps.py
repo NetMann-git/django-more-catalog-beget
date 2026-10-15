@@ -47,15 +47,23 @@ def material_map(material):
     if products is None:
         return None
     points = []
-    for product in products:
+    types = {}
+    for product in products.select_related('brand'):
         try:
             marker = coordinate_pair(product.map_coordinates)
         except ValidationError:
             continue
         if marker is not None:
-            points.append({'id': product.pk, 'coordinates': marker, 'title': product.title,
+            key = str(product.brand_id) if product.brand_id else 'untyped'
+            label = product.brand.name if product.brand_id else 'Тип не указан'
+            if key not in types:
+                types[key] = {'value': key, 'label': label, 'count': 0,
+                              'order': product.brand.sort_order if product.brand_id else 0}
+            types[key]['count'] += 1
+            points.append({'housing_type': key, 'housing_type_label': label, 'id': product.pk, 'coordinates': marker, 'title': product.title,
                            'address': product.address, 'url': product.get_absolute_url()})
-    return {'points': points, 'tile_url': settings.MAP_EDITOR_TILE_URL,
+    housing_types = sorted(types.values(), key=lambda row: (row['value'] == 'untyped', row['order'], row['label'].casefold(), row['value']))
+    return {'points': points, 'housing_types': housing_types, 'tile_url': settings.MAP_EDITOR_TILE_URL,
             'attribution': settings.MAP_EDITOR_TILE_ATTRIBUTION}
 
 

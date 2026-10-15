@@ -24,3 +24,8 @@
 .info-map__filter button {padding: 10px; font: inherit;}
 .info-map__results {margin: 12px 0 0;}
 .info-map__objects li[hidden] {display: none;}
+
+.info-map__filter-fields {display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 12px; margin-bottom: 12px;}
+.info-map__filter-fields input, .info-map__filter-fields select {width: 100%; padding: 10px; font: inherit; box-sizing: border-box; min-width: 0;}
+.info-map__type-label {display: inline-block; font-size: 14px; color: #526b73;}
+@media (max-width: 600px) {.info-map__filter-fields {grid-template-columns: minmax(0, 1fr);}}
