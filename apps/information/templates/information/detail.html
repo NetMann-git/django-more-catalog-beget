@@ -1,7 +1,7 @@
 {% extends "base.html" %}{% load static %}
 {% block extra_css %}<link rel="stylesheet" href="{% static 'information/information.css' %}">{% if map_data %}<link rel="stylesheet" href="{% static 'products/vendor/openlayers/ol.css' %}">{% endif %}{% endblock %}
 {% block content %}<main class="info-page">
-<nav aria-label="Путь к материалу"><a href="{% url 'home' %}">Главная</a> / <a href="{% url 'information:index' %}">Информация</a></nav>
+<nav class="info-breadcrumbs" aria-label="Путь к материалу"><a href="{% url 'home' %}">Главная</a> / <a href="{% url 'information:index' %}">Информация</a>{% for category in material_breadcrumb_categories %} / <a href="{% url 'information:category' category.slug %}">{{ category.title }}</a>{% endfor %} / <span aria-current="page">{{ material.title }}</span></nav>
 <article><h1>{{ material.title }}</h1>{% with cover=material.cover_url %}{% if cover %}<img class="info-page__cover" src="{{ cover }}" alt="{{ material.title }}" decoding="async"><p><a href="{{ cover }}" target="_blank" rel="noopener">Открыть фото в полном размере</a></p>{% endif %}{% endwith %}{% if material.subtitle %}<p class="info-page__subtitle">{{ material.subtitle }}</p>{% endif %}
 <nav class="info-page__categories" aria-label="Категории материала">{% for category in material_categories %}<a href="{% url 'information:category' category.slug %}">{{ category.title }}</a>{% endfor %}</nav>
 {% if map_category_links %}<nav class="info-map__catalog" aria-label="Категории жилья этой карты"><span>Выбрать жильё в каталоге:</span>{% for category in map_category_links %}<a href="{{ category.url }}">{{ category.title }}</a>{% endfor %}</nav>{% endif %}
