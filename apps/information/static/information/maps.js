@@ -7,15 +7,42 @@
         if (!button) return;
         const canvas = root.querySelector('.info-map__canvas');
         const status = root.querySelector('.info-map__status');
+        let data;
+        try { data = JSON.parse(document.getElementById('information-map-data').textContent); }
+        catch { status.textContent = 'Не удалось прочитать данные карты.'; return; }
+        const filter = root.querySelector('.info-map__filter');
+        const input = root.querySelector('#information-map-search');
+        const results = root.querySelector('.info-map__results');
+        const fitButton = root.querySelector('.info-map__fit');
+        const rows = [...root.querySelectorAll('.info-map__objects li[data-object-id]')];
+        const normalize = value => String(value || '').normalize('NFKC').toLocaleLowerCase('ru').replaceAll('ё', 'е');
+        const searchText = new Map(data.points.map(point => [point.id, normalize(point.title + ' ' + (point.address || ''))]));
+        let visibleIds = new Set(data.points.map(point => point.id));
+        let updateMap = () => {};
+        const applyFilter = () => {
+            const words = normalize(input?.value).trim().split(/\s+/).filter(Boolean);
+            visibleIds = new Set(data.points.filter(point => words.every(word => searchText.get(point.id).includes(word))).map(point => point.id));
+            rows.forEach(row => { row.hidden = !visibleIds.has(Number(row.dataset.objectId)); });
+            const objectList = root.querySelector('.info-map__objects');
+            if (words.length && objectList) objectList.open = true;
+            if (results) results.textContent = 'Найдено: ' + visibleIds.size + ' из ' + data.points.length + (visibleIds.size ? '' : '. Измените запрос или сбросьте поиск.');
+            if (fitButton) fitButton.disabled = !visibleIds.size;
+            updateMap();
+        };
+        if (filter && input) {
+            filter.hidden = false;
+            input.addEventListener('input', applyFilter);
+            root.querySelector('.info-map__reset').addEventListener('click', () => { input.value = ''; applyFilter(); input.focus(); });
+            applyFilter();
+        }
         button.addEventListener('click', () => {
             let map;
             try {
                 if (!window.ol) throw new Error('Не удалось загрузить карту. Используйте список объектов ниже.');
-                const data = JSON.parse(document.getElementById('information-map-data').textContent);
                 const features = data.points.map(point => new ol.Feature({
                     geometry: new ol.geom.Point(ol.proj.fromLonLat(point.coordinates.map(Number))), point
                 }));
-                const source = new ol.source.Vector({features, wrapX:false});
+                const source = new ol.source.Vector({features:features.filter(feature => visibleIds.has(feature.get('point').id)), wrapX:false});
                 const selected = features.find(feature => feature.get('point').id === data.selected_id);
                 const clusters = new ol.source.Cluster({distance:40, source});
                 const styles = new Map();
@@ -37,11 +64,12 @@
                         }));
                         return styles.get(count);
                     }})],
-                    overlays:[overlay], view:new ol.View({maxZoom:19}),
+                    overlays:[overlay], view:new ol.View({center:ol.proj.fromLonLat(data.points[0].coordinates.map(Number)), zoom:10, maxZoom:19}),
                     controls:ol.control.defaults.defaults({attributionOptions:{collapsible:false}}),
                     interactions:ol.interaction.defaults.defaults({mouseWheelZoom:false})});
                 const showAll = () => {
                     overlay.setPosition(undefined);
+                    if (!source.getFeatures().length) return;
                     map.getView().fit(source.getExtent(), {padding:[45,45,45,45], maxZoom:15});
                 };
                 const showPopup = (members, coordinates) => {
@@ -75,17 +103,31 @@
                 });
                 map.getView().on('change:resolution', () => overlay.setPosition(undefined));
                 const allButton = root.querySelector('.info-map__all');
-                if (allButton) { allButton.hidden = false; allButton.addEventListener('click', showAll); }
+                if (allButton) { allButton.hidden = false; allButton.addEventListener('click', () => {
+                    if (input) input.value = ''; applyFilter(); showAll();
+                }); }
+                if (fitButton) { fitButton.hidden = false; fitButton.addEventListener('click', showAll); }
+                const highlight = new ol.source.Vector();
                 if (selected) {
-                    map.addLayer(new ol.layer.Vector({source:new ol.source.Vector({features:[selected]}), zIndex:10,
+                    map.addLayer(new ol.layer.Vector({source:highlight, zIndex:10,
                         style:new ol.style.Style({image:new ol.style.Circle({radius:22,
                             fill:new ol.style.Fill({color:'rgba(0,0,0,0)'}), stroke:new ol.style.Stroke({color:'#b33b16',width:3})})})}));
+                }
+                updateMap = () => {
+                    overlay.setPosition(undefined);
+                    source.clear(true); source.addFeatures(features.filter(feature => visibleIds.has(feature.get('point').id)));
+                    highlight.clear(true);
+                    if (selected && visibleIds.has(selected.get('point').id)) highlight.addFeature(selected);
+                };
+                updateMap();
+                if (selected && visibleIds.has(selected.get('point').id)) {
                     map.getView().setCenter(selected.getGeometry().getCoordinates()); map.getView().setZoom(16);
                     map.renderSync();
                     showPopup([selected], selected.getGeometry().getCoordinates());
                 } else { showAll(); }
                 button.hidden = true;
             } catch (error) {
+                updateMap = () => {};
                 if (map) map.setTarget(undefined);
                 canvas.hidden = true; status.textContent = error.message;
             }

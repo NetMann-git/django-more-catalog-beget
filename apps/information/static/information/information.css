@@ -16,3 +16,11 @@
 .info-map__selection, .info-map__selected-item {background: #fff1df; border-left: 4px solid #b33b16; padding: 10px;}
 .info-map__all {margin-top: 12px;}
 #housing-resort-map {scroll-margin-top: 24px;}
+
+.info-map__filter {padding: 16px; background: #edf7f7; border-radius: 8px; margin: 16px 0;}
+.info-map__filter label {display: block; margin-bottom: 8px; font-weight: 600;}
+.info-map__filter-controls {display: flex; flex-wrap: wrap; gap: 10px;}
+.info-map__filter input {flex: 1 1 240px; min-width: 0; max-width: 100%; padding: 10px; font: inherit; box-sizing: border-box;}
+.info-map__filter button {padding: 10px; font: inherit;}
+.info-map__results {margin: 12px 0 0;}
+.info-map__objects li[hidden] {display: none;}
