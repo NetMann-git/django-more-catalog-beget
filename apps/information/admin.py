@@ -1,5 +1,8 @@
 from django import forms
 from django.contrib import admin
+from django.db.models import Q, Count, OuterRef, Subquery, Value
+from django.db.models.functions import Coalesce
+from apps.products.category_tree_admin import CategoryTreeChangeList, category_tree_title
 from apps.products.price_widgets import PricesWidget
 from .models import InformationCategory, InformationMaterial
 
@@ -13,10 +16,41 @@ class MaterialForm(forms.ModelForm):
 
 @admin.register(InformationCategory)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('title', 'joomla_id', 'parent', 'is_published', 'sort_order')
+    change_list_template = 'admin/products/category/change_list.html'
+    list_display = ('tree_title', 'elements_count', 'parent', 'slug', 'joomla_id', 'sort_order', 'is_published')
+    list_display_links = None
+    sortable_by = ()
     list_filter = ('is_published',)
     search_fields = ('title', 'slug')
     readonly_fields = ('joomla_id', 'source')
+    list_select_related = ('parent',)
+    autocomplete_fields = ('parent',)
+    prepopulated_fields = {'slug': ('title',)}
+
+    @admin.display(description='Дерево категорий')
+    def tree_title(self, obj):
+        return category_tree_title(obj, change_url_name='admin:information_informationcategory_change')
+
+    @admin.display(description='Элементы')
+    def elements_count(self, obj):
+        return obj.elements_count
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).annotate(elements_count=Coalesce(Subquery(
+            InformationMaterial.objects.filter(Q(primary_category_id=OuterRef('pk')) | Q(categories__pk=OuterRef('pk')))
+            .order_by().annotate(group=Value(1)).values('group')
+            .annotate(total=Count('pk', distinct=True)).values('total')
+        ), Value(0)))
+
+    def get_changelist(self, request, **kwargs):
+        return CategoryTreeChangeList
+
+    def get_ordering(self, request):
+        return ('sort_order', 'title', 'pk')
+
+    class Media:
+        css = {'all': ('products/css/admin/category-tree.css',)}
+        js = ('products/js/admin/category-tree.js',)
 
 
 @admin.register(InformationMaterial)

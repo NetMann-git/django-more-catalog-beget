@@ -1,5 +1,6 @@
 """Материалы ZOO/JBZoo с независимыми категориями и исходным архивом."""
 from django.db import models
+from django.core.exceptions import ValidationError
 
 
 class InformationCategory(models.Model):
@@ -21,6 +22,16 @@ class InformationCategory(models.Model):
 
     def __str__(self):
         return self.title
+
+    def clean(self):
+        super().clean()
+        current = self.parent_id
+        visited = {self.pk} if self.pk is not None else set()
+        while current is not None:
+            if current in visited:
+                raise ValidationError({'parent': 'Категории не могут образовывать цикл.'})
+            visited.add(current)
+            current = InformationCategory.objects.filter(pk=current).values_list('parent_id', flat=True).first()
 
 
 class InformationMaterial(models.Model):

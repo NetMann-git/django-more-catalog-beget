@@ -47,7 +47,7 @@ class CategoryTreeChangeList(ChangeList):
         self.can_show_all = True
 
 
-def category_tree_title(obj):
+def category_tree_title(obj, change_url_name="admin:products_category_change"):
     """Название, ссылка редактирования и отдельная кнопка раскрытия."""
     ancestors = getattr(obj, "tree_ancestors", ())
     depth = getattr(obj, "tree_depth", 0)
@@ -62,5 +62,5 @@ def category_tree_title(obj):
         '<span class="category-tree-node" data-node="{}" data-ancestors="{}" '
         'style="--tree-depth:{}">{}<a href="{}">{}</a></span>',
         obj.pk, ",".join(str(pk) for pk in ancestors), depth, toggle,
-        reverse("admin:products_category_change", args=[obj.pk]), obj.title,
+        reverse(change_url_name, args=[obj.pk]), obj.title,
     )
