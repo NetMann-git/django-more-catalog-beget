@@ -16,6 +16,7 @@
                     geometry: new ol.geom.Point(ol.proj.fromLonLat(point.coordinates.map(Number))), point
                 }));
                 const source = new ol.source.Vector({features, wrapX:false});
+                const selected = features.find(feature => feature.get('point').id === data.selected_id);
                 const clusters = new ol.source.Cluster({distance:40, source});
                 const styles = new Map();
                 const tiles = new ol.source.XYZ({url:data.tile_url, attributions:data.attribution, maxZoom:19});
@@ -39,12 +40,13 @@
                     overlays:[overlay], view:new ol.View({maxZoom:19}),
                     controls:ol.control.defaults.defaults({attributionOptions:{collapsible:false}}),
                     interactions:ol.interaction.defaults.defaults({mouseWheelZoom:false})});
-                map.getView().fit(source.getExtent(), {padding:[45,45,45,45], maxZoom:15});
-                map.on('singleclick', event => {
-                    const feature = map.forEachFeatureAtPixel(event.pixel, item => item, {hitTolerance:8});
+                const showAll = () => {
+                    overlay.setPosition(undefined);
+                    map.getView().fit(source.getExtent(), {padding:[45,45,45,45], maxZoom:15});
+                };
+                const showPopup = (members, coordinates) => {
                     popup.replaceChildren();
-                    if (!feature) { overlay.setPosition(undefined); return; }
-                    const members = feature.get('features');
+                    members = [...members].sort((a,b) => Number(b.get('point').id === data.selected_id) - Number(a.get('point').id === data.selected_id));
                     const heading = document.createElement('p');
                     heading.textContent = members.length > 1 ? 'Объектов в группе: ' + members.length : 'Объект жилья';
                     const list = document.createElement('ul');
@@ -52,15 +54,36 @@
                     members.forEach(member => {
                         const point = member.get('point');
                         const item = document.createElement('li');
+                        if (point.id === data.selected_id) {
+                            item.className = 'info-map__selected-item';
+                            const label = document.createElement('strong'); label.textContent = 'Выбранный объект';
+                            item.append(label, document.createElement('br'));
+                        }
                         const link = document.createElement('a'); link.href = point.url; link.textContent = point.title;
                         const address = document.createElement('p'); address.textContent = point.address;
                         item.append(link, address); list.append(item);
                     });
                     const close = document.createElement('button'); close.type='button'; close.textContent='Закрыть';
                     close.addEventListener('click', () => overlay.setPosition(undefined));
-                    popup.append(heading, close, list); overlay.setPosition(feature.getGeometry().getCoordinates());
+                    popup.append(heading, close, list); overlay.setPosition(coordinates);
+                };
+                map.on('singleclick', event => {
+                    const feature = map.forEachFeatureAtPixel(event.pixel, item => item, {hitTolerance:8});
+                    if (!feature) { overlay.setPosition(undefined); return; }
+                    const group = feature.get('features') || clusters.getFeatures().find(cluster => cluster.get('features').includes(feature))?.get('features') || [feature];
+                    showPopup(group, feature.getGeometry().getCoordinates());
                 });
                 map.getView().on('change:resolution', () => overlay.setPosition(undefined));
+                const allButton = root.querySelector('.info-map__all');
+                if (allButton) { allButton.hidden = false; allButton.addEventListener('click', showAll); }
+                if (selected) {
+                    map.addLayer(new ol.layer.Vector({source:new ol.source.Vector({features:[selected]}), zIndex:10,
+                        style:new ol.style.Style({image:new ol.style.Circle({radius:22,
+                            fill:new ol.style.Fill({color:'rgba(0,0,0,0)'}), stroke:new ol.style.Stroke({color:'#b33b16',width:3})})})}));
+                    map.getView().setCenter(selected.getGeometry().getCoordinates()); map.getView().setZoom(16);
+                    map.renderSync();
+                    showPopup([selected], selected.getGeometry().getCoordinates());
+                } else { showAll(); }
                 button.hidden = true;
             } catch (error) {
                 if (map) map.setTarget(undefined);

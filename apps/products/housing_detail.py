@@ -45,6 +45,7 @@ def phones(value: str) -> list[dict]:
 def housing_context(product) -> dict:
     """Собрать только публичные поля, без SQL на каждое значение удобства."""
     from .map_data import product_map
+    from apps.information.maps import product_map_links
     sections = []
     for slug, title, fields in SECTIONS:
         blocks = [{'label': label, 'html': public_html(getattr(product, name))} for name, label in fields]
@@ -70,6 +71,7 @@ def housing_context(product) -> dict:
         **category_links,
         'housing_sections': sections,
         'housing_map': product_map(product),
+        'housing_resort_maps': product_map_links(product),
         'housing_short_description': public_html(product.short_description),
         'housing_attributes': list(groups.values()),
         'housing_contacts': contacts,

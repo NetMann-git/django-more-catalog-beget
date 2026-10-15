@@ -6,7 +6,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from .models import InformationCategory, InformationMaterial
 from .rendering import material_html
-from .maps import material_map
+from .maps import material_map, select_map_point
 
 
 def public_categories():
@@ -62,4 +62,4 @@ def material_detail(request, slug=None, joomla_id=None):
     categories = [row for row in material.categories.all() if row.pk in visible]
     blocks = [material_html(value) for value in (material.intro, material.body, material.extra_body, material.html_insert) if value.strip()]
     return render(request, 'information/detail.html', {'housing_public_page': True, 'information_public_page': True,
-        'material': material, 'page': material, 'material_categories': categories, 'blocks': blocks, 'map_data': material_map(material)})
+        'material': material, 'page': material, 'material_categories': categories, 'blocks': blocks, 'map_data': select_map_point(material_map(material), request.GET.get('object', ''))})
