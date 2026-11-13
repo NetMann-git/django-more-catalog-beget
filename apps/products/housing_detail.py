@@ -75,6 +75,10 @@ def housing_context(product) -> dict:
         'housing_short_description': public_html(product.short_description),
         'housing_attributes': list(groups.values()),
         'housing_contacts': contacts,
+        'housing_call_href': next(
+            (phone['href'] for contact in contacts for phone in contact['phones'] if phone['href']),
+            '',
+        ),
         'housing_has_contacts': bool(contacts or product.contact_email),
         'housing_gallery': gallery,
         'housing_cover': product.image or (gallery[0].image if gallery else None),

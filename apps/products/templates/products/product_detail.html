@@ -4,6 +4,9 @@
 {% load static prices_html %}
 {% load thumbnail %}
 
+{% block body_class %}sea-home sea-detail-page{% endblock %}
+{% block body_theme_class %}{% endblock %}
+{% block site_header %}{% include 'home/sections/sea_header.html' %}{% endblock %}
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'products/css/prices-editor.css' %}">
 <link rel="stylesheet" href="{% static 'products/css/availability.css' %}">
@@ -15,6 +18,8 @@
 <link rel="stylesheet" href="{% static 'products/css/product/car-detail.css' %}">
 <link rel="stylesheet" href="{% static 'products/css/product/housing-detail.css' %}">
 {% if housing_map %}<link rel="stylesheet" href="{% static 'products/css/object-map.css' %}">{% endif %}
+<link rel="stylesheet" href="{% static 'home/css/sea-home.css' %}">
+<link rel="stylesheet" href="{% static 'products/css/product/sea-detail.css' %}">
 {% endblock extra_css %}
 
 {% block content %}
@@ -41,6 +46,19 @@
         {% for category in housing_categories %}<a href="{{ category.get_absolute_url }}">{{ category.title }}</a>{% endfor %}
     </nav>
     {% endif %}
+
+    <header class="sea-detail__heading">
+            <h1>{{ product.title }}</h1>
+            {% if product.subtitle %}<p class="housing-detail__subtitle">{{ product.subtitle }}</p>{% endif %}
+            {% if product.location or product.district_text or product.address %}
+            <div class="housing-detail__location">
+                {% if product.location %}<p><strong>{{ product.location.name }}</strong></p>{% endif %}
+                {% if product.district_text %}<p>{{ product.district_text }}</p>{% endif %}
+                {% if product.address %}<p>{{ product.address }}</p>{% endif %}
+            </div>
+            {% endif %}
+        {% if housing_map %}<a class="sea-detail__map-link" href="#housing-map">На карте</a>{% endif %}
+    </header>
 
     <!-- Основной блок -->
     <div class="dress-detail">
@@ -87,11 +105,12 @@
                 </div>
             </div>
 
-            {% if housing_gallery %}
+            {% if housing_cover %}
             <div class="gallery-counter">
                 Фото <span id="current-photo">1</span> из <span id="total-photos">
                     {{ housing_gallery_count }}
                 </span>
+                <button type="button" class="sea-detail__all-photos" id="open-housing-photos">Все фото</button>
             </div>
             {% endif %}
         </div>
@@ -99,17 +118,14 @@
         <!-- Информация о товаре -->
         <div class="dress-info">
 
-            <h1>{{ product.title }}</h1>
-            {% if product.subtitle %}<p class="housing-detail__subtitle">{{ product.subtitle }}</p>{% endif %}
-            {% if product.location or product.district_text or product.address %}
-            <div class="housing-detail__location">
-                {% if product.location %}<p><strong>{{ product.location.name }}</strong></p>{% endif %}
-                {% if product.district_text %}<p>{{ product.district_text }}</p>{% endif %}
-                {% if product.address %}<p>{{ product.address }}</p>{% endif %}
+            <div class="price-block">
+                <span class="price-label">Цена</span>
+                <div class="price">{% product_price product %}</div>
             </div>
-            {% endif %}
-            {% if housing_short_description %}<div class="housing-detail__intro prices-content">{{ housing_short_description }}</div>{% endif %}
-
+            <div class="sea-detail__actions">
+                {% include 'products/_housing_primary_actions.html' %}
+            </div>
+            <p class="housing-detail__contact-note">Заявку получит менеджер сайта.</p>
             {% if product.brand %}
                 <div class="product-brand">Тип жилья: <a href="{{ product.brand.get_absolute_url }}">{{ product.brand.name }}</a></div>
             {% endif %}
@@ -139,26 +155,24 @@
             {% include "wishlist/_button.html" with product=product %}
             </div>
 
-            <div class="price-block">
-                <span class="price-label">Цена</span>
-                <div class="price">{% product_price product %}</div>
+            <div class="sea-detail__links">
+                {% if housing_has_contacts %}<a href="#housing-contacts">Контакты и бронирование</a>{% endif %}
+                <a href="{% url 'appointments:car_inquiry' product.id %}" class="car-inquiry__trigger" id="open-car-inquiry-modal">Уточнить условия</a>
+                <a href="{% url 'catalog:housing_catalog' %}">Вернуться к подбору жилья</a>
+                <a href="{% url 'catalog:comparison' %}">Сравнение</a>
+                <a href="{% url 'catalog:recently_viewed' %}">История просмотров</a>
             </div>
-
-            <p class="housing-detail__contact-note">Свободные даты уточняйте при бронировании.</p>
-
-            <!-- Заявки по выбранному автомобилю. -->
-            <div class="dress-actions">
-                {% if housing_has_contacts %}<a href="#housing-contacts" class="btn">Контакты и бронирование</a>{% endif %}
-                <a href="{% url 'appointments:car_inquiry' product.id %}" class="btn car-inquiry__trigger" id="open-car-inquiry-modal">
-                    Уточнить условия
-                </a>
-                <a href="{% url 'appointments:car_inquiry' product.id %}?type=order" class="btn btn-outline car-inquiry__trigger">Оставить заявку</a>
-                <a href="{% url 'catalog:housing_catalog' %}" class="car-detail__back">← Вернуться к подбору жилья</a>
-            </div>
-
 
         </div>
     </div>
+
+    {% if not import_preview %}
+    <div class="sea-detail__mobile-actions" aria-label="Связь по объекту">
+        {% include 'products/_housing_primary_actions.html' %}
+        <p>Заявку получит менеджер сайта.</p>
+    </div>
+    {% endif %}
+            {% if housing_short_description %}<div class="housing-detail__intro prices-content">{{ housing_short_description }}</div>{% endif %}
 
     {% include "products/_housing_information.html" %}
 

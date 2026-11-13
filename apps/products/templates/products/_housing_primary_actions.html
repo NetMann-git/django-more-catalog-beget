@@ -1,0 +1,2 @@
+{% if housing_call_href %}<a class="sea-detail__action" href="{{ housing_call_href }}">Позвонить владельцу</a>{% endif %}
+<a href="{% url 'appointments:car_inquiry' product.id %}?type=order" class="sea-detail__action{% if housing_call_href %} sea-detail__action--secondary{% endif %} car-inquiry__trigger">Оставить заявку</a>

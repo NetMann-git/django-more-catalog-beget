@@ -1,0 +1,125 @@
+.sea-detail-page .housing-detail {
+    width: min(1240px, calc(100% - 64px));
+    max-width: none;
+    margin-inline: auto;
+    padding-inline: 0;
+}
+.sea-detail-page .housing-detail .breadcrumbs a,
+.sea-detail-page .housing-detail .housing-detail__contact a,
+.sea-detail-page .housing-detail #housing-contacts a { color: var(--sea-teal-dark); }
+.sea-detail__heading { margin: 18px 0 22px; }
+.sea-detail-page .sea-detail__heading h1 {
+    font-size: clamp(2.25rem, 5vw, 4rem);
+    overflow-wrap: anywhere;
+}
+.sea-detail-page .housing-detail__location {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    padding: 0;
+    background: transparent;
+    margin-bottom: 8px;
+}
+.sea-detail__map-link, .sea-detail__links a { color: var(--sea-teal-dark); }
+.sea-detail-page .housing-detail > .dress-detail {
+    grid-template-columns: minmax(0, 2.15fr) minmax(280px, 1fr);
+    gap: 22px;
+}
+.sea-detail-page .housing-detail .dress-info {
+    padding: 22px;
+    border: 1px solid var(--sea-line);
+    border-radius: 14px;
+    background: var(--sea-card);
+    box-shadow: none;
+}
+.sea-detail-page .housing-detail .gallery-wrapper { display: flex; flex-direction: column; gap: 10px; }
+.sea-detail-page .housing-detail .main-image-wrapper { width: 100%; min-width: 0; }
+.sea-detail-page .housing-detail .main-image { aspect-ratio: 16 / 10; border-radius: 14px; }
+.sea-detail-page .housing-detail .gallery-thumbs-vertical {
+    order: 1;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    max-height: none;
+    overflow-x: auto;
+    gap: 8px;
+    padding: 4px 2px;
+}
+.sea-detail-page .housing-detail .gallery-thumb-vertical {
+    flex: 0 0 88px;
+    width: 88px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+.sea-detail-page .housing-detail .gallery-thumb-vertical.active { border-color: var(--sea-teal); }
+.sea-detail__all-photos {
+    margin-inline-start: 10px;
+    min-height: 44px;
+    padding: 6px 12px;
+    border: 1px solid var(--sea-line);
+    border-radius: 8px;
+    background: var(--sea-card);
+    color: var(--sea-teal-dark);
+    font: inherit;
+    cursor: pointer;
+}
+.sea-detail__actions, .sea-detail__links { display: grid; gap: 8px; }
+.sea-detail-page .sea-detail__action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 8px;
+    border: 1px solid var(--sea-teal);
+    border-radius: 9px;
+    background: var(--sea-teal);
+    color: white;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+}
+.sea-detail-page .sea-detail__action:hover { background: var(--sea-teal-dark); }
+.sea-detail-page .sea-detail__action--secondary { background: transparent; color: var(--sea-teal-dark); }
+.sea-detail-page .sea-detail__action--secondary:hover { background: #e6eeea; }
+.sea-detail-page .housing-detail__intro { margin-top: 20px; }
+.sea-detail-page .housing-detail__navigation { padding: 0; background: transparent; }
+.sea-detail-page .housing-detail__navigation a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    border-color: var(--sea-line);
+    background: #ebe8da;
+    color: var(--sea-ink);
+}
+.sea-detail-page .housing-detail__information .description-block { background: var(--sea-card); border-color: var(--sea-line); }
+.sea-detail-page .housing-detail__information h2 { font-size: clamp(1.55rem, 3vw, 2.25rem); }
+.sea-detail__mobile-actions { display: none; }
+@media (max-width: 760px) {
+    .sea-detail-page .housing-detail { width: calc(100% - 32px); }
+    .sea-detail-page .housing-detail > .dress-detail { grid-template-columns: minmax(0, 1fr); }
+    .sea-detail-page:has(.sea-detail__mobile-actions) { padding-bottom: calc(106px + env(safe-area-inset-bottom)); }
+    .sea-detail-page:has(.sea-detail__mobile-actions) .scroll-to-top { bottom: calc(116px + env(safe-area-inset-bottom)); }
+    .sea-detail-page:has(.sea-detail__mobile-actions) .sea-detail__actions { display: none; }
+    .sea-detail-page:has(.sea-detail__mobile-actions) .dress-info > .housing-detail__contact-note { display: none; }
+    .sea-detail__mobile-actions {
+        position: fixed;
+        inset: auto 0 0;
+        z-index: 900;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(0, 1fr);
+        grid-template-rows: auto auto;
+        gap: 4px 8px;
+        padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+        border-top: 1px solid var(--sea-line);
+        background: var(--sea-paper);
+    }
+    .sea-detail__mobile-actions p {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        margin: 0;
+        text-align: center;
+        font-size: .8rem;
+    }
+}

@@ -221,6 +221,8 @@ document.addEventListener("DOMContentLoaded", function () {
         openLightbox(currentIndex);
     });
 
+    document.getElementById("open-housing-photos")?.addEventListener("click", () => openLightbox(currentIndex));
+
     // Крестик закрытия
     if (lightboxClose) {
         lightboxClose.addEventListener("click", function (e) {

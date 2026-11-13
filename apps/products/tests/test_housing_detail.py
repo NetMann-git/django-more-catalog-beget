@@ -53,6 +53,21 @@ class HousingDetailTests(TestCase):
         self.assertNotContains(response,'class="housing-detail__navigation"')
         self.assertContains(response,'Нет фото')
 
+    def test_primary_actions_use_first_valid_phone_and_work_without_phone(self):
+        self.product.contact_phone = 'звонить вечером'
+        self.product.additional_contact_phone = '+7 (900) 765-43-21'
+        self.product.save()
+        response = self.client.get(self.url)
+        self.assertContains(response, 'href="tel:+79007654321">Позвонить владельцу', count=2)
+        self.assertContains(response, 'class="sea-detail__mobile-actions"')
+        self.assertContains(response, '?type=order')
+
+        self.product.additional_contact_phone = ''
+        self.product.save()
+        response = self.client.get(self.url)
+        self.assertNotContains(response, 'Позвонить владельцу')
+        self.assertContains(response, '?type=order')
+
     def test_html_restrictions_and_plain_text_paragraphs(self):
         self.product.rooms_description='<script>LEAK_SCRIPT()</script><p onclick="BAD_HANDLER()">Комнаты</p>'
         self.product.booking_conditions='Первый абзац\n\nВторой абзац'
