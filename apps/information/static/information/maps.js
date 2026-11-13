@@ -48,8 +48,23 @@
                 const selected = features.find(feature => feature.get('point').id === data.selected_id);
                 const clusters = new ol.source.Cluster({distance:40, source});
                 const styles = new Map();
-                const tiles = new ol.source.XYZ({url:data.tile_url, attributions:data.attribution, maxZoom:19});
-                tiles.on('tileloaderror', () => { status.textContent = 'Подложка недоступна. Метки и список объектов доступны.'; });
+                const tiles = new ol.source.XYZ({
+                    url: data.tile_url,
+                    attributions: data.attribution,
+                    maxZoom: 19,
+                    tileLoadFunction(tile, url) {
+                        const image = tile.getImage();
+                        // Сервису тайлов нужен origin сайта, без пути и параметров подбора.
+                        image.referrerPolicy = 'strict-origin';
+                        image.src = url;
+                    },
+                });
+                tiles.on('tileloaderror', () => {
+                    if (status.textContent) return;
+                    status.textContent = 'Подложка карты недоступна. Откройте нужный объект из списка ниже.';
+                    const objectList = root.querySelector('.info-map__objects');
+                    if (objectList) objectList.open = true;
+                });
                 canvas.hidden = false;
                 const popup = document.createElement('div');
                 popup.className = 'info-map__popup';
