@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{% if is_order %}Заявка на автомобиль{% else %}Запрос стоимости автомобиля{% endif %}{% endblock %}
+{% block title %}{% if is_order %}Заявка по жилью{% else %}Уточнить условия проживания{% endif %}{% endblock %}
 {% block extra_css %}<link rel="stylesheet" href="{% static 'appointments/css/car_inquiry.css' %}">{% endblock %}
 
 {% block content %}

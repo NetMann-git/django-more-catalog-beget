@@ -124,7 +124,7 @@ class WorkingHours(models.Model):
         return f'{self.get_day_of_week_display()}: {self.start_time} - {self.end_time}'
 
 class CallbackRequest(models.Model):
-    """Обращение с главной страницы или страницы автомобиля."""
+    """Обращение с главной страницы или из карточки жилья."""
 
     STATUS_NEW = 'new'
     STATUS_PROCESSED = 'processed'
@@ -138,7 +138,7 @@ class CallbackRequest(models.Model):
     name = models.CharField(max_length=100, blank=True, verbose_name='Имя')
     phone = models.CharField(max_length=30, verbose_name='Телефон')
     email = models.EmailField(blank=True, verbose_name='Электронная почта')
-    city = models.CharField(max_length=120, blank=True, verbose_name='Город доставки')
+    city = models.CharField(max_length=120, blank=True, verbose_name='Город')
     comment = models.TextField(blank=True, verbose_name='Комментарий')
     product = models.ForeignKey(
         Product,
@@ -146,7 +146,7 @@ class CallbackRequest(models.Model):
         null=True,
         blank=True,
         related_name='callback_requests',
-        verbose_name='Автомобиль',
+        verbose_name='Объект жилья',
     )
     status = models.CharField(
         max_length=20,
@@ -160,6 +160,7 @@ class CallbackRequest(models.Model):
         default='homepage',
         verbose_name='Источник',
     )
+    submission_id = models.UUIDField(null=True, unique=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Создана')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Изменена')
 

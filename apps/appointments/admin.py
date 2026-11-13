@@ -173,5 +173,5 @@ class CallbackRequestAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {'fields': ('name', 'phone', 'email', 'city', 'comment', 'status')}),
-        ('Автомобиль и источник', {'fields': ('product', 'source', 'created_at', 'updated_at')}),
+        ('Объект жилья и источник', {'fields': ('product', 'source', 'created_at', 'updated_at')}),
     )

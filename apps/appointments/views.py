@@ -1,15 +1,19 @@
 # apps/appointments/views.py
 
+from uuid import UUID, uuid4
+
+from django.core import signing
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.urls import reverse
+from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_http_methods, require_POST
 from django.http import JsonResponse
 
 from apps.products.models import Product
 from apps.users.constants import ROLE_ADMIN, ROLE_MANAGER
 from apps.users.decorators import role_required
-from .forms import AppointmentForm, CallbackRequestForm, CarInquiryForm
+from .forms import AppointmentForm, CallbackRequestForm, HousingInquiryForm
 from .notifications import (
     send_email_notification,
     send_telegram_notification,
@@ -24,13 +28,22 @@ from datetime import datetime, timedelta
 from .models import Appointment, CallbackRequest, WorkingHours
 
 
+HOUSING_INQUIRY_SALT = 'appointments.housing-inquiry'
+
+
+@never_cache
 @require_http_methods(['GET', 'POST'])
 def car_inquiry(request, product_id):
-    """Принимает запрос цены или заявку на покупку выбранного автомобиля."""
+    """Принимает обращение по выбранному объекту жилья."""
     product = get_object_or_404(Product, pk=product_id, is_active=True)
     is_order = request.GET.get('type') == 'order'
     is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
-    form = CarInquiryForm(request.POST if request.method == 'POST' else None)
+    source = 'product_order' if is_order else 'product_detail'
+    form = HousingInquiryForm(request.POST if request.method == 'POST' else None)
+    if request.method == 'GET':
+        form.initial['submission_token'] = signing.dumps(
+            [product.pk, source, str(uuid4())], salt=HOUSING_INQUIRY_SALT,
+        )
 
     if request.method == 'POST':
         # Невидимое поле не мешает посетителю, но отсекает простых ботов.
@@ -40,13 +53,32 @@ def car_inquiry(request, product_id):
             return redirect(product.get_absolute_url())
 
         if form.is_valid():
-            inquiry = form.save(commit=False)
-            inquiry.product = product
-            inquiry.source = 'product_order' if is_order else 'product_detail'
-            inquiry.save()
-            send_email_notification(inquiry)
-            send_telegram_notification(inquiry)
-            send_max_notification(inquiry)
+            try:
+                token_product, token_source, token_id = signing.loads(
+                    form.cleaned_data['submission_token'],
+                    salt=HOUSING_INQUIRY_SALT,
+                    max_age=86400,
+                )
+                submission_id = UUID(token_id)
+                if (token_product, token_source) != (product.pk, source):
+                    raise ValueError
+            except (signing.BadSignature, ValueError):
+                form.add_error(None, 'Откройте форму заново и повторите отправку.')
+
+        if not form.errors:
+            draft = form.save(commit=False)
+            inquiry, created = CallbackRequest.objects.get_or_create(
+                submission_id=submission_id,
+                defaults={
+                    'product': product, 'source': source,
+                    'name': draft.name, 'phone': draft.phone, 'city': draft.city,
+                    'email': draft.email, 'comment': draft.comment,
+                },
+            )
+            if created:
+                send_email_notification(inquiry)
+                send_telegram_notification(inquiry)
+                send_max_notification(inquiry)
 
             message = 'Заявка получена. Менеджер свяжется с вами.'
             if is_ajax:

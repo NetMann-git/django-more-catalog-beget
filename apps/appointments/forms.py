@@ -1,5 +1,7 @@
 # apps/appointments/forms.py
 
+import re
+
 from django import forms
 from .models import Appointment, CallbackRequest
 
@@ -69,11 +71,27 @@ class CallbackRequestForm(forms.ModelForm):
         return phone
 
 
-class CarInquiryForm(CallbackRequestForm):
-    """Контакты для персонального расчёта доставки автомобиля."""
+class HousingInquiryForm(CallbackRequestForm):
+    """Контакты и вопрос по выбранному жилью."""
 
     name = forms.CharField(max_length=100, label='Ваше имя')
-    city = forms.CharField(max_length=120, label='Город доставки')
+    city = forms.CharField(max_length=120, required=False, label='Ваш город')
+    comment = forms.CharField(
+        max_length=2000,
+        required=False,
+        label='Сообщение',
+        widget=forms.Textarea(attrs={
+            'rows': 3,
+            'placeholder': 'Например, даты поездки и количество гостей',
+        }),
+    )
+    submission_token = forms.CharField(max_length=300, widget=forms.HiddenInput)
+
+    def clean_phone(self):
+        phone = super().clean_phone()
+        if not re.fullmatch(r'\+?[0-9() .-]+', phone):
+            raise forms.ValidationError('Введите корректный номер телефона.')
+        return phone
 
     class Meta:
         model = CallbackRequest
@@ -85,13 +103,9 @@ class CarInquiryForm(CallbackRequestForm):
                 'placeholder': '+7 (999) 123-45-67',
             }),
             'email': forms.EmailInput(attrs={'autocomplete': 'email'}),
-            'comment': forms.Textarea(attrs={
-                'rows': 3,
-                'placeholder': 'Ваши вопросы об автомобиле (необязательно)',
-            }),
+
         }
         labels = {
             'phone': 'Телефон',
             'email': 'Электронная почта (необязательно)',
-            'comment': 'Комментарий (необязательно)',
         }

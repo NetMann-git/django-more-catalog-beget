@@ -186,13 +186,13 @@ class CallbackRequestTests(TestCase):
         self.assertEqual(CallbackRequest.objects.count(), 0)
 
 
-class CarInquiryTests(TestCase):
-    """Запрос расчёта сохраняет контакт и выбранный автомобиль."""
+class HousingInquiryTests(TestCase):
+    """Обращение сохраняет контакты и выбранный объект жилья."""
 
     @classmethod
     def setUpTestData(cls):
         cls.product = Product.objects.create(
-            title='Тестовый автомобиль',
+            title='Гостевой дом',
             slug='test-car-inquiry',
             price=100000,
         )
@@ -200,10 +200,15 @@ class CarInquiryTests(TestCase):
     def setUp(self):
         self.url = reverse('appointments:car_inquiry', args=[self.product.pk])
 
+    def submission_token(self, *, order=False):
+        url = self.url + '?type=order' if order else self.url
+        response = self.client.get(url)
+        return response.context['form']['submission_token'].value()
+
     def test_form_is_available_without_javascript(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Тестовый автомобиль')
+        self.assertContains(response, 'Гостевой дом')
         self.assertContains(response, 'Ваш город')
 
     def test_product_page_has_inquiry_link(self):
@@ -235,7 +240,8 @@ class CarInquiryTests(TestCase):
     def test_order_without_ajax_opens_success_modal_once(self, *_notifications):
         response = self.client.post(
             self.url + '?type=order',
-            {'name': 'Иван', 'phone': '+79991234567', 'city': 'Ростов-на-Дону'},
+            {'name': 'Иван', 'phone': '+79991234567',
+             'submission_token': self.submission_token(order=True)},
             follow=True,
         )
         self.assertEqual(response.status_code, 200)
@@ -256,7 +262,8 @@ class CarInquiryTests(TestCase):
     ):
         response = self.client.post(
             self.url + '?type=order',
-            {'name': 'Иван', 'phone': '+79991234567', 'city': 'Ростов-на-Дону'},
+            {'name': 'Иван', 'phone': '+79991234567',
+             'submission_token': self.submission_token(order=True)},
             HTTP_X_REQUESTED_WITH='XMLHttpRequest',
         )
         self.assertEqual(response.status_code, 200)
@@ -278,13 +285,14 @@ class CarInquiryTests(TestCase):
     @patch('apps.appointments.views.send_max_notification')
     @patch('apps.appointments.views.send_telegram_notification')
     @patch('apps.appointments.views.send_email_notification')
-    def test_ajax_submission_saves_car_and_contacts(self, email, telegram, max_message):
+    def test_ajax_submission_saves_housing_and_contacts(self, email, telegram, max_message):
         response = self.client.post(
             self.url,
             {
                 'name': 'Иван', 'phone': '+7 (999) 123-45-67',
                 'city': 'Ростов-на-Дону', 'email': 'ivan@example.com',
-                'comment': 'Нужен расчёт доставки',
+                'comment': 'Свободны ли даты?',
+                'submission_token': self.submission_token(),
             },
             HTTP_X_REQUESTED_WITH='XMLHttpRequest',
         )
@@ -294,19 +302,19 @@ class CarInquiryTests(TestCase):
         self.assertEqual(inquiry.product, self.product)
         self.assertEqual(inquiry.city, 'Ростов-на-Дону')
         self.assertEqual(inquiry.email, 'ivan@example.com')
-        self.assertEqual(inquiry.comment, 'Нужен расчёт доставки')
+        self.assertEqual(inquiry.comment, 'Свободны ли даты?')
         email.assert_called_once_with(inquiry)
         telegram.assert_called_once_with(inquiry)
         max_message.assert_called_once_with(inquiry)
 
-    def test_missing_city_or_short_phone_does_not_save(self):
+    def test_short_phone_does_not_save(self):
         response = self.client.post(
             self.url,
             {'name': 'Иван', 'phone': '123'},
             HTTP_X_REQUESTED_WITH='XMLHttpRequest',
         )
         self.assertEqual(response.status_code, 400)
-        self.assertContains(response, 'Ваш город', status_code=400)
+        self.assertContains(response, 'Введите корректный номер телефона.', status_code=400)
         self.assertEqual(CallbackRequest.objects.count(), 0)
 
     def test_honeypot_does_not_create_inquiry(self):
@@ -331,6 +339,7 @@ class CarInquiryTests(TestCase):
         token = response.context['csrf_token']
         response = client.post(self.url, {
             'csrfmiddlewaretoken': str(token),
+            'submission_token': response.context['form']['submission_token'].value(),
             'name': 'Иван', 'phone': '+7 (999) 123-45-67',
             'city': 'Ростов-на-Дону',
         })
@@ -346,7 +355,7 @@ class CarInquiryTests(TestCase):
         MANAGER_EMAILS=['manager@example.com'],
         SITE_URL='https://carstar-rnd.ru',
     )
-    def test_manager_email_contains_car_link_and_contacts(self):
+    def test_manager_email_contains_housing_link_and_contacts(self):
         inquiry = CallbackRequest.objects.create(
             name='Иван', phone='+79991234567', product=self.product,
             city='Ростов-на-Дону', email='ivan@example.com',
@@ -364,17 +373,17 @@ class CarInquiryTests(TestCase):
         MANAGER_EMAILS=['manager@example.com'],
         SITE_URL='https://carstar-rnd.ru',
     )
-    def test_order_email_has_order_subject_and_car_link(self):
+    def test_order_email_has_order_subject_and_housing_link(self):
         inquiry = CallbackRequest.objects.create(
             name='Иван', phone='+79991234567', product=self.product,
             city='Ростов-на-Дону', source='product_order',
         )
         self.assertTrue(send_email_notification(inquiry))
         message = mail.outbox[-1]
-        self.assertIn('Заявка на покупку автомобиля', message.subject)
+        self.assertIn('Заявка по жилью', message.subject)
         self.assertIn(self.product.get_absolute_url(), message.body)
 
-    def test_manager_sees_car_and_city_in_inquiry_list(self):
+    def test_manager_sees_housing_and_city_in_inquiry_list(self):
         CallbackRequest.objects.create(
             name='Иван', phone='+79991234567', product=self.product,
             city='Ростов-на-Дону', source='product_detail',
@@ -388,6 +397,32 @@ class CarInquiryTests(TestCase):
         response = self.client.get(reverse('appointments:callback_request_list'))
         self.assertContains(response, self.product.get_absolute_url())
         self.assertContains(response, 'Ростов-на-Дону')
+
+    @patch('apps.appointments.views.send_max_notification')
+    @patch('apps.appointments.views.send_telegram_notification')
+    @patch('apps.appointments.views.send_email_notification')
+    def test_repeated_submission_saves_and_notifies_once(self, *notifications):
+        data = {
+            'name': 'Иван', 'phone': '+79991234567',
+            'submission_token': self.submission_token(),
+        }
+        for _ in range(2):
+            response = self.client.post(
+                self.url, data, HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+            )
+            self.assertTrue(response.json()['success'])
+        self.assertEqual(CallbackRequest.objects.count(), 1)
+        for notification in notifications:
+            notification.assert_called_once()
+
+    def test_token_cannot_be_used_for_another_kind_of_inquiry(self):
+        response = self.client.post(self.url + '?type=order', {
+            'name': 'Иван', 'phone': '+79991234567',
+            'submission_token': self.submission_token(),
+        })
+        self.assertContains(response, 'Откройте форму заново', status_code=400)
+        self.assertFalse(CallbackRequest.objects.exists())
+
 
 @override_settings(
     EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",

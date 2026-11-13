@@ -32,7 +32,7 @@
                         <th style="text-align:left; padding:10px; border-bottom:2px solid #ddd;">Дата</th>
                         <th style="text-align:left; padding:10px; border-bottom:2px solid #ddd;">Имя</th>
                         <th style="text-align:left; padding:10px; border-bottom:2px solid #ddd;">Телефон</th>
-                        <th style="text-align:left; padding:10px; border-bottom:2px solid #ddd;">Автомобиль</th>
+                        <th style="text-align:left; padding:10px; border-bottom:2px solid #ddd;">Объект жилья</th>
                         <th style="text-align:left; padding:10px; border-bottom:2px solid #ddd;">Город</th>
                         <th style="text-align:left; padding:10px; border-bottom:2px solid #ddd;">Email и комментарий</th>
                         <th style="text-align:left; padding:10px; border-bottom:2px solid #ddd;">Статус</th>
@@ -66,7 +66,8 @@
                                 </form>
                             </td>
                             <td style="padding:10px; border-bottom:1px solid #eee;">
-                                {% if callback.source == 'product_detail' %}Страница автомобиля
+                                {% if callback.source == 'product_detail' %}Вопрос по жилью
+                                {% elif callback.source == 'product_order' %}Заявка по жилью
                                 {% elif callback.source == 'homepage' %}Главная
                                 {% else %}{{ callback.source }}{% endif %}
                             </td>

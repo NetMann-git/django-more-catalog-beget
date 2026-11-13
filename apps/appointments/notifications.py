@@ -12,20 +12,20 @@ from django.utils import timezone
 logger = logging.getLogger(__name__)
 
 
-def _car_inquiry_details(callback_request) -> tuple[str, str]:
-    """Детали автомобиля для уведомления менеджеру, если он выбран."""
+def _housing_inquiry_details(callback_request) -> tuple[str, str]:
+    """Детали объекта жилья для уведомления менеджеру, если он выбран."""
     if callback_request.source not in ('product_detail', 'product_order'):
         return '', ''
     product = callback_request.product
-    product_title = product.title if product else 'Автомобиль удалён'
+    product_title = product.title if product else 'Объект удалён'
     product_url = (
         settings.SITE_URL.rstrip('/') + product.get_absolute_url()
         if product else ''
     )
     details = (
-        f'Автомобиль: {product_title}\n'
+        f'Объект жилья: {product_title}\n'
         f'Ссылка: {product_url}\n'
-        f'Город доставки: {callback_request.city}\n'
+        f'Город: {callback_request.city}\n'
         f'Email: {callback_request.email or "Не указан"}\n'
     )
     return details, product_url
@@ -51,37 +51,37 @@ def send_email_notification(callback_request) -> bool:
     created_at_text = created_at.strftime("%d.%m.%Y %H:%M")
 
     if callback_request.source == 'product_order':
-        subject = f'Заявка на покупку автомобиля от {name}'
+        subject = f'Заявка по жилью от {name}'
     elif callback_request.source == 'product_detail':
-        subject = f'Запрос стоимости автомобиля от {name}'
+        subject = f'Вопрос по жилью от {name}'
     else:
         subject = f'Новая заявка на обратный звонок от {name}'
-    car_details, product_url = _car_inquiry_details(callback_request)
+    housing_details, product_url = _housing_inquiry_details(callback_request)
     heading = (
-        'Получена заявка на покупку автомобиля'
+        'Получена заявка по жилью'
         if callback_request.source == 'product_order'
-        else 'Получен запрос стоимости автомобиля'
-        if car_details else 'Получена новая заявка на обратный звонок'
+        else 'Получен вопрос по жилью'
+        if housing_details else 'Получена новая заявка на обратный звонок'
     )
     html_details = ''
-    if car_details:
+    if housing_details:
         title = (
             callback_request.product.title
-            if callback_request.product else 'Автомобиль удалён'
+            if callback_request.product else 'Объект удалён'
         )
         safe_url = escape(product_url, quote=True)
         html_details = (
-            f'<p><strong>Автомобиль:</strong> {escape(title)}</p>'
+            f'<p><strong>Объект жилья:</strong> {escape(title)}</p>'
             f'<p><strong>Ссылка:</strong> '
             f'<a href="{safe_url}">{escape(product_url)}</a></p>'
-            f'<p><strong>Город доставки:</strong> {escape(callback_request.city)}</p>'
+            f'<p><strong>Город:</strong> {escape(callback_request.city)}</p>'
             f'<p><strong>Email:</strong> {escape(callback_request.email or "Не указан")}</p>'
         )
     text_body = (
         f"{heading}.\n\n"
         f"Имя: {name}\n"
         f"Телефон: {phone}\n"
-        f"{car_details}"
+        f"{housing_details}"
         f"Комментарий: {comment}\n"
         f"Дата создания: {created_at_text}\n"
     )
@@ -149,13 +149,14 @@ def send_telegram_notification(callback_request) -> bool:
     comment = getattr(callback_request, "comment", "") or ""
     comment = comment.strip() or "Не указан"
 
-    car_details, _ = _car_inquiry_details(callback_request)
-    extra = f'*Автомобиль и доставка:* {_escape_markdown_v2(car_details)}\n' if car_details else ''
+    housing_details, _ = _housing_inquiry_details(callback_request)
+    extra = f'*Объект жилья:* {_escape_markdown_v2(housing_details)}\n' if housing_details else ''
 
     title = (
-        "🚗 *Заявка на покупку автомобиля*\n"
+        "🏠 *Заявка по жилью*\n"
         if callback_request.source == 'product_order'
-        else "📞 *Новая заявка на звонок*\n"
+        else "🏠 *Вопрос по жилью*\n"
+        if housing_details else "📞 *Новая заявка на звонок*\n"
     )
     text = (
         title +
@@ -223,13 +224,14 @@ def send_max_notification(callback_request) -> bool:
     comment = getattr(callback_request, "comment", "") or ""
     comment = comment.strip() or "Не указан"
 
-    car_details, _ = _car_inquiry_details(callback_request)
-    extra = f'Автомобиль и доставка: {car_details}' if car_details else ''
+    housing_details, _ = _housing_inquiry_details(callback_request)
+    extra = f'Объект жилья: {housing_details}' if housing_details else ''
 
     title = (
-        "🚗 *Заявка на покупку автомобиля*\n"
+        "🏠 *Заявка по жилью*\n"
         if callback_request.source == 'product_order'
-        else "📞 *Новая заявка на звонок*\n"
+        else "🏠 *Вопрос по жилью*\n"
+        if housing_details else "📞 *Новая заявка на звонок*\n"
     )
     text = (
         title +

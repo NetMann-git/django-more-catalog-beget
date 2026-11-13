@@ -8,9 +8,14 @@
 
 <form action="{% url 'appointments:car_inquiry' product.id %}{% if is_order %}?type=order{% endif %}" method="post" class="car-inquiry__form">
     {% csrf_token %}
-    {% for field in form %}
+    {{ form.non_field_errors }}
+    {% for field in form.hidden_fields %}
+        {{ field }}
+        {% if field.errors %}<p class="car-inquiry__error">Откройте форму заново и повторите отправку.</p>{% endif %}
+    {% endfor %}
+    {% for field in form.visible_fields %}
         <div class="car-inquiry__field">
-            <label for="{{ field.id_for_label }}">{% if field.name == "city" %}Ваш город{% else %}{{ field.label }}{% endif %}{% if field.field.required %} *{% endif %}</label>
+            <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
             {{ field }}
             {% for error in field.errors %}<span class="car-inquiry__error">{{ error }}</span>{% endfor %}
         </div>
