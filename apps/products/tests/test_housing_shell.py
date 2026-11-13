@@ -16,7 +16,7 @@ class HousingShellTests(TestCase):
                 response = self.client.get(path)
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, 'housing-public-page')
-                self.assertContains(response, 'Категории жилья')
+                self.assertContains(response, '/catalog/categories/')
                 self.assertNotContains(response, 'СТАРЫЙ АВТООФИС')
                 self.assertNotContains(response, 'old-car-office')
                 self.assertNotContains(response, '+79999990000')

@@ -1,0 +1,17 @@
+<header class="site-header" data-site-header>
+  <div class="header-inner">
+    <a class="logo" href="{% url 'home' %}" aria-label="Дикарь Сочи — главная">Дикарь Сочи</a>
+    <nav class="main-nav" aria-label="Основная навигация">
+      {% include 'home/sections/sea_nav.html' %}
+    </nav>
+    <div class="header-actions">
+      <a class="sea-home__favorites" href="{% url 'wishlist:list' %}" aria-label="Избранное" title="Избранное">
+        <span aria-hidden="true">♡</span>
+      </a>
+      <button type="button" class="mobile-menu-toggle" aria-label="Открыть меню" aria-expanded="false" aria-controls="sea-home-mobile-nav" data-mobile-menu-toggle><span></span></button>
+    </div>
+  </div>
+  <nav id="sea-home-mobile-nav" class="mobile-nav" aria-label="Мобильная навигация" data-mobile-nav>
+    {% include 'home/sections/sea_nav.html' %}
+  </nav>
+</header>

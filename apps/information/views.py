@@ -7,6 +7,7 @@ from django.http import Http404, HttpResponsePermanentRedirect
 from django.views.decorators.http import require_safe
 from .content_links import content_aliases, REVIEWS_ALIAS
 from django.shortcuts import get_object_or_404, redirect, render
+from apps.products.models import Brand
 from .models import InformationCategory, InformationMaterial
 from .forms import InformationSearchForm
 from .rendering import material_html
@@ -82,7 +83,19 @@ def material_detail(request, slug=None, joomla_id=None):
     material = get_object_or_404(InformationMaterial, is_active=True, **lookup)
     if request.path != material.get_absolute_url():
         return redirect(material.get_absolute_url(), permanent=True)
-    return render(request, 'information/detail.html', material_detail_context(material, request.GET.get('object', '')))
+    context = material_detail_context(material, request.GET.get('object', ''))
+    map_data = context['map_data']
+    initial_type = request.GET.get('type', '')
+    if map_data and initial_type:
+        types = map_data['housing_types']
+        if any(row['value'] == initial_type for row in types):
+            context['map_initial_type'] = initial_type
+        elif initial_type.isascii() and initial_type.isdecimal() and len(initial_type) <= 18:
+            brand = Brand.objects.filter(pk=int(initial_type), products__is_active=True).first()
+            if brand:
+                types.append({'value': initial_type, 'label': brand.name, 'count': 0})
+                context['map_initial_type'] = initial_type
+    return render(request, 'information/detail.html', context)
 
 
 def material_detail_context(material, selected_id=''):

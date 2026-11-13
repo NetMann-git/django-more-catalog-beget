@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static price_format %}
 
 {% block title %}Дикарь-Сочи — жильё для отдыха у моря{% endblock %}
 {% block title_suffix %}{% endblock %}
@@ -10,45 +10,63 @@
 <link rel="stylesheet" href="{% static 'css/footer-legal.css' %}">
 <link rel="stylesheet" href="{% static 'home/css/sea-home.css' %}">
 {% endblock %}
-{% block extra_js %}{% endblock %}
+{% block site_header %}{% include 'home/sections/sea_header.html' %}{% endblock %}
+{% block extra_js %}<script src="{% static 'products/js/wishlist.js' %}" defer></script>{% endblock %}
 
 {% block content %}
 <main id="main-content" class="sea-home__main">
-  {# Подбор направляет в общий каталог жилья с GET-фильтрами. #}
-  <section class="sea-home__hero" aria-labelledby="sea-home-title">
-    <div class="sea-home__container">
-      <p class="sea-home__eyebrow">ДИКАРЬ-СОЧИ · ОТДЫХ У МОРЯ</p>
-      <h1 id="sea-home-title">Ваше место<br>для отдыха у моря</h1>
-      <p class="sea-home__intro">Гостевые дома, квартиры и мини-гостиницы в Сочи и на побережье. Выбирайте место, где хочется провести отпуск.</p>
+  <section class="sea-home__hero sea-home__container" aria-labelledby="sea-home-title">
+    <div class="sea-home__hero-copy">
+      <h1 id="sea-home-title">Жильё у моря<br>в Сочи</h1>
+      <p class="sea-home__intro">Гостевые дома, квартиры и гостиницы для отдыха на Черноморском побережье.</p>
       <form class="sea-home__filter" method="get" action="{% url 'catalog:housing_catalog' %}">
-        {% for field in housing_filter_form %}<div><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}</div>{% endfor %}
-        <button type="submit" class="sea-home__button">Найти жильё →</button>
+        {% with form=housing_filter_form %}
+        <div class="sea-home__field">{{ form.category.label_tag }}{{ form.category }}</div>
+        <div class="sea-home__field">{{ form.housing_type.label_tag }}{{ form.housing_type }}</div>
+        {% endwith %}
+        <button type="submit" class="sea-home__button">Найти жильё</button>
+        <button type="submit" class="sea-home__button sea-home__button--secondary" formaction="{% url 'home' %}" name="view" value="map">На карте</button>
       </form>
-      <div class="sea-home__destinations" aria-label="Направления отдыха">
-        {% for category in housing_destinations %}<a href="{{ category.get_absolute_url }}">{{ category.title }}</a>{% endfor %}
-      </div>
     </div>
+    <img class="sea-home__hero-image" src="{% static 'home/images/sochi-coast.webp' %}" alt="" width="1200" height="800" fetchpriority="high">
   </section>
 
-  <section id="housing-catalog" class="sea-home__catalog sea-home__container" aria-labelledby="housing-catalog-title">
-    <p class="sea-home__eyebrow">КАТАЛОГ ЖИЛЬЯ</p>
-    <h2 id="housing-catalog-title">Выбирайте отдых под себя</h2>
-    <p class="sea-home__muted">Опубликовано объектов: {{ housing_count }}. Выберите категорию или задайте условия поиска.</p>
-    <div class="sea-home__grid">
-      {% for brand in housing_home_types %}<article class="sea-home__card"><h3><a href="{% url 'catalog:housing_catalog' %}?housing_type={{ brand.slug|urlencode }}">{{ brand.name }}</a></h3><p><a href="{% url 'catalog:housing_catalog' %}?housing_type={{ brand.slug|urlencode }}">Посмотреть объекты →</a></p></article>{% empty %}<p>Типы жилья появятся после публикации объектов.</p>{% endfor %}
+  <section id="housing-catalog" class="sea-home__catalog sea-home__container" aria-labelledby="sea-home-latest-title">
+    {% if housing_destinations %}
+    <nav class="sea-home__chips" aria-label="Быстрый выбор курорта">
+      {% for resort in housing_destinations %}<a href="{% url 'catalog:housing_catalog' %}?category={{ resort.slug|urlencode }}">{{ resort.title }}</a>{% endfor %}
+      <a class="sea-home__chip-link" href="{% url 'catalog:category_index' %}">Все курорты</a>
+    </nav>
+    {% endif %}
+    <div class="sea-home__section-heading">
+      <h2 id="sea-home-latest-title">Недавно добавленное жильё</h2>
+      <a href="{% url 'catalog:housing_catalog' %}">Весь каталог →</a>
     </div>
-  </section>
-  <section class="sea-home__catalog sea-home__container" aria-labelledby="sea-home-latest-title">
-    <h2 id="sea-home-latest-title">Недавно добавленные объекты</h2>
     <div class="sea-home__grid">
     {% for card in housing_home_cards %}
+      {% with product=card.product %}
       <article class="sea-home__listing">
-        <a class="sea-home__photo" href="{{ card.product.get_absolute_url }}" aria-label="{{ card.product.title }}">{% if card.cover %}<img src="{{ card.cover.url }}" alt="{{ card.product.title }}" loading="lazy" decoding="async">{% else %}<span>Фото пока нет</span>{% endif %}</a>
-        <div class="sea-home__listing-body"><h3><a href="{{ card.product.get_absolute_url }}">{{ card.product.title }}</a></h3>{% if card.product.address %}<p>{{ card.product.address }}</p>{% endif %}<a href="{{ card.product.get_absolute_url }}">Подробнее об объекте →</a></div>
+        <a class="sea-home__photo" href="{{ product.get_absolute_url }}" aria-label="{{ product.title }}">
+          {% if card.cover %}<img src="{{ card.cover.url }}" alt="" loading="lazy" decoding="async">{% else %}<span>Фото пока нет</span>{% endif %}
+        </a>
+        <div class="sea-home__listing-body">
+          <h3><a href="{{ product.get_absolute_url }}">{{ product.title }}</a></h3>
+          {% if product.location or product.address %}<p>{% if product.location %}{{ product.location.name }}{% else %}{{ product.address }}{% endif %}</p>{% endif %}
+          <p class="sea-home__price">{% product_price product %}</p>
+          {% include 'wishlist/_button.html' %}
+        </div>
       </article>
+      {% endwith %}
     {% empty %}<p>Опубликованные объекты пока не добавлены.</p>{% endfor %}
     </div>
-    <p><a class="sea-home__button" href="{% url 'catalog:housing_catalog' %}">Все объекты →</a> <a class="sea-home__more" href="{% url 'catalog:category_index' %}">Все категории →</a></p>
   </section>
+  {% if housing_home_types %}
+  <section class="sea-home__types sea-home__container" aria-labelledby="sea-home-types-title">
+    <h2 id="sea-home-types-title">Типы жилья</h2>
+    <div class="sea-home__chips">
+      {% for brand in housing_home_types %}<a href="{% url 'catalog:housing_catalog' %}?housing_type={{ brand.slug|urlencode }}">{{ brand.name }}</a>{% endfor %}
+    </div>
+  </section>
+  {% endif %}
 </main>
 {% endblock %}
