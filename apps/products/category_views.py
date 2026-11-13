@@ -1,10 +1,12 @@
 """Публичные категории жилья с множественными привязками объектов."""
+from collections import defaultdict
 from types import SimpleNamespace
 
 from django.core.paginator import Paginator, InvalidPage
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import redirect, render
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from .housing_detail import public_html
 from .models import Category, Product
@@ -29,16 +31,20 @@ def public_tree():
 
 def category_index(request):
     categories = public_tree()
+    children = defaultdict(list)
+    for category in categories:
+        children[category.parent_id].append(category)
     return render(request, 'products/housing_categories.html', {
         'housing_public_page': True, 'housing_section': 'categories',
-        'roots': [category for category in categories if category.parent_id is None],
-        'categories': categories,
+        'groups': [{'root': root, 'children': children[root.pk]} for root in children[None]],
         'page': SimpleNamespace(seo_title='Категории жилья', search_description='Жильё для отдыха по курортам и типам размещения.'),
     })
 
 
+@ensure_csrf_cookie
 def category_detail(request, slug):
     from apps.information.map_navigation import category_map_links
+    from .housing_related import housing_cards
     categories = public_tree()
     category = next((category for category in categories if category.slug == slug), None)
     if category is None:
@@ -56,16 +62,16 @@ def category_detail(request, slug):
         selected = expanded
     products = Product.objects.filter(is_active=True).filter(
         Q(category_id__in=selected) | Q(categories__pk__in=selected)
-    ).distinct().select_related('brand').prefetch_related('gallery').order_by('title', 'pk')
+    ).distinct().select_related('brand', 'location').prefetch_related('gallery').order_by('title', 'pk')
     paginator = Paginator(products, PAGE_SIZE)
     try:
         page_obj = paginator.page(request.GET.get('page', '1'))
     except InvalidPage as exc:
         raise Http404 from exc
-    cards = []
-    for product in page_obj:
-        gallery = list(product.gallery.all())
-        cards.append({'product': product, 'cover': product.image or (gallery[0].image if gallery else None)})
+    favorites = (
+        request.user.favorites.values_list('product_id', flat=True)
+        if request.user.is_authenticated else request.session.get('wishlist', [])
+    )
     by_id = {entry.pk: entry for entry in categories}
     ancestors = []
     parent = category.parent_id
@@ -79,7 +85,7 @@ def category_detail(request, slug):
         'category': category, 'description_html': public_html(category.description),
         'ancestors': list(reversed(ancestors)),
         'children': [entry for entry in categories if entry.parent_id == category.pk],
-        'cards': cards, 'page_obj': page_obj,
+        'cards': housing_cards(page_obj), 'page_obj': page_obj, 'wishlist_ids': set(favorites),
         'canonical_path': canonical + (f'?page={page_obj.number}' if page_obj.number > 1 else ''),
         'page': SimpleNamespace(seo_title=category.meta_title or category.title, search_description=category.meta_description),
     })

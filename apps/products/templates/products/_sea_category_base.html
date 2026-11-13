@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load static %}
+{% block body_class %}sea-home sea-catalog sea-categories{% endblock %}
+{% block body_theme_class %}{% endblock %}
+{% block global_css %}
+<link rel="stylesheet" href="{% static 'css/header.css' %}">
+<link rel="stylesheet" href="{% static 'css/footer-legal.css' %}">
+<link rel="stylesheet" href="{% static 'home/css/sea-home.css' %}">
+<link rel="stylesheet" href="{% static 'products/css/sea_catalog.css' %}">
+<link rel="stylesheet" href="{% static 'products/css/sea_categories.css' %}">
+{% endblock %}
+{% block catalog_card_css %}{% endblock %}
+{% block site_header %}{% include 'home/sections/sea_header.html' %}{% endblock %}
+{% block extra_js %}{% if cards %}<script src="{% static 'products/js/wishlist.js' %}" defer></script>{% endif %}{% endblock %}

@@ -17,7 +17,9 @@ class MapNavigationTests(TestCase):
         for category in (self.region, self.child):
             response = self.client.get(category.get_absolute_url())
             self.assertContains(response, self.map.get_absolute_url()+'#housing-resort-map')
-            self.assertContains(response, 'Посмотреть жильё на карте')
+            self.assertContains(response, 'Жильё на карте')
+            self.assertContains(response, f'?category={category.slug}&amp;view=map')
+            self.assertContains(response, f'?category={category.slug}"')
         response = self.client.get(self.map.get_absolute_url())
         self.assertContains(response, 'Категории жилья этой карты')
         self.assertContains(response, self.region.get_absolute_url())

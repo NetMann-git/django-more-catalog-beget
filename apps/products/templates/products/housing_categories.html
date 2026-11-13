@@ -1,14 +1,23 @@
-{% extends "base.html" %}
-{% load static %}
-{% block body_class %}housing-category-page{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/housing_categories.css' %}">{% endblock %}
+{% extends "products/_sea_category_base.html" %}
 {% block content %}
-<main class="housing-category">
-  <nav class="housing-category__breadcrumbs" aria-label="Путь к категории"><a href="{% url 'home' %}">Главная</a></nav>
-  <h1>Категории жилья</h1><p><a href="{% url 'catalog:housing_catalog' %}">Подобрать жильё по параметрам →</a></p><p>Выберите курорт или тип размещения.</p>
-  <div class="housing-category__grid">
-  {% for root in roots %}<section class="housing-category__card housing-category__body"><h2><a href="{{ root.get_absolute_url }}">{{ root.title }}</a></h2><ul>{% for child in categories %}{% if child.parent_id == root.pk %}<li><a href="{{ child.get_absolute_url }}">{{ child.title }}</a></li>{% endif %}{% endfor %}</ul></section>
-  {% empty %}<p>Категории пока не добавлены.</p>{% endfor %}
+<main class="sea-home__container sea-catalog__main">
+  <nav class="sea-catalog__breadcrumb" aria-label="Путь к категории"><a href="{% url 'home' %}">Главная</a></nav>
+  <h1>Курорты и категории жилья</h1>
+  <div class="sea-categories__actions">
+    <a href="{% url 'catalog:housing_catalog' %}">Подобрать жильё по параметрам →</a>
+    <a href="{% url 'information:maps' %}">Карты курортов</a>
+  </div>
+  <div class="sea-home__grid sea-categories__grid">
+    {% for group in groups %}
+    <section class="sea-categories__group">
+      <h2><a href="{{ group.root.get_absolute_url }}">{{ group.root.title }}</a></h2>
+      {% if group.children %}
+      <ul class="sea-home__chips">
+        {% for child in group.children %}<li><a href="{{ child.get_absolute_url }}">{{ child.title }}</a></li>{% endfor %}
+      </ul>
+      {% endif %}
+    </section>
+    {% empty %}<p>Категории пока не добавлены.</p>{% endfor %}
   </div>
 </main>
 {% endblock %}

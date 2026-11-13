@@ -34,6 +34,6 @@ class HousingShellTests(TestCase):
         self.assertEqual(self.contacts.address, 'СТАРЫЙ АВТООФИС')
 
     def test_category_menu_active_for_categories_only(self):
-        self.assertContains(self.client.get('/catalog/categories/'), 'class="nav-link is-active">Категории жилья')
-        self.assertContains(self.client.get(self.category.get_absolute_url()), 'class="nav-link is-active">Категории жилья')
-        self.assertNotContains(self.client.get('/catalog/housing/'), 'class="nav-link is-active">Категории жилья')
+        self.assertContains(self.client.get('/catalog/categories/'), 'class="nav-link is-active" href="/catalog/categories/"')
+        self.assertContains(self.client.get(self.category.get_absolute_url()), 'class="nav-link is-active" href="/catalog/categories/"')
+        self.assertNotContains(self.client.get('/catalog/housing/'), 'class="nav-link is-active" href="/catalog/categories/"')
