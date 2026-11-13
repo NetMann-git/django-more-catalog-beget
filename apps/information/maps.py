@@ -56,9 +56,17 @@ def material_map(material):
     products = material_products(material)
     if products is None:
         return None
+    return housing_map_data(products)
+
+
+def housing_map_data(products, *, include_photos=False):
+    """Подготовить метки из уже отобранных объектов."""
     points = []
     types = {}
-    for product in products.select_related('brand'):
+    products = products.select_related('brand')
+    if include_photos:
+        products = products.prefetch_related('gallery')
+    for product in products:
         try:
             marker = coordinate_pair(product.map_coordinates)
         except ValidationError:
@@ -70,8 +78,14 @@ def material_map(material):
                 types[key] = {'value': key, 'label': label, 'count': 0,
                               'order': product.brand.sort_order if product.brand_id else 0}
             types[key]['count'] += 1
-            points.append({'housing_type': key, 'housing_type_label': label, 'id': product.pk, 'coordinates': marker, 'title': product.title,
-                           'address': product.address, 'url': product.get_absolute_url()})
+            point = {'housing_type': key, 'housing_type_label': label, 'id': product.pk, 'coordinates': marker, 'title': product.title,
+                           'address': product.address, 'url': product.get_absolute_url()}
+            if include_photos:
+                gallery = list(product.gallery.all())
+                cover = product.image or (gallery[0].image if gallery else None)
+                if cover:
+                    point['photo'] = cover.url
+            points.append(point)
     housing_types = sorted(types.values(), key=lambda row: (row['value'] == 'untyped', row['order'], row['label'].casefold(), row['value']))
     return {'points': points, 'housing_types': housing_types, 'tile_url': settings.MAP_EDITOR_TILE_URL,
             'attribution': settings.MAP_EDITOR_TILE_ATTRIBUTION}

@@ -92,6 +92,13 @@
                         const link = document.createElement('a'); link.href = point.url; link.textContent = point.title;
                         const address = document.createElement('p'); address.textContent = point.address;
                         const kind = document.createElement('p'); kind.className = 'info-map__type-label'; kind.textContent = point.housing_type_label || '';
+                        if (point.photo && members.length === 1) {
+                            const photo = document.createElement('img');
+                            photo.className = 'info-map__popup-photo';
+                            photo.alt = '';
+                            photo.src = point.photo;
+                            item.append(photo);
+                        }
                         item.append(link, kind, address); list.append(item);
                     });
                     const close = document.createElement('button'); close.type='button'; close.textContent='Закрыть';

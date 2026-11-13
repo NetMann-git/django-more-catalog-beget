@@ -1,21 +1,96 @@
 {% extends "base.html" %}
-{% load static %}
-{% block body_class %}housing-category-page{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/housing_categories.css' %}">{% endblock %}
+{% load static price_format %}
+{% block body_class %}sea-home sea-catalog{% endblock %}
+{% block body_theme_class %}{% endblock %}
+{% block global_css %}
+<link rel="stylesheet" href="{% static 'css/header.css' %}">
+<link rel="stylesheet" href="{% static 'css/footer-legal.css' %}">
+<link rel="stylesheet" href="{% static 'home/css/sea-home.css' %}">
+<link rel="stylesheet" href="{% static 'products/css/sea_catalog.css' %}">
+{% if map_view %}<link rel="stylesheet" href="{% static 'information/information.css' %}"><link rel="stylesheet" href="{% static 'products/vendor/openlayers/ol.css' %}">{% endif %}
+{% endblock %}
+{% block catalog_card_css %}{% endblock %}
+{% block site_header %}{% include 'home/sections/sea_header.html' %}{% endblock %}
+{% block extra_js %}
+<script src="{% static 'products/js/wishlist.js' %}" defer></script>
+<script src="{% static 'products/js/sea_catalog.js' %}" defer></script>
+{% if map_data.points %}<script src="{% static 'products/vendor/openlayers/ol.js' %}" defer></script><script src="{% static 'information/maps.js' %}" defer></script>{% endif %}
+{% endblock %}
 {% block content %}
-<main class="housing-category">
-  <nav class="housing-category__breadcrumbs" aria-label="Путь к каталогу"><a href="{% url 'home' %}">Главная</a> / <a href="{% url 'catalog:category_index' %}">Категории жилья</a></nav>
-  <h1>Подбор жилья</h1>
-  <form method="get" class="housing-filter" action="{% url 'catalog:housing_catalog' %}">
-    {% for field in filter_form %}<div class="housing-filter__field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}<div class="housing-filter__error" role="alert">{{ field.errors }}</div>{% endif %}</div>{% endfor %}
-    <div class="housing-filter__actions"><button type="submit">Найти жильё</button><a href="{% url 'catalog:housing_catalog' %}">Сбросить</a></div>
-  </form>
-  {% if filter_form.errors %}<p role="status">Проверьте выбранные условия поиска.</p>{% else %}<p class="housing-category__count">Найдено объектов: {{ page_obj.paginator.count }}</p>{% endif %}
-  {% include "products/_housing_cards.html" with empty_text="По выбранным условиям жильё не найдено. Попробуйте другую категорию или сбросьте фильтры." %}
-  {% if page_obj.paginator.num_pages > 1 %}<nav class="housing-category__pagination" aria-label="Страницы объектов">
-    {% if page_obj.has_previous %}<a href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_obj.previous_page_number }}" rel="prev">← Назад</a>{% endif %}
-    <span aria-current="page">{{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
-    {% if page_obj.has_next %}<a href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_obj.next_page_number }}" rel="next">Далее →</a>{% endif %}
-  </nav>{% endif %}
+<main class="sea-home__container sea-catalog__main">
+  <nav class="sea-catalog__breadcrumb" aria-label="Путь к каталогу"><a href="{% url 'home' %}">Главная</a> / <a href="{% url 'catalog:category_index' %}">Категории жилья</a></nav>
+  <h1>{% if selected_category %}{{ selected_category.title }} — жильё{% else %}Подбор жилья{% endif %}</h1>
+  <div class="sea-catalog__layout">
+    <details class="sea-catalog__filters" open>
+      <summary>Фильтры</summary>
+      <h2>Фильтры</h2>
+      <form method="get" action="{% url 'catalog:housing_catalog' %}">
+        {% if map_view %}<input type="hidden" name="view" value="map">{% endif %}
+        {% for field in filter_form %}
+          {% if field.name != 'amenities' %}
+          <div class="sea-home__field">{{ field.label_tag }}{{ field }}{{ field.errors }}</div>
+          {% elif field.field.queryset or field.errors %}
+          <fieldset><legend>{{ field.label }}</legend>{{ field }}{{ field.errors }}</fieldset>
+          {% endif %}
+        {% endfor %}
+        <button type="submit" class="sea-home__button">Показать варианты</button>
+      </form>
+    </details>
+    <section class="sea-catalog__results" aria-label="Результаты подбора">
+      <div class="sea-catalog__toolbar">
+        <nav aria-label="Вид выдачи">
+          <a href="?{{ pagination_query }}" {% if not map_view %}aria-current="page"{% endif %}>Список</a>
+          <a href="?{{ map_query }}" {% if map_view %}aria-current="page"{% endif %}>На карте</a>
+        </nav>
+        <span>Найдено объектов: {{ result_count }}</span>
+      </div>
+      {% if filter_chips or filter_form.errors %}
+      <nav class="sea-home__chips sea-catalog__chips" aria-label="Выбранные фильтры">
+        {% for chip in filter_chips %}<a href="?{{ chip.query }}" aria-label="Снять фильтр: {{ chip.label }}">{{ chip.label }} ×</a>{% endfor %}
+        <a class="sea-home__chip-link" href="?{% if map_view %}view=map{% endif %}">Сбросить</a>
+      </nav>
+      {% endif %}
+      {% if filter_form.errors %}<p role="status">Проверьте выбранные условия поиска.</p>{% endif %}
+      {% if map_view and map_data.points %}
+      <section class="info-map" aria-label="Жильё на карте">
+        <p>На карте {{ map_data.points|length }} из {{ result_count }} объектов с указанными координатами.</p>
+        <button type="button" class="sea-home__button info-map__load">Показать карту</button>
+        <div class="info-map__canvas" hidden tabindex="0" aria-label="Интерактивная карта"></div>
+        <button type="button" class="info-map__all" hidden>Показать все метки</button>
+        <p class="info-map__status" role="status"></p>
+        {{ map_data|json_script:"information-map-data" }}
+        <details class="info-map__objects"><summary>Объекты с координатами</summary>
+          <ul>{% for point in map_data.points %}<li><a href="{{ point.url }}">{{ point.title }}</a>{% if point.address %} — {{ point.address }}{% endif %}</li>{% endfor %}</ul>
+        </details>
+      </section>
+      {% elif map_view and result_count %}
+        <p>У найденных объектов пока нет координат. <a href="?{{ pagination_query }}">Посмотреть список</a></p>
+      {% elif cards %}
+      <div class="sea-catalog__cards">
+        {% for card in cards %}{% with product=card.product %}
+        <article class="sea-home__listing">
+          <a class="sea-home__photo" href="{{ product.get_absolute_url }}" aria-label="{{ product.title }}">{% if card.cover %}<img src="{{ card.cover.url }}" alt="" loading="lazy" decoding="async">{% else %}<span>Фото пока нет</span>{% endif %}</a>
+          <div class="sea-home__listing-body">
+            <h2><a href="{{ product.get_absolute_url }}">{{ product.title }}</a></h2>
+            {% if product.location or product.address %}<p>{% if product.location %}{{ product.location.name }}{% else %}{{ product.address }}{% endif %}</p>{% endif %}
+            {% if product.brand %}<p>{{ product.brand.name }}</p>{% endif %}
+            {% if product.catalog_amenities %}<ul class="sea-catalog__amenities">{% for row in product.catalog_amenities|slice:":3" %}<li>{{ row.attribute_value.value }}</li>{% endfor %}</ul>{% endif %}
+            <p class="sea-home__price">{% product_price product %}</p>
+            <a class="sea-catalog__details" href="{{ product.get_absolute_url }}">Подробнее →</a>
+            {% include 'wishlist/_button.html' %}
+          </div>
+        </article>
+        {% endwith %}{% endfor %}
+      </div>
+      {% else %}
+        <p>По выбранным условиям жильё не найдено. Измените фильтры или снимите одно из условий.</p>
+      {% endif %}
+      {% if page_obj.paginator.num_pages > 1 %}<nav class="sea-catalog__pagination" aria-label="Страницы объектов">
+        {% if page_obj.has_previous %}<a href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_obj.previous_page_number }}" rel="prev">← Назад</a>{% endif %}
+        <span aria-current="page">{{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}<a href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_obj.next_page_number }}" rel="next">Далее →</a>{% endif %}
+      </nav>{% endif %}
+    </section>
+  </div>
 </main>
 {% endblock %}

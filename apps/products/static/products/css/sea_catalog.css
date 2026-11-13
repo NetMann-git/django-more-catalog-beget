@@ -1,0 +1,63 @@
+.sea-catalog__main { padding-block: 20px 48px; }
+.sea-catalog__breadcrumb { margin-bottom: 12px; color: var(--sea-text); }
+.sea-catalog h1 { margin-bottom: 24px; font-size: clamp(2.3rem, 4vw, 4rem); overflow-wrap: anywhere; }
+.sea-catalog__layout { display: grid; grid-template-columns: minmax(230px, 265px) minmax(0, 1fr); align-items: start; gap: 22px; }
+.sea-catalog__filters { padding: 16px; border: 1px solid var(--sea-line); border-radius: 14px; background: var(--sea-card); }
+.sea-catalog__filters > h2 { font-size: 1.65rem; margin-bottom: 14px; }
+.sea-catalog__filters summary { cursor: pointer; font-weight: 700; padding-block: 8px; }
+.sea-catalog__filters form { display: grid; gap: 14px; }
+.sea-catalog__filters input:not([type="checkbox"]), .sea-catalog__filters select {
+    width: 100%; min-height: 44px; padding: 8px; border: 1px solid #bfb8aa;
+    border-radius: 8px; background: white; color: var(--sea-ink); font: inherit;
+}
+.sea-catalog__filters fieldset { min-width: 0; margin: 0; padding: 8px 10px; border: 1px solid var(--sea-line); border-radius: 8px; }
+.sea-catalog__filters legend { font-weight: 650; }
+.sea-catalog__filters fieldset label { display: flex; align-items: center; gap: 7px; min-height: 32px; overflow-wrap: anywhere; }
+.sea-catalog__filters input[type="checkbox"] { accent-color: var(--sea-teal); }
+.sea-catalog__filters .errorlist { margin: 6px 0 0; padding-left: 18px; color: #9a2424; }
+.sea-catalog__toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px 16px; margin-bottom: 14px; }
+.sea-catalog__toolbar nav { display: flex; gap: 8px; }
+.sea-catalog__toolbar a, .sea-catalog__details, .sea-catalog__pagination a {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 44px; padding: 6px 16px; border: 1px solid var(--sea-teal);
+    border-radius: 8px; color: var(--sea-teal-dark); font-weight: 650; text-decoration: none;
+}
+.sea-catalog__toolbar a:hover, .sea-catalog__pagination a:hover { background: #e6eeea; }
+.sea-catalog__toolbar [aria-current], .sea-catalog__details { background: var(--sea-teal); color: white; }
+.sea-catalog__toolbar [aria-current]:hover, .sea-catalog__details:hover { background: var(--sea-teal-dark); }
+.sea-catalog__chips { margin-bottom: 14px; overflow-wrap: anywhere; }
+.sea-catalog__cards { display: grid; gap: 14px; }
+.sea-catalog .sea-home__listing { display: grid; grid-template-columns: minmax(0, 44fr) minmax(0, 56fr); }
+.sea-catalog .sea-home__photo { position: relative; min-height: 175px; height: 100%; border-radius: 13px 0 0 13px; }
+.sea-catalog .sea-home__photo img { position: absolute; inset: 0; }
+.sea-catalog .sea-home__listing h2 { margin: 0 0 6px; font-size: clamp(1.3rem, 2.5vw, 2.05rem); }
+.sea-catalog .sea-home__listing h2 a { text-decoration: none; }
+.sea-catalog .sea-home__listing h2 a:hover { text-decoration: underline; }
+.sea-catalog .sea-home__listing-body { padding: 16px 62px 16px 16px; }
+.sea-catalog__details { margin-top: 10px; }
+.sea-catalog__amenities { display: flex; flex-wrap: wrap; gap: 5px; list-style: none; margin: 8px 0 0; padding: 0; }
+.sea-catalog__amenities li { border-radius: 16px; background: #ebe8da; padding: 3px 9px; font-size: .86rem; }
+.sea-catalog__pagination { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+.sea-catalog .info-map__canvas { border-radius: 10px; }
+@media (min-width: 761px) {
+    .sea-catalog__filters summary { display: none; }
+}
+@media (max-width: 760px) {
+    .sea-catalog__layout { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+    .sea-catalog__filters { padding-block: 2px; }
+    .sea-catalog__filters form { padding-bottom: 12px; }
+    .sea-catalog__filters > h2 { display: none; }
+    .sea-catalog__filters summary { min-height: 44px; }
+}
+@media (max-width: 560px) {
+    .sea-catalog .sea-home__listing { grid-template-columns: minmax(0, 1fr); }
+    .sea-catalog .sea-home__photo { height: auto; border-radius: 13px 13px 0 0; }
+}
+
+.sea-catalog .info-map__popup-photo {
+    display: block;
+    width: 100%;
+    height: 105px;
+    object-fit: cover;
+    border-radius: 6px;
+}

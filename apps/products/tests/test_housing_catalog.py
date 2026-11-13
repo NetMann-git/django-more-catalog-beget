@@ -62,3 +62,30 @@ class HousingCatalogTests(TestCase):
         self.assertNotContains(response, '<script>alert(1)</script>')
         self.assertContains(response, '/catalog/housing/')
         self.assertContains(self.client.get('/catalog/categories/'), 'Подобрать жильё по параметрам')
+
+    def test_price_and_amenities_apply_to_list_and_entire_map(self):
+        from apps.products.models import AttributeType, AttributeValue, ProductAttribute
+
+        kind = AttributeType.objects.create(name='Удобства', slug='amenities', allow_multiple=True)
+        wifi = AttributeValue.objects.create(attribute_type=kind, value='Wi-Fi')
+        parking = AttributeValue.objects.create(attribute_type=kind, value='Парковка')
+        self.obj.price = 3000
+        self.obj.map_coordinates = '39.9,43.4'
+        self.obj.image = 'housing/orion.webp'
+        self.obj.save()
+        self.unknown.price = 3000
+        self.unknown.map_coordinates = '39.8,43.5'
+        self.unknown.save()
+        for product, value in [(self.obj, wifi), (self.obj, parking), (self.unknown, wifi)]:
+            ProductAttribute.objects.create(product=product, attribute_type=kind, attribute_value=value)
+        params = {'price_min': '2000', 'price_max': '4000', 'amenities': [wifi.pk, parking.pk]}
+        listing = self.get(**params)
+        self.assertEqual(list(listing.context['page_obj']), [self.obj])
+        self.assertContains(listing, 'Снять фильтр: Wi-Fi')
+        self.assertIn(f'amenities={parking.pk}', listing.context['map_query'])
+        mapped = self.get(**params, view='map', page=2)
+        self.assertEqual(mapped.context['result_count'], 1)
+        self.assertEqual([point['id'] for point in mapped.context['map_data']['points']], [self.obj.pk])
+        self.assertEqual(mapped.context['map_data']['points'][0]['photo'], self.obj.image.url)
+        self.assertIn(f'amenities={wifi.pk}', mapped.context['pagination_query'])
+        self.assertTrue(self.get(price_min=4000, price_max=2000).context['filter_form'].errors)
