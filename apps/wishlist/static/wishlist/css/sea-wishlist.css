@@ -1,0 +1,40 @@
+.sea-wishlist__heading, .sea-wishlist__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 20px;
+    margin-bottom: 18px;
+}
+.sea-wishlist .sea-wishlist__heading h1 { margin: 0; }
+.sea-wishlist__count {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: #ebe8da;
+    font: 600 1rem/1.4 system-ui, sans-serif;
+    vertical-align: middle;
+    letter-spacing: normal;
+}
+.sea-wishlist__actions { margin-top: 18px; }
+.sea-wishlist__actions button {
+    min-height: 44px;
+    padding: 8px 14px;
+    border: 1px solid var(--sea-line);
+    border-radius: 8px;
+    background: var(--sea-card);
+    color: var(--sea-ink);
+    font: inherit;
+    cursor: pointer;
+}
+.sea-wishlist__actions button:hover { border-color: var(--sea-teal); }
+.sea-wishlist__note { color: var(--sea-text); }
+.sea-wishlist__empty {
+    padding: clamp(18px, 5vw, 44px);
+    border: 1px solid var(--sea-line);
+    border-radius: 12px;
+    background: var(--sea-card);
+}
+.sea-wishlist .sea-wishlist__empty h2 { font-size: clamp(1.25rem, 3vw, 1.75rem); }
+.sea-wishlist .compare-btn { background: var(--sea-card); color: var(--sea-teal-dark); cursor: pointer; font-family: inherit; }
+.sea-wishlist .compare-btn.active, .sea-wishlist .compare-btn:hover { background: #e6eeea; }

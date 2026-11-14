@@ -1,6 +1,8 @@
 # apps\wishlist\views.py
 
 from django.http import JsonResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView
@@ -10,6 +12,7 @@ from apps.products.models import Product
 from .models import Favorite
 
 
+@method_decorator(ensure_csrf_cookie, name="dispatch")
 class WishlistView(ListView):
     model = Favorite
     template_name = "wishlist/wishlist.html"
@@ -18,7 +21,7 @@ class WishlistView(ListView):
 
     def get_queryset(self):
         if self.request.user.is_authenticated:
-            return Favorite.objects.filter(user=self.request.user, product__is_active=True).select_related("product", "product__brand").prefetch_related("product__gallery")
+            return Favorite.objects.filter(user=self.request.user, product__is_active=True).select_related("product", "product__brand", "product__location").prefetch_related("product__gallery")
         return Favorite.objects.none()  # для гостей пустой queryset, товары будем брать из сессии
 
     def get_context_data(self, **kwargs):
@@ -31,7 +34,7 @@ class WishlistView(ListView):
             wishlist_ids = self.request.session.get('wishlist', [])
             by_id = {product.pk: product for product in
                      Product.objects.filter(pk__in=wishlist_ids, is_active=True)
-                     .select_related('brand').prefetch_related('gallery')}
+                     .select_related('brand', 'location').prefetch_related('gallery')}
             products = [by_id[pk] for pk in reversed(list(dict.fromkeys(wishlist_ids)))
                         if pk in by_id]
             wishlist_ids = [product.pk for product in products]

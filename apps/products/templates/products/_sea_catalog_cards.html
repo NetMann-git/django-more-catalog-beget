@@ -1,5 +1,5 @@
 {% load price_format %}
-      <div class="sea-catalog__cards">
+      <div class="sea-catalog__cards"{% if wishlist_page %} id="wishlist-grid"{% endif %}>
         {% for card in cards %}{% with product=card.product %}
         <article class="sea-home__listing">
           <a class="sea-home__photo" href="{{ product.get_absolute_url }}" aria-label="{{ product.title }}">{% if card.cover %}<img src="{{ card.cover.url }}" alt="" loading="lazy" decoding="async">{% else %}<span>Фото пока нет</span>{% endif %}</a>
@@ -11,6 +11,9 @@
             {% if product.catalog_amenities %}<ul class="sea-catalog__amenities">{% for row in product.catalog_amenities|slice:":3" %}<li>{{ row.attribute_value.value }}</li>{% endfor %}</ul>{% endif %}
             <p class="sea-home__price">{% product_price product %}</p>
             <a class="sea-catalog__details" href="{{ product.get_absolute_url }}">Подробнее →</a>
+            {% if wishlist_page %}
+            <button class="sea-catalog__details compare-btn{% if product.id in comparison_ids %} active{% endif %}" data-product-id="{{ product.id }}" data-url="{% url 'catalog:toggle_comparison_ajax' product.id %}" type="button"><span>{% if product.id in comparison_ids %}Убрать{% else %}Сравнить{% endif %}</span></button>
+            {% endif %}
             {% include 'wishlist/_button.html' %}
           </div>
         </article>

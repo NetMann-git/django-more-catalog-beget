@@ -1,65 +1,36 @@
-<!-- apps\wishlist\templates\wishlist\wishlist.html -->
-
-{% extends "base.html" %}
+{% extends "products/_sea_category_base.html" %}
 {% load static %}
 
-{% block extra_css %}
-    {{ block.super }}
-    <link rel="stylesheet" href="{% static 'products/css/catalog/catalog.css' %}">
-    <link rel="stylesheet" href="{% static 'products/css/housing_categories.css' %}">
-    <link rel="stylesheet" href="{% static 'wishlist/css/wishlist-page.css' %}">
+{% block title %}Избранное{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'wishlist/css/sea-wishlist.css' %}">{% endblock %}
+{% block extra_js %}
+{{ block.super }}
+<script src="{% static 'products/js/comparison.js' %}" defer></script>
 {% endblock %}
 
-{% block title %}Избранное{% endblock %}
-
 {% block content %}
-<div class="container wishlist-page housing-wishlist-page">
-    <!-- Хлебные крошки -->
-    <nav class="breadcrumbs" aria-label="Хлебные крошки">
-        <a href="/">Главная</a>
-        <span>/</span>
-        <span>Избранное</span>
-    </nav>
-    <header class="wishlist-page__header">
-        <div>
-            <p class="wishlist-page__eyebrow">Ваш выбор</p>
-            <h1>Избранное жильё <span class="wishlist-page__count" data-wishlist-count>{{ products|length }}</span></h1>
-            <p class="wishlist-page__intro">Сохраняйте интересные варианты, сравнивайте и выбирайте жильё для отдыха.</p>
-        </div>
-        <a class="wishlist-page__catalog" href="{% url 'catalog:housing_catalog' %}">Продолжить выбор →</a>
+<main class="sea-home__container sea-catalog__main sea-wishlist">
+    <nav class="sea-catalog__breadcrumb" aria-label="Хлебные крошки"><a href="{% url 'home' %}">Главная</a> / <span aria-current="page">Избранное</span></nav>
+    <header class="sea-wishlist__heading">
+        <h1>Избранное <span class="sea-wishlist__count" data-wishlist-count aria-live="polite">{{ products|length }}</span></h1>
+        {% if products %}<a href="{% url 'catalog:housing_catalog' %}">Продолжить выбор →</a>{% endif %}
     </header>
 
-    <!-- Блок с карточками товаров (виден, если есть товары) -->
-    <div id="wishlist-products" {% if not products %}style="display:none;"{% endif %}>
-        <div class="housing-category__grid" id="wishlist-grid">
-            {% for card in cards %}
-                {% include "products/_housing_history_card.html" with product=card.product %}
-            {% endfor %}
+    <div id="wishlist-products"{% if not products %} style="display:none"{% endif %}>
+        {% include "products/_sea_catalog_cards.html" with wishlist_page=True %}
+        <div class="sea-wishlist__actions">
+            <a href="{% url 'catalog:comparison' %}">К сравнению</a>
+            <button type="button" id="clear-wishlist" data-url="{% url 'wishlist:clear' %}">Очистить избранное</button>
         </div>
-
-        <button type="button"
-                id="clear-wishlist"
-                class="wishlist-page__clear"
-                data-url="{% url 'wishlist:clear' %}">
-            Очистить избранное
-        </button>
-
         {% if is_guest %}
-            <p class="wishlist-note">
-                Вы сохраняете объекты жилья как гость. Список связан с текущей сессией браузера.
-                <a href="{% url 'users:login' %}?next={{ request.path }}">Войдите</a> или зарегистрируйтесь, для работы с избранным в личном кабинете.
-            </p>
+        <p class="sea-wishlist__note">Список сохранён в текущем браузере. <a href="{% url 'users:login' %}?next={{ request.path|urlencode }}">Войти в аккаунт</a></p>
         {% endif %}
     </div>
 
-    <!-- Сообщение, если избранное пусто -->
-    <div class="wishlist-page__empty" id="empty-wishlist" {% if products %}style="display:none;"{% endif %}>
-        <div class="wishlist-page__empty-icon" aria-hidden="true">♡</div>
+    <section class="sea-wishlist__empty" id="empty-wishlist"{% if products %} style="display:none"{% endif %}>
         <h2>Здесь будут ваши избранные объекты жилья</h2>
-        <p>Нажмите «В избранное» на понравившейся карточке — объект появится в этом списке.</p>
-        <a href="{% url 'catalog:housing_catalog' %}" class="wishlist-page__catalog wishlist-page__catalog--primary">Подобрать жильё</a>
-    </div>
-
-
-</div>
+        <p>Нажмите на сердечко на карточке жилья, чтобы сохранить её.</p>
+        <a class="sea-catalog__details" href="{% url 'catalog:housing_catalog' %}">Подобрать жильё</a>
+    </section>
+</main>
 {% endblock %}
