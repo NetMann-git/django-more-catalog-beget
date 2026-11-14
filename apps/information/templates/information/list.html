@@ -1,17 +1,5 @@
-{% extends "base.html" %}
-{% load static %}
-{% block body_class %}sea-home sea-guide{% if not category and not maps_only %} sea-guide-index{% endif %}{% endblock %}
-{% block body_theme_class %}{% endblock %}
-{% block global_css %}
-<link rel="stylesheet" href="{% static 'css/header.css' %}">
-<link rel="stylesheet" href="{% static 'css/footer-legal.css' %}">
-<link rel="stylesheet" href="{% static 'home/css/sea-home.css' %}">
-<link rel="stylesheet" href="{% static 'information/information.css' %}">
-<link rel="stylesheet" href="{% static 'information/guide.css' %}">
-{% endblock %}
-{% block catalog_card_css %}{% endblock %}
-{% block site_header %}{% include 'home/sections/sea_header.html' %}{% endblock %}
-{% block extra_js %}{% endblock %}
+{% extends "information/_guide_base.html" %}
+{% block body_class %}{{ block.super }}{% if not category and not maps_only %} sea-guide-index{% endif %}{% endblock %}
 {% block content %}<main class="info-page">
 <nav class="info-breadcrumbs" aria-label="Путь к странице"><a href="{% url 'home' %}">Главная</a> / <a href="{% url 'information:index' %}">Путеводитель</a>{% for ancestor in category_ancestors %} / <a href="{% url 'information:category' ancestor.slug %}">{{ ancestor.title }}</a>{% endfor %}{% if category %} / <span aria-current="page">{{ category.title }}</span>{% elif maps_only %} / <span aria-current="page">Материалы с картами</span>{% endif %}</nav>
 <h1>{% if category %}{{ title }}{% elif maps_only %}Карты курортов{% else %}Путеводитель{% endif %}</h1>{% if category_description %}<div class="info-page__text info-page__description">{{ category_description }}</div>{% endif %}

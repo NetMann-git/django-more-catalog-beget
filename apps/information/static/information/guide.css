@@ -42,3 +42,41 @@
 @media (min-width: 1440px) {
     .sea-guide-index .info-page__grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 }
+
+.sea-guide-detail .info-page { max-width: 1120px; }
+.guide-article-header,
+.sea-guide-detail .info-page__text { max-width: 76ch; }
+.guide-article-header h1 { margin: 0 0 12px; }
+.guide-article-header .info-page__subtitle { color: var(--sea-text); margin: 0 0 16px; }
+.guide-article-header .info-page__cover {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    object-position: left center;
+    margin: 16px 0 8px;
+}
+.sea-guide-detail .info-page__text { line-height: 1.75; }
+.sea-guide-detail .info-page__text img { height: auto; }
+.sea-guide-detail .info-page__text pre { overflow-wrap: anywhere; }
+.sea-guide-detail .info-map {
+    scroll-margin-top: 90px;
+    padding: clamp(12px, 3vw, 24px);
+    border: 1px solid var(--sea-line);
+    border-radius: 12px;
+    background: var(--sea-card);
+}
+.sea-guide-detail .info-map > button,
+.sea-guide-detail .info-map__filter-controls button {
+    min-height: 44px;
+    padding: 8px 14px;
+    border: 1px solid var(--sea-teal);
+    border-radius: 8px;
+    background: var(--sea-card);
+    color: var(--sea-teal-dark);
+    font: inherit;
+    cursor: pointer;
+}
+.sea-guide-detail .info-map .info-map__load { background: var(--sea-teal); color: white; }
+.sea-guide-detail .info-map > button:disabled,
+.sea-guide-detail .info-map__filter-controls button:disabled { cursor: default; opacity: .6; }
+.sea-guide-detail .info-map__objects summary { padding-block: 10px; cursor: pointer; }
