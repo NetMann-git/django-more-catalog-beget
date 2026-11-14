@@ -48,3 +48,20 @@ class InformationSearchTests(TestCase):
         response = self.client.get('/search/', {'query': 'водопады'})
         self.assertNotContains(response, '<script>bad()</script>')
         self.assertContains(response, '&lt;script&gt;')
+
+    def test_scope_filters_before_pagination_and_stays_in_links(self):
+        for number in range(12):
+            InformationMaterial.objects.create(
+                joomla_id=12000 + number, kind='info', title=f'Водопады {number:02}',
+                slug=f'waterfall-{number}', is_active=True,
+            )
+        url = '/search/'
+        response = self.client.get(url, {'query': 'водопад', 'scope': 'information'})
+        self.assertEqual(response.context['search_results'].paginator.count, 13)
+        self.assertContains(response, '&amp;scope=information&amp;page=2')
+        self.assertNotContains(response, self.product.get_absolute_url())
+
+        response = self.client.get(url, {'query': 'водопад', 'scope': 'housing', 'page': 2})
+        self.assertEqual(response.context['search_results'].paginator.count, 1)
+        self.assertContains(response, self.product.get_absolute_url())
+        self.assertNotContains(response, self.material.get_absolute_url())

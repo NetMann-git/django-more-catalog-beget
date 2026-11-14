@@ -1,9 +1,11 @@
 # apps/search/views.py
 
+from urllib.parse import urlencode
+
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.template.response import TemplateResponse
 from django.http import JsonResponse
-from django.views.decorators.cache import cache_page
+from django.urls import reverse
 from django.views.decorators.vary import vary_on_headers
 
 from .services import SearchService
@@ -39,8 +41,25 @@ def suggest(request):
 def search(request):
     """Общие результаты поиска жилья и материалов по каноническим адресам."""
     search_query = request.GET.get('query', '').strip()[:120]
-    queryset = SearchService.combined_search(search_query)
-    paginator = Paginator(queryset, 12)
+    results = SearchService.combined_search(search_query)
+    scope = request.GET.get('scope', '')
+    if scope not in ('housing', 'information'):
+        scope = ''
+    search_url = reverse('search:search')
+    tabs = [
+        {
+            'label': label,
+            'url': search_url + '?' + urlencode({'query': search_query, 'scope': key}),
+            'active': scope == key,
+        }
+        for key, label in (('', 'Все результаты'), ('housing', 'Жильё'), ('information', 'Материалы'))
+    ]
+    if scope:
+        results = [
+            row for row in results
+            if row['kind'] == scope
+        ]
+    paginator = Paginator(results, 12)
     try:
         page = paginator.page(request.GET.get('page', 1))
     except PageNotAnInteger:
@@ -61,5 +80,6 @@ def search(request):
         result_cards.append({**row, 'image_url': image_url})
     return TemplateResponse(request, 'search/search.html', {
         'search_query': search_query, 'search_results': page,
+        'search_scope': scope, 'search_tabs': tabs,
         'cards': cards, 'result_cards': result_cards, 'housing_public_page': True,
     })

@@ -1,0 +1,32 @@
+.sea-search__form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 16px;
+    border: 1px solid var(--sea-line);
+    border-radius: 12px;
+    background: var(--sea-card);
+}
+.sea-search__form .sea-home__field { flex: 1 1 250px; min-width: 0; }
+.sea-search__form input[type="search"] {
+    width: 100%;
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 1px solid #bfb8aa;
+    border-radius: 8px;
+    color: var(--sea-ink);
+    font: inherit;
+}
+.sea-search__actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.sea-search .sea-home__listing { min-width: 0; }
+.sea-search .sea-home__listing-body { padding: 16px; }
+.sea-search .sea-home__listing h2 {
+    margin-block: 6px;
+    font: 700 1.125rem/1.4 system-ui, sans-serif;
+    letter-spacing: normal;
+}
+.sea-search .sea-home__photo { overflow: hidden; }
+.sea-search .sea-home__photo img { min-height: 0; }
+.sea-search__kind { font-size: .875rem; }
