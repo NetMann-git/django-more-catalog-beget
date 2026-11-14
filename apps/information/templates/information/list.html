@@ -1,14 +1,34 @@
-{% extends "base.html" %}{% load static %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'information/information.css' %}">{% endblock %}
+{% extends "base.html" %}
+{% load static %}
+{% block body_class %}sea-home sea-guide{% endblock %}
+{% block body_theme_class %}{% endblock %}
+{% block global_css %}
+<link rel="stylesheet" href="{% static 'css/header.css' %}">
+<link rel="stylesheet" href="{% static 'css/footer-legal.css' %}">
+<link rel="stylesheet" href="{% static 'home/css/sea-home.css' %}">
+<link rel="stylesheet" href="{% static 'information/information.css' %}">
+<link rel="stylesheet" href="{% static 'information/guide.css' %}">
+{% endblock %}
+{% block catalog_card_css %}{% endblock %}
+{% block site_header %}{% include 'home/sections/sea_header.html' %}{% endblock %}
+{% block extra_js %}{% endblock %}
 {% block content %}<main class="info-page">
-<nav class="info-breadcrumbs" aria-label="Путь к странице"><a href="{% url 'home' %}">Главная</a> / <a href="{% url 'information:index' %}">Информация</a>{% for ancestor in category_ancestors %} / <a href="{% url 'information:category' ancestor.slug %}">{{ ancestor.title }}</a>{% endfor %}{% if category %} / <span aria-current="page">{{ category.title }}</span>{% elif maps_only %} / <span aria-current="page">Материалы с картами</span>{% endif %}</nav>
-<h1>{{ title }}</h1>{% if category_description %}<div class="info-page__text info-page__description">{{ category_description }}</div>{% endif %}
+<nav class="info-breadcrumbs" aria-label="Путь к странице"><a href="{% url 'home' %}">Главная</a> / <a href="{% url 'information:index' %}">Путеводитель</a>{% for ancestor in category_ancestors %} / <a href="{% url 'information:category' ancestor.slug %}">{{ ancestor.title }}</a>{% endfor %}{% if category %} / <span aria-current="page">{{ category.title }}</span>{% elif maps_only %} / <span aria-current="page">Материалы с картами</span>{% endif %}</nav>
+<h1>{% if category %}{{ title }}{% elif maps_only %}Карты курортов{% else %}Путеводитель{% endif %}</h1>{% if category_description %}<div class="info-page__text info-page__description">{{ category_description }}</div>{% endif %}
 {% if subcategories %}<section class="info-subcategories" aria-labelledby="info-subcategories-title"><h2 id="info-subcategories-title">Подкатегории</h2><nav class="info-page__categories" aria-label="Подкатегории материалов">{% for child in subcategories %}<a href="{% url 'information:category' child.slug %}{% if search_query_string %}?{{ search_query_string }}{% endif %}">{{ child.title }}</a>{% endfor %}</nav></section>{% endif %}
-<nav class="info-page__categories" aria-label="Категории материалов"><a href="{% url 'information:index' %}{% if search_query_string %}?{{ search_query_string }}{% endif %}"{% if not category and not maps_only %} aria-current="page"{% endif %}>Все материалы</a><a href="{% url 'information:maps' %}{% if search_query_string %}?{{ search_query_string }}{% endif %}"{% if maps_only %} aria-current="page"{% endif %}>Материалы с картами</a>{% for row in categories %}<a href="{% url 'information:category' row.slug %}{% if search_query_string %}?{{ search_query_string }}{% endif %}"{% if category.pk == row.pk %} aria-current="page"{% endif %}>{{ row.title }}</a>{% endfor %}</nav>
+<nav class="info-page__categories" aria-label="Категории материалов"><a href="{% url 'information:index' %}{% if search_query_string %}?{{ search_query_string }}{% endif %}"{% if not category and not maps_only %} aria-current="page"{% endif %}>Все материалы</a><a href="{% url 'information:maps' %}{% if search_query_string %}?{{ search_query_string }}{% endif %}"{% if maps_only %} aria-current="page"{% endif %}>Карты курортов</a></nav>
 <form class="info-search" method="get" action="{{ request.path }}" role="search" aria-label="Поиск в текущем разделе материалов">
 <div><label for="{{ search_form.q.id_for_label }}">{{ search_form.q.label }}</label>{{ search_form.q }}{{ search_form.q.errors }}</div>
 <div class="info-search__actions"><button type="submit">Найти</button>{% if search_active %}<a href="{{ request.path }}">Сбросить поиск</a>{% endif %}</div></form>
+{% if categories %}
+<details class="guide-topics"{% if category %} open{% endif %}>
+  <summary>Темы путеводителя</summary>
+  <nav class="info-page__categories" aria-label="Темы путеводителя">{% for row in categories %}<a href="{% url 'information:category' row.slug %}{% if search_query_string %}?{{ search_query_string }}{% endif %}"{% if category.pk == row.pk %} aria-current="page"{% endif %}>{{ row.title }}</a>{% endfor %}</nav>
+
+</details>
+{% endif %}
+
 <p>{% if search_active %}Найдено материалов{% else %}Материалов{% endif %}: {{ page_obj.paginator.count }}</p>
-<div class="info-page__grid">{% for material in page_obj %}<article class="info-page__card">{% with cover=material.cover_url %}{% if cover %}<a href="{{ material.get_absolute_url }}"><img class="info-page__card-photo" src="{{ cover }}" alt="{{ material.title }}" loading="lazy" decoding="async"></a>{% endif %}{% endwith %}<h2><a href="{{ material.get_absolute_url }}">{{ material.title }}</a></h2>{% if material.subtitle %}<p>{{ material.subtitle }}</p>{% endif %}<p>{{ material.search_description|truncatechars:220 }}</p><a href="{{ material.get_absolute_url }}">Читать материал →</a></article>{% empty %}<p>{% if search_form.errors %}Проверьте поисковый запрос.{% elif search_active %}По вашему запросу в этом разделе ничего не найдено. Измените запрос или сбросьте поиск.{% else %}В этом разделе пока нет опубликованных материалов.{% endif %}</p>{% endfor %}</div>
+<div class="info-page__grid">{% for material in page_obj %}<article class="info-page__card"><a class="guide-card-link" href="{{ material.get_absolute_url }}">{% with cover=material.cover_url %}{% if cover %}<img class="info-page__card-photo" src="{{ cover }}" alt="" loading="lazy" decoding="async">{% endif %}{% endwith %}<h2>{{ material.title }}</h2></a>{% if material.subtitle %}<p>{{ material.subtitle }}</p>{% endif %}<p>{{ material.search_description|truncatechars:220 }}</p></article>{% empty %}<p>{% if search_form.errors %}Проверьте поисковый запрос.{% elif search_active %}По вашему запросу в этом разделе ничего не найдено. Измените запрос или сбросьте поиск.{% else %}В этом разделе пока нет опубликованных материалов.{% endif %}</p>{% endfor %}</div>
 {% if page_obj.paginator.num_pages > 1 %}<nav class="info-page__pagination" aria-label="Страницы материалов">{% if page_obj.has_previous %}<a href="{{ pagination_prefix }}page={{ page_obj.previous_page_number }}" rel="prev">← Назад</a>{% endif %}<span>{{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a href="{{ pagination_prefix }}page={{ page_obj.next_page_number }}" rel="next">Далее →</a>{% endif %}</nav>{% endif %}
 </main>{% endblock %}

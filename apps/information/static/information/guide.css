@@ -1,0 +1,29 @@
+.sea-guide .info-page {
+    width: min(1200px, calc(100% - 32px));
+    max-width: none;
+    margin: 20px auto;
+    padding-inline: 0;
+}
+.sea-guide .info-page h1 { font-size: clamp(1.75rem, 3vw, 2.25rem); }
+.sea-guide .info-page a { color: var(--sea-teal-dark); }
+.sea-guide .info-page__categories { margin-block: 12px; }
+.sea-guide .info-page__categories a { background: #ebe8da; }
+.sea-guide .info-page__categories a[aria-current] { background: var(--sea-teal); color: white; }
+.sea-guide .info-search,
+.sea-guide .info-subcategories,
+.sea-guide .guide-topics,
+.sea-guide .info-page__card {
+    border: 1px solid var(--sea-line);
+    border-radius: 12px;
+    background: var(--sea-card);
+}
+.sea-guide .info-search button { background: var(--sea-teal); min-height: 44px; }
+.sea-guide .guide-topics { padding: 0 14px; }
+.sea-guide .guide-topics summary { min-height: 44px; padding-block: 10px; cursor: pointer; font-weight: 650; }
+.sea-guide .guide-topics summary:focus-visible { outline: 3px solid #9b5818; outline-offset: -3px; }
+.sea-guide .info-page__card { min-width: 0; padding: 14px; }
+.sea-guide .info-page__card-photo { aspect-ratio: 16 / 9; margin-bottom: 12px; }
+.sea-guide .guide-card-link { display: block; text-decoration: none; }
+.sea-guide .guide-card-link:hover h2 { text-decoration: underline; }
+.sea-guide .info-page h2 { font: 700 1.125rem/1.4 system-ui, sans-serif; letter-spacing: normal; }
+.sea-guide .info-page__card p { margin-bottom: 0; }
