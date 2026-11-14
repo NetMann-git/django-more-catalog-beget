@@ -1,20 +1,29 @@
 {% extends "products/_sea_category_base.html" %}
+{% load static %}
 {% block content %}
-<main class="sea-home__container sea-catalog__main">
+<main class="sea-home__container sea-catalog__main sea-resorts">
   <nav class="sea-catalog__breadcrumb" aria-label="Путь к категории"><a href="{% url 'home' %}">Главная</a></nav>
-  <h1>Курорты и категории жилья</h1>
-  <div class="sea-categories__actions">
-    <a href="{% url 'catalog:housing_catalog' %}">Подобрать жильё по параметрам →</a>
-    <a href="{% url 'information:maps' %}">Карты курортов</a>
+  <div class="sea-resorts__heading">
+    <h1>Курорты</h1>
+    <div class="sea-categories__actions">
+      <a href="{% url 'catalog:housing_catalog' %}" aria-label="Подобрать жильё по параметрам">Подобрать жильё</a>
+      <a href="{% url 'information:maps' %}">Карты курортов</a>
+    </div>
   </div>
-  <div class="sea-home__grid sea-categories__grid">
+  <div class="sea-home__grid sea-resorts__grid">
     {% for group in groups %}
-    <section class="sea-categories__group">
-      <h2><a href="{{ group.root.get_absolute_url }}">{{ group.root.title }}</a></h2>
+    <section class="sea-resorts__card">
+      <a class="sea-resorts__link" href="{{ group.root.get_absolute_url }}">
+        {% if group.image %}<img src="{% static group.image %}" alt="" width="480" height="240" decoding="async"{% if forloop.counter > 4 %} loading="lazy"{% endif %}>{% endif %}
+        <h2>{{ group.title }} <span aria-hidden="true">→</span></h2>
+      </a>
       {% if group.children %}
-      <ul class="sea-home__chips">
-        {% for child in group.children %}<li><a href="{{ child.get_absolute_url }}">{{ child.title }}</a></li>{% endfor %}
-      </ul>
+      <details class="sea-resorts__types">
+        <summary>Подкатегории</summary>
+        <ul>
+          {% for child in group.children %}<li><a href="{{ child.get_absolute_url }}">{{ child.title }}</a></li>{% endfor %}
+        </ul>
+      </details>
       {% endif %}
     </section>
     {% empty %}<p>Категории пока не добавлены.</p>{% endfor %}

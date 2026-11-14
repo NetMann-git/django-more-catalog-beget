@@ -17,17 +17,6 @@
 }
 .sea-categories__actions a:first-child { background: var(--sea-teal); color: white; }
 .sea-categories__actions a:hover { text-decoration: underline; }
-.sea-categories__group {
-    padding: 18px;
-    border: 1px solid var(--sea-line);
-    border-radius: 14px;
-    background: var(--sea-card);
-    overflow-wrap: anywhere;
-}
-.sea-categories__group h2 { font-size: clamp(1.125rem, 1.6vw, 1.375rem); letter-spacing: normal; }
-.sea-categories__group h2 a { color: var(--sea-teal-dark); text-decoration: none; }
-.sea-categories__group h2 a:hover { text-decoration: underline; }
-.sea-categories__group ul { list-style: none; padding: 0; margin: 12px 0 0; }
 .sea-categories__children { margin-bottom: 14px; }
 .sea-categories__extra {
     margin-block: 10px;
@@ -42,3 +31,58 @@
 .sea-categories__description { overflow: auto; overflow-wrap: anywhere; }
 .sea-categories__description :is(img, iframe, video) { max-width: 100%; }
 .sea-categories__count { margin-top: 20px; color: var(--sea-text); }
+
+.sea-resorts__heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 20px;
+    margin-bottom: 20px;
+}
+.sea-resorts .sea-resorts__heading h1 {
+    margin: 0;
+    font-size: clamp(1.65rem, 2.5vw, 2.125rem);
+}
+.sea-resorts__heading .sea-categories__actions { margin: 0; }
+.sea-resorts .sea-resorts__grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+    align-items: start;
+    gap: 16px;
+}
+.sea-resorts__card {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    border: 1px solid var(--sea-line);
+    border-radius: 12px;
+    background: var(--sea-card);
+}
+.sea-resorts__link { display: block; border-radius: 11px; text-decoration: none; }
+.sea-resorts__link img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 8;
+    object-fit: cover;
+    border-radius: 11px 11px 0 0;
+}
+.sea-resorts .sea-resorts__link h2 {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 12px 14px;
+    color: var(--sea-teal-dark);
+    font: 700 1.125rem/1.4 system-ui, sans-serif;
+    letter-spacing: normal;
+}
+.sea-resorts__link:hover h2 { text-decoration: underline; }
+.sea-resorts__types { border-top: 1px solid var(--sea-line); }
+.sea-resorts__types summary {
+    min-height: 44px;
+    padding: 10px 14px;
+    color: var(--sea-text);
+    cursor: pointer;
+}
+.sea-resorts__types summary:focus-visible { outline: 3px solid #9b5818; outline-offset: -3px; }
+.sea-resorts__types ul { list-style: none; margin: 0; padding: 0 14px 8px; }
+.sea-resorts__types a { display: flex; align-items: center; min-height: 44px; color: var(--sea-teal-dark); }

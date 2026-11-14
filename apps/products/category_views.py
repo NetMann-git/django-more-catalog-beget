@@ -30,13 +30,30 @@ def public_tree():
 
 
 def category_index(request):
+    from .region_proposals import REGIONS
+
+    illustrations = {
+        73: 'promenade', 77: 'coastal-village', 114: 'forest-coast',
+        79: 'promenade', 80: 'coastal-town', 81: 'coastal-village',
+        85: 'forest-coast', 82: 'pebble-beach', 83: 'mountain-valley',
+        86: 'coastal-town', 84: 'pebble-beach',
+    }
     categories = public_tree()
     children = defaultdict(list)
     for category in categories:
         children[category.parent_id].append(category)
     return render(request, 'products/housing_categories.html', {
         'housing_public_page': True, 'housing_section': 'categories',
-        'groups': [{'root': root, 'children': children[root.pk]} for root in children[None]],
+        'groups': [
+            {
+                'root': root,
+                'title': REGIONS[root.joomla_id][0] if root.joomla_id in REGIONS else root.title,
+                'image': f'products/images/resorts/{illustrations[root.joomla_id]}.webp'
+                if root.joomla_id in illustrations else '',
+                'children': children[root.pk],
+            }
+            for root in children[None]
+        ],
         'page': SimpleNamespace(seo_title='Категории жилья', search_description='Жильё для отдыха по курортам и типам размещения.'),
     })
 
