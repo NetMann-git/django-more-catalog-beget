@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-{% block body_class %}sea-home sea-guide{% endblock %}
+{% block body_class %}sea-home sea-guide{% if not category and not maps_only %} sea-guide-index{% endif %}{% endblock %}
 {% block body_theme_class %}{% endblock %}
 {% block global_css %}
 <link rel="stylesheet" href="{% static 'css/header.css' %}">
