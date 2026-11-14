@@ -4,7 +4,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const comparisonCounts = document.querySelectorAll('#comparison-count, [data-comparison-count]');
     const emptyMessage = document.getElementById('empty-message');
     const tableWrapper = document.getElementById('comparison-table-wrapper');
-    const backLink = document.querySelector('.comparison-back-link');
+    const table = document.getElementById('comparison-table');
+    const scrollArea = table?.closest('.comparison-page__scroll');
+    const scrollHint = document.getElementById('comparison-scroll-hint');
+    let pendingRemoval = false;
+    if (scrollArea && scrollHint) {
+        const updateHint = () => { scrollHint.hidden = scrollArea.scrollWidth <= scrollArea.clientWidth; };
+        new ResizeObserver(updateHint).observe(scrollArea);
+        updateHint();
+    }
 
     function updateComparisonUI(productId, isAdded, count, message) {
         // Обновляем счётчик в шапке
@@ -18,19 +26,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (label) label.textContent = isAdded ? 'Убрать' : 'Сравнить';
             });
 
-        // Если мы на странице сравнения — обновляем её
-        if (window.location.pathname === '/catalog/comparison/') {
+        if (table && !isAdded) {
+            table.querySelectorAll('th, td').forEach(cell => {
+                if (cell.dataset.productId === productId) cell.remove();
+            });
             if (count === 0) {
-                // Показываем сообщение о пустом списке
-                if (emptyMessage) emptyMessage.style.display = 'block';
-                if (tableWrapper) tableWrapper.style.display = 'none';
-                if (backLink) backLink.style.display = 'none';
+                tableWrapper.style.display = 'none';
+                emptyMessage.style.display = 'block';
+                emptyMessage.querySelector('a').focus();
             } else {
-                if (emptyMessage) emptyMessage.style.display = 'none';
-                if (tableWrapper) tableWrapper.style.display = 'block';
-                if (backLink) backLink.style.display = 'block';
-                // Обновляем таблицу (перезагружаем страницу для простоты)
-                location.reload();
+                scrollHint.hidden = scrollArea.scrollWidth <= scrollArea.clientWidth;
+                (table.querySelector('.remove-btn') || scrollArea).focus({preventScroll: true});
             }
         }
 
@@ -55,8 +61,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.addEventListener('click', function(e) {
         const button = e.target.closest('.compare-btn[data-url]');
-        if (!button || !button.dataset.url.startsWith('/catalog/comparison/toggle/')) return;
+        if (!button || pendingRemoval || button.disabled || !button.dataset.url.startsWith('/catalog/comparison/toggle/')) return;
         e.preventDefault();
+        button.disabled = true;
+        pendingRemoval = Boolean(table);
         const url = button.dataset.url;
         const productId = button.dataset.productId;
 
@@ -77,6 +85,8 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             console.error('Error:', error);
-        });
+            showMessage('Не удалось обновить сравнение. Попробуйте ещё раз.');
+        })
+        .finally(() => { button.disabled = false; pendingRemoval = false; });
     });
 });

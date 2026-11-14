@@ -1,23 +1,85 @@
-/* Comparison is a collection page, with an accessible horizontal table. */
-.comparison-page__hint { color: #68758a; font-size: 13px; line-height: 1.6; margin: 0 0 12px; }
-.comparison-page__scroll { overflow-x: auto; border: 1px solid #dfe5ec; border-radius: 16px; background: #fff; }
-.comparison-page__scroll:focus-visible { outline: 3px solid #467db4; outline-offset: 3px; }
-.comparison-page #comparison-table { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: auto; margin: 0; color: #263449; font-size: 14px; }
-.comparison-page #comparison-table th, .comparison-page #comparison-table td { padding: 18px 20px; min-width: 230px; width: 230px; text-align: left; vertical-align: top; line-height: 1.55; border: 0; border-bottom: 1px solid #e8ecf1; border-right: 1px solid #e8ecf1; white-space: normal; overflow-wrap: anywhere; }
-.comparison-page #comparison-table tr > :first-child { position: sticky; left: 0; z-index: 2; min-width: 160px; width: 160px; max-width: 190px; background: #f5f7fa; color: #606e82; font-size: 13px; font-weight: 500; box-shadow: 1px 0 #dfe5ec; }
-.comparison-page #comparison-table thead th { position: relative; background: #fff; padding-top: 48px; }
-.comparison-page #comparison-table thead th:first-child { position: sticky; vertical-align: bottom; padding-top: 20px; font-weight: 600; }
-.comparison-page #comparison-table tr > :last-child { border-right: 0; }
-.comparison-page #comparison-table tbody tr:last-child > * { border-bottom: 0; }
-.comparison-page #comparison-table tbody tr:nth-child(even) td { background: #fafbfc; }
-.comparison-page #comparison-table tbody tr:hover td { background: #f1f5f9; }
-.comparison-page__car { display: block; color: #23334a; text-decoration: none; font-size: 16px; font-weight: 650; }
-.comparison-page__car:hover { color: #a33329; }
-.comparison-page__car img { display: block; width: 100%; max-width: 280px; height: auto; aspect-ratio: 4/3; object-fit: cover; border-radius: 10px; margin-bottom: 14px; }
-.comparison-page__placeholder { display: grid; place-items: center; aspect-ratio: 4/3; background: #f1f3f6; border-radius: 10px; color: #69758a; margin-bottom: 14px; font-size: 13px; }
-.comparison-page #comparison-table .remove-btn { position: absolute; top: 10px; right: 12px; display: grid; place-items: center; width: 30px; height: 30px; min-width: 30px; margin: 0; padding: 0; border: 1px solid #dfe5ec; border-radius: 8px; background: #fff; color: #68758a; cursor: pointer; font-size: 15px; box-shadow: none; }
-.comparison-page #comparison-table .remove-btn:hover { color: #9c3026; background: #fff1ef; border-color: #deb8b1; }
-.comparison-page__price { font-size: 21px; font-weight: 700; color: #202d40; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.comparison-page .availability-status { display: inline-block; white-space: normal; padding: 5px 9px; border-radius: 6px; font-size: 12px; }
-.comparison-page .comparison-back-link { margin-top: 22px; width: fit-content; }
-@media (max-width: 600px) { .comparison-page #comparison-table th, .comparison-page #comparison-table td { min-width: 200px; width: 200px; padding: 14px; } .comparison-page #comparison-table tr > :first-child { min-width: 110px; width: 110px; max-width: 110px; font-size: 12px; padding: 12px; } .comparison-page__price { font-size: 19px; } .comparison-page__scroll { border-radius: 12px; } }
+.comparison-page__heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 20px;
+    margin-bottom: 18px;
+}
+.comparison-page .comparison-page__heading h1 { margin: 0; }
+.comparison-page__count {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: #ebe8da;
+    font: 600 1rem/1.4 system-ui, sans-serif;
+    vertical-align: middle;
+    letter-spacing: normal;
+}
+.comparison-page__empty {
+    padding: clamp(18px, 5vw, 44px);
+    border: 1px solid var(--sea-line);
+    border-radius: 12px;
+    background: var(--sea-card);
+}
+.comparison-page .comparison-page__empty h2 { font-size: clamp(1.25rem, 3vw, 1.75rem); }
+.comparison-page__hint { color: var(--sea-text); font-size: .875rem; margin: 0 0 10px; }
+.comparison-page__scroll { overflow-x: auto; border: 1px solid var(--sea-line); border-radius: 12px; }
+.comparison-page__scroll:focus-visible { outline: 3px solid #9b5818; outline-offset: 3px; }
+.comparison-table { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--sea-card); font-size: .9375rem; }
+.comparison-table th, .comparison-table td {
+    min-width: 208px;
+    padding: 12px 14px;
+    text-align: left;
+    vertical-align: top;
+    overflow-wrap: anywhere;
+    border-right: 1px solid var(--sea-line);
+    border-bottom: 1px solid var(--sea-line);
+}
+.comparison-table tr > :first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    width: 148px;
+    min-width: 148px;
+    max-width: 148px;
+    background: #ebe8da;
+    color: var(--sea-ink);
+}
+.comparison-table tr > :last-child { border-right: 0; }
+.comparison-table tbody tr:last-child > * { border-bottom: 0; }
+.comparison-table tbody tr:nth-child(even) td { background: var(--sea-paper); }
+.comparison-table thead th { position: relative; padding-top: 48px; }
+.comparison-table thead th:first-child { vertical-align: bottom; }
+.comparison-table a { color: var(--sea-teal-dark); }
+.comparison-page__car { display: block; text-decoration: none; font-weight: 700; }
+.comparison-page__car:hover { text-decoration: underline; }
+.comparison-page__car img, .comparison-page__placeholder {
+    display: block;
+    width: 100%;
+    max-width: 240px;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+.comparison-page__placeholder { display: grid; place-items: center; background: var(--sea-paper); }
+.comparison-table .remove-btn {
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--sea-line);
+    border-radius: 8px;
+    background: var(--sea-card);
+    color: var(--sea-ink);
+    cursor: pointer;
+    font: inherit;
+}
+.comparison-table .remove-btn:hover { background: #f7e6e1; }
+@media (max-width: 600px) {
+    .comparison-table th, .comparison-table td { min-width: 164px; padding-inline: 10px; }
+    .comparison-table tr > :first-child { width: 92px; min-width: 92px; max-width: 92px; font-size: .8125rem; }
+}

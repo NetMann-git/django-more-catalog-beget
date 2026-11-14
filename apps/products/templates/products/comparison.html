@@ -1,48 +1,36 @@
 <!-- apps/products/templates/products/comparison.html -->
 
-{% extends "base.html" %}
+{% extends "products/_sea_category_base.html" %}
 {% load static %}
 {% load comparison_filters %}
 
 {% block extra_css %}
-    {{ block.super }}
-    <link rel="stylesheet" href="{% static 'products/css/catalog/catalog.css' %}">
-    <link rel="stylesheet" href="{% static 'wishlist/css/wishlist-page.css' %}">
     <link rel="stylesheet" href="{% static 'products/css/comparison-page.css' %}">
 {% endblock %}
+{% block extra_js %}<script src="{% static 'products/js/comparison.js' %}" defer></script>{% endblock %}
 
 {% block title %}Сравнение жилья{% endblock %}
 
 {% block content %}
-<div class="container wishlist-page comparison-page">
-
-    <!-- Хлебные крошки -->
-    <nav class="breadcrumbs" aria-label="Хлебные крошки">
-        <a href="/">Главная</a>
-        <span>/</span>
-        <a href="/catalog/housing/">Подбор жилья</a>
-        <span>/</span>
-        <span>Сравнение жилья</span>
+<main class="sea-home__container sea-catalog__main comparison-page">
+    <nav class="sea-catalog__breadcrumb" aria-label="Хлебные крошки">
+        <a href="{% url 'home' %}">Главная</a> /
+        <a href="{% url 'catalog:housing_catalog' %}">Подбор жилья</a> /
+        <span aria-current="page">Сравнение</span>
     </nav>
-
-    <header class="wishlist-page__header">
-        <div>
-            <p class="wishlist-page__eyebrow">Выбирайте по важным деталям</p>
-            <h1>Сравнение жилья <span class="wishlist-page__count" data-comparison-count>{{ products|length }}</span></h1>
-            <p class="wishlist-page__intro">Сопоставьте размещение, питание и удобства. Откройте карточку объекта, чтобы узнать подробности.</p>
-        </div>
-        <a class="wishlist-page__catalog" href="{% url 'catalog:housing_catalog' %}">Продолжить выбор →</a>
+    <header class="comparison-page__heading">
+        <h1>Сравнение жилья <span class="comparison-page__count" data-comparison-count aria-label="Количество объектов" aria-live="polite">{{ products|length }}</span></h1>
+        <a href="{% url 'wishlist:list' %}">Избранное</a>
     </header>
-    <div class="wishlist-page__empty" id="empty-message" {% if products %}style="display:none;"{% endif %}>
-        <div class="wishlist-page__empty-icon" aria-hidden="true">⇄</div>
+    <div class="comparison-page__empty" id="empty-message" {% if products %}style="display:none;"{% endif %}>
         <h2>Какие объекты сравним?</h2>
         <p>Нажмите «Сравнить» на карточках интересующих объектов жилья — здесь появится таблица их характеристик.</p>
-        <a class="wishlist-page__catalog wishlist-page__catalog--primary" href="{% url 'catalog:housing_catalog' %}">Подобрать жильё</a>
+        <a class="sea-catalog__details" href="{% url 'catalog:housing_catalog' %}">Подобрать жильё</a>
     </div>
 
     <!-- Таблица сравнения -->
     <div id="comparison-table-wrapper" {% if not products %}style="display:none;"{% endif %}>
-        <p class="comparison-page__hint" id="comparison-scroll-hint">Если таблица не помещается на экране, прокрутите её по горизонтали →</p>
+        <p class="comparison-page__hint" id="comparison-scroll-hint">Прокрутите таблицу вправо, чтобы увидеть остальные объекты.</p>
         <div class="comparison-page__scroll" role="region" aria-label="Таблица сравнения жилья" aria-describedby="comparison-scroll-hint" tabindex="0">
         <table class="comparison-table" id="comparison-table">
             <thead>
@@ -53,7 +41,7 @@
                         <th scope="col" data-product-id="{{ product.id }}">
                             <a class="comparison-page__car" href="{{ product.get_absolute_url }}">
                                 {% if card.cover %}
-                                <img src="{{ card.cover.url }}" alt="{{ product.title }}" width="400" height="300" loading="lazy">
+                                <img src="{{ card.cover.url }}" alt="" width="400" height="300" loading="lazy">
                                 {% else %}<span class="comparison-page__placeholder">Нет фото</span>{% endif %}
                                 <span>{{ product.title }}</span>
                             </a>
@@ -86,9 +74,9 @@
             </tbody>
         </table>
         </div>
-        <a href="{% url 'catalog:housing_catalog' %}" class="wishlist-page__catalog comparison-back-link">Вернуться к подбору жилья</a>
+        <a href="{% url 'catalog:housing_catalog' %}" class="sea-catalog__details comparison-back-link">Вернуться к подбору жилья</a>
     </div>
 
 
-</div>
+</main>
 {% endblock %}

@@ -2,6 +2,7 @@ from .housing_detail import housing_context
 # apps/products/views.py
 
 from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 
 from .constants import MAX_COMPARISON_ITEMS, MAX_RECENTLY_VIEWED
@@ -326,6 +327,7 @@ def remove_from_comparison(request, product_id):
     return redirect(request.META.get('HTTP_REFERER', 'catalog:catalog'))
 
 
+@ensure_csrf_cookie
 def comparison_list(request):
     products = ComparisonService.get_products(request)
 
