@@ -11,7 +11,7 @@
             {% if product.catalog_amenities %}<ul class="sea-catalog__amenities">{% for row in product.catalog_amenities|slice:":3" %}<li>{{ row.attribute_value.value }}</li>{% endfor %}</ul>{% endif %}
             <p class="sea-home__price">{% product_price product %}</p>
             <a class="sea-catalog__details" href="{{ product.get_absolute_url }}">Подробнее →</a>
-            {% if wishlist_page %}
+            {% if wishlist_page or history_page %}
             <button class="sea-catalog__details compare-btn{% if product.id in comparison_ids %} active{% endif %}" data-product-id="{{ product.id }}" data-url="{% url 'catalog:toggle_comparison_ajax' product.id %}" type="button"><span>{% if product.id in comparison_ids %}Убрать{% else %}Сравнить{% endif %}</span></button>
             {% endif %}
             {% include 'wishlist/_button.html' %}

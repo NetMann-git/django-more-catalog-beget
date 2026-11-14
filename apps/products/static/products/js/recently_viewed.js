@@ -38,6 +38,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (clearBtnHistory) {
         clearBtnHistory.addEventListener('click', function(e) {
             e.preventDefault();
+            if (clearBtnHistory.disabled) return;
+            clearBtnHistory.disabled = true;
+            const status = document.getElementById('history-clear-status');
+            if (status) status.textContent = '';
             const url = this.dataset.url;
 
             fetch(url, {
@@ -48,20 +52,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify({})
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Скрываем блок с товарами, показываем блок с сообщением
-                    const productsBlock = document.getElementById('recently-viewed-products');
-                    const emptyBlock = document.getElementById('empty-history-message');
-                    if (productsBlock) productsBlock.style.display = 'none';
-                    if (emptyBlock) emptyBlock.style.display = 'block';
-                    // Обновляем счётчик
-                    document.querySelectorAll('#recently-viewed-count, [data-recently-viewed-count]')
-                        .forEach(counter => { counter.textContent = '0'; });
-                }
+            .then(response => {
+                if (!response.ok) throw new Error(response.statusText);
+                return response.json();
             })
-            .catch(error => console.error('Ошибка:', error));
+            .then(data => {
+                if (!data.success) throw new Error("History was not cleared");
+                // Скрываем блок с товарами, показываем блок с сообщением
+                const productsBlock = document.getElementById('recently-viewed-products');
+                const emptyBlock = document.getElementById('empty-history-message');
+                if (productsBlock) productsBlock.style.display = 'none';
+                if (emptyBlock) {
+                    emptyBlock.style.display = 'block';
+                    emptyBlock.querySelector('a')?.focus();
+                }
+                // Обновляем счётчик
+                document.querySelectorAll('#recently-viewed-count, [data-recently-viewed-count]')
+                    .forEach(counter => { counter.textContent = '0'; });
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                if (status) status.textContent = 'Не удалось очистить историю. Попробуйте ещё раз.';
+            })
+            .finally(() => { clearBtnHistory.disabled = false; });
         });
     }
 

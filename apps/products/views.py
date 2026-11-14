@@ -132,23 +132,26 @@ def catalog(request):
 
     return render(request, "products/catalog.html", context)
 
+@ensure_csrf_cookie
 def recently_viewed_list(request):
     """История опубликованных объектов в порядке последних просмотров."""
+    from .housing_related import housing_cards
+
     recently_ids = request.session.get('recently_viewed', [])
     products_by_id = {
         product.pk: product
         for product in Product.objects.filter(pk__in=recently_ids, is_active=True)
-        .select_related('brand').prefetch_related('gallery')
+        .select_related('brand', 'location').prefetch_related('gallery')
     }
     products = [products_by_id[pk] for pk in dict.fromkeys(recently_ids)
                 if pk in products_by_id]
-    cards = []
-    for product in products:
-        gallery = list(product.gallery.all())
-        cards.append({'product': product, 'cover': product.image or
-                      (gallery[0].image if gallery else None)})
+    wishlist_ids = (
+        request.user.favorites.values_list('product_id', flat=True)
+        if request.user.is_authenticated else request.session.get('wishlist', [])
+    )
     context = {
-        'products': products, 'cards': cards,
+        'products': products, 'cards': housing_cards(products),
+        'wishlist_ids': set(wishlist_ids),
         'recently_viewed_ids': [product.pk for product in products],
         'housing_public_page': True,
     }

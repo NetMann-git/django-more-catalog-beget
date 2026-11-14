@@ -1,62 +1,36 @@
-<!-- apps/products/templates/products/recently_viewed.html -->
-
-{% extends "base.html" %}
+{% extends "products/_sea_category_base.html" %}
 {% load static %}
 
-{% block extra_css %}
-    {{ block.super }}
-    <link rel="stylesheet" href="{% static 'products/css/catalog/catalog.css' %}">
-    <link rel="stylesheet" href="{% static 'products/css/housing_categories.css' %}">
-    <link rel="stylesheet" href="{% static 'wishlist/css/wishlist-page.css' %}">
+{% block title %}История просмотров{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'wishlist/css/sea-wishlist.css' %}">{% endblock %}
+{% block extra_js %}
+{{ block.super }}
+{% if cards %}
+<script src="{% static 'products/js/comparison.js' %}" defer></script>
+<script src="{% static 'products/js/recently_viewed.js' %}" defer></script>
+{% endif %}
 {% endblock %}
 
-{% block title %}История просмотров{% endblock %}
-
 {% block content %}
-<div class="container wishlist-page history-page">
-    <!-- Хлебные крошки -->
-    <nav class="breadcrumbs" aria-label="Хлебные крошки">
-        <a href="/">Главная</a>
-        <span>/</span>
-        <a href="/catalog/housing/">Подбор жилья</a>
-        <span>/</span>
-        <span>История просмотров</span>
+<main class="sea-home__container sea-catalog__main sea-wishlist">
+    <nav class="sea-catalog__breadcrumb" aria-label="Хлебные крошки">
+        <a href="{% url 'home' %}">Главная</a> / <span aria-current="page">История просмотров</span>
     </nav>
-    <header class="wishlist-page__header">
-        <div>
-            <p class="wishlist-page__eyebrow">Недавно просмотренные</p>
-            <h1>История просмотров <span class="wishlist-page__count" data-recently-viewed-count>{{ products|length }}</span></h1>
-            <p class="wishlist-page__intro">Вернитесь к объектам жилья, которые вас заинтересовали. Сохраните понравившиеся варианты в избранное, чтобы не потерять их.</p>
-        </div>
-        <a class="wishlist-page__catalog" href="{% url 'catalog:housing_catalog' %}">Продолжить выбор →</a>
+    <header class="sea-wishlist__heading">
+        <h1>История просмотров <span class="sea-wishlist__count" data-recently-viewed-count aria-live="polite">{{ products|length }}</span></h1>
+        {% if products %}<a href="{% url 'catalog:housing_catalog' %}">Продолжить выбор →</a>{% endif %}
     </header>
-    <div id="recently-viewed-container">
-        <!-- Блок с товарами -->
-        <div id="recently-viewed-products" {% if not products %}style="display:none;"{% endif %}>
-            <div id="recently-viewed-grid" class="housing-category__grid">
-                {% for card in cards %}
-                    <div class="product-item" data-product-id="{{ card.product.id }}">
-                        {% include "products/_housing_history_card.html" with product=card.product %}
-                    </div>
-                {% endfor %}
-            </div>
-            <button type="button"
-                    id="clear-recently-viewed-history"
-                    class="wishlist-page__clear"
-                    data-url="{% url 'catalog:clear_recently_viewed_ajax' %}">
-                Очистить историю
-            </button>
+    <div id="recently-viewed-products"{% if not products %} style="display:none"{% endif %}>
+        {% include "products/_sea_catalog_cards.html" with history_page=True %}
+        <div class="sea-wishlist__actions">
+            <a href="{% url 'catalog:comparison' %}">К сравнению</a>
+            <button type="button" id="clear-recently-viewed-history" data-url="{% url 'catalog:clear_recently_viewed_ajax' %}">Очистить историю</button>
         </div>
-
-        <!-- Блок с сообщением о пустой истории -->
-        <div class="wishlist-page__empty" id="empty-history-message" {% if products %}style="display:none;"{% endif %}>
-            <div class="wishlist-page__empty-icon" aria-hidden="true">↶</div>
-            <h2>Здесь появятся просмотренные объекты жилья</h2>
-            <p>Откройте карточку объекта в каталоге — мы добавим его в историю, чтобы вы могли быстро вернуться к нему.</p>
-            <a href="{% url 'catalog:housing_catalog' %}" class="wishlist-page__catalog wishlist-page__catalog--primary">Подобрать жильё</a>
-        </div>
+        <p id="history-clear-status" role="status"></p>
     </div>
-
-
-</div>
+    <section class="sea-wishlist__empty" id="empty-history-message"{% if products %} style="display:none"{% endif %}>
+        <h2>Здесь появятся просмотренные объекты жилья</h2>
+        <a href="{% url 'catalog:housing_catalog' %}" class="sea-catalog__details">Подобрать жильё</a>
+    </section>
+</main>
 {% endblock %}
